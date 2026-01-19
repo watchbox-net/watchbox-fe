@@ -1,6 +1,6 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
-import MobileFrame from "@/components/common/MobileFrame";
+import HealthCheck from "@/components/common/HealthCheck";
 
 export const viewport: Viewport = {
     width: 'device-width',
@@ -22,6 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+          <HealthCheck />
           {children}
       </body>
     </html>

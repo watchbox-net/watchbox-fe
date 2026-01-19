@@ -10,7 +10,7 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-    title: 'Watch Box',
+    title: 'WatchBox',
     description: '...',
 }
 

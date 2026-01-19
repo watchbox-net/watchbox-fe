@@ -7,7 +7,7 @@ import axios, {
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-// 공통 인스턴스 (인증 불필요)
+// 공통 인스턴스 (로그인 불필요)
 export const publicApi: AxiosInstance = axios.create({
     baseURL: API_BASE_URL,
     timeout: 10000,
@@ -16,7 +16,7 @@ export const publicApi: AxiosInstance = axios.create({
     },
 });
 
-// 인증 필요 인스턴스
+// 개인별 인스턴스 (로그인 필요)
 export const privateApi: AxiosInstance = axios.create({
     baseURL: API_BASE_URL,
     timeout: 10000,

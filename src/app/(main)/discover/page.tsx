@@ -1,0 +1,34 @@
+import MobileFrame from '@/components/common/MobileFrame';
+import Header from '@/components/common/Header';
+import Link from 'next/link';
+import BottomMenu from '@/components/common/BottomMenu';
+
+const DISCOVER_LINKS = [
+  { href: '/discover/popular/movie', label: '인기 영화' },
+  { href: '/discover/popular/tv', label: '인기 TV' },
+  { href: '/discover/top-rated/movie', label: '높은 평가 영화' },
+  { href: '/discover/top-rated/tv', label: '높은 평가 TV' },
+];
+
+export default function DiscoverPage() {
+  return (
+    <MobileFrame>
+      <Header />
+      <main className="p-4">
+        <h1 className="text-xl font-bold mb-4">둘러보기</h1>
+        <div className="flex flex-col gap-2">
+          {DISCOVER_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="p-3 bg-gray-100 rounded hover:bg-gray-200"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+      </main>
+      <BottomMenu />
+    </MobileFrame>
+  );
+}

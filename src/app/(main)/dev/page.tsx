@@ -141,7 +141,7 @@ export default function DevPage() {
                         <Link href="/" className="bg-gray-200 px-3 py-1 rounded">홈</Link>
                         <Link href="/search" className="bg-gray-200 px-3 py-1 rounded">검색</Link>
                         <Link href="/box" className="bg-gray-200 px-3 py-1 rounded">박스</Link>
-                        <Link href="/history" className="bg-gray-200 px-3 py-1 rounded">기록</Link>
+                        <Link href="/record" className="bg-gray-200 px-3 py-1 rounded">시청기록</Link>
                         <Link href="/my" className="bg-gray-200 px-3 py-1 rounded">마이</Link>
                     </div>
                 </section>

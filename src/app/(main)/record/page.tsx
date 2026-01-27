@@ -1,8 +1,8 @@
 import MobileFrame from "@/components/common/MobileFrame";
 import Header from "@/components/common/Header";
-import BottomNav from "@/components/common/BottomNav";
+import BottomMenu from "@/components/common/BottomMenu";
 
-export default function HistoryPage() {
+export default function RecordPage() {
     return (
         <MobileFrame>
             <Header />
@@ -10,7 +10,7 @@ export default function HistoryPage() {
                 <h1>시청기록 화면</h1>
                 {/* 콘텐츠 */}
             </main>
-            <BottomNav />
+            <BottomMenu />
         </MobileFrame>
     );
 }

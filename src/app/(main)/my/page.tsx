@@ -1,6 +1,6 @@
 import MobileFrame from "@/components/common/MobileFrame";
 import Header from "@/components/common/Header";
-import BottomNav from "@/components/common/BottomNav";
+import BottomMenu from "@/components/common/BottomMenu";
 
 export default function MyPage() {
     return (
@@ -10,7 +10,7 @@ export default function MyPage() {
                 <h1>마이페이지 화면</h1>
                 {/* 콘텐츠 */}
             </main>
-            <BottomNav />
+            <BottomMenu />
         </MobileFrame>
     );
 }

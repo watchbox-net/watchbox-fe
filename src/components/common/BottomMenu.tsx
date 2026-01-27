@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname } from 'next/navigation'
 
-export default function BottomNav() {
+export default function BottomMenu() {
     const router = useRouter();
     const pathname = usePathname();
 
@@ -32,11 +32,11 @@ export default function BottomNav() {
                 박스
             </button>
             <button
-                onClick={() => router.push('/history')}
+                onClick={() => router.push('/record')}
                 className={`flex flex-col items-center gap-1 cursor-pointer
-                            ${isActive('/history') ? 'text-black font-semibold' : 'text-gray-400'}`}
+                            ${isActive('/record') ? 'text-black font-semibold' : 'text-gray-400'}`}
             >
-                기록
+                시청기록
             </button>
             <button
                 onClick={() => router.push('/my')}

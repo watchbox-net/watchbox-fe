@@ -5,9 +5,9 @@ import BottomMenu from '@/components/common/BottomMenu';
 
 const DISCOVER_LINKS = [
   { href: '/discover/popular/movie', label: '인기 영화' },
-  { href: '/discover/popular/tv', label: '인기 TV' },
+  { href: '/discover/popular/tv', label: '인기 시리즈' },
   { href: '/discover/top-rated/movie', label: '높은 평가 영화' },
-  { href: '/discover/top-rated/tv', label: '높은 평가 TV' },
+  { href: '/discover/top-rated/tv', label: '높은 평가 시리즈' },
 ];
 
 export default function DiscoverPage() {

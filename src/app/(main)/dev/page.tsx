@@ -249,7 +249,9 @@ export default function DevPage() {
                         {JSON.stringify(
                             {
                                 NODE_ENV: process.env.NODE_ENV,
-                                // 필요한 환경 변수들 추가
+                                NEXT_PUBLIC_SERVER_URL: process.env.NEXT_PUBLIC_SERVER_URL,
+                                NEXT_PUBLIC_SERVER_API_URL: process.env.NEXT_PUBLIC_SERVER_API_URL,
+                                NEXT_PUBLIC_SERVER_DEV_URL: process.env.NEXT_PUBLIC_SERVER_DEV_URL,
                             },
                             null,
                             2

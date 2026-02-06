@@ -4,10 +4,23 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { healthCheckAction, healthInfoAction, healthTimeAction } from '@/actions/health-check.action';
 
+const TEST_ACCOUNTS = [-1, -2, -3, -4, -5];
+
+interface LoginResponse {
+    memberId: number;
+}
+
 export default function DevPage() {
     const [healthCheckResult, setHealthCheckResult] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // 테스트 로그인 상태
+    const [selectedAccountId, setSelectedAccountId] = useState<number>(-1);
+    const [loginData, setLoginData] = useState<LoginResponse | null>(null);
+    const [memberInfo, setMemberInfo] = useState<string | null>(null);
+    const [authLoading, setAuthLoading] = useState(false);
+    const [authError, setAuthError] = useState<string | null>(null);
 
     const handleHealthCheck = async () => {
         setIsLoading(true);
@@ -73,10 +86,66 @@ export default function DevPage() {
         }
     };
 
+    // 테스트 로그인 (BFF 패턴 + HttpOnly Cookie)
+    const handleDevLogin = async () => {
+        setAuthLoading(true);
+        setAuthError(null);
+        setLoginData(null);
+        setMemberInfo(null);
+
+        try {
+            const response = await fetch('/api/dev/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ accountId: selectedAccountId }),
+            });
+
+            const result = await response.json();
+
+            if (!result.success) {
+                throw new Error(result.message || '로그인 실패');
+            }
+
+            // 토큰은 HttpOnly Cookie에 저장됨, 클라이언트는 memberId만 받음
+            setLoginData(result.data);
+        } catch (err: any) {
+            setAuthError(err.message ?? '로그인 실패');
+            console.error('Dev login error:', err);
+        } finally {
+            setAuthLoading(false);
+        }
+    };
+
+    // 회원 정보 조회 (BFF 패턴 + HttpOnly Cookie)
+    const handleGetMember = async () => {
+        setAuthLoading(true);
+        setAuthError(null);
+        setMemberInfo(null);
+
+        try {
+            // 토큰은 HttpOnly Cookie에서 자동으로 전송됨
+            const response = await fetch('/api/dev/member', {
+                method: 'GET',
+            });
+
+            const result = await response.json();
+
+            if (!result.success) {
+                throw new Error(result.message || '회원 조회 실패');
+            }
+
+            setMemberInfo(result.data);
+        } catch (err: any) {
+            setAuthError(err.message ?? '회원 조회 실패');
+            console.error('Get member error:', err);
+        } finally {
+            setAuthLoading(false);
+        }
+    };
+
     return (
         <div className="p-6">
             <h1 className="text-2xl font-bold mb-4">🛠️ 개발자 페이지</h1>
-
             <div className="space-y-4">
                 <section className="border p-4 rounded">
                     <h2 className="font-semibold mb-2">API 테스트</h2>
@@ -122,6 +191,59 @@ export default function DevPage() {
                 </section>
 
                 <section className="border p-4 rounded">
+                    <h2 className="font-semibold mb-2">테스트 로그인</h2>
+                    <div className="flex flex-wrap gap-2 mb-4 items-center">
+                        <select
+                            value={selectedAccountId}
+                            onChange={(e) => setSelectedAccountId(Number(e.target.value))}
+                            className="border rounded px-3 py-2"
+                        >
+                            {TEST_ACCOUNTS.map((id) => (
+                                <option key={id} value={id}>
+                                    테스터 {id}
+                                </option>
+                            ))}
+                        </select>
+                        <button
+                            onClick={handleDevLogin}
+                            disabled={authLoading}
+                            className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 disabled:bg-gray-400"
+                        >
+                            {authLoading ? '처리 중...' : '로그인'}
+                        </button>
+                        <button
+                            onClick={handleGetMember}
+                            disabled={authLoading}
+                            className="bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600 disabled:bg-gray-400"
+                        >
+                            {authLoading ? '처리 중...' : '회원 정보 조회'}
+                        </button>
+                    </div>
+
+                    {loginData && (
+                        <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded">
+                            <h3 className="font-semibold text-orange-800 mb-2">로그인 성공</h3>
+                            <p className="text-sm">memberId: {loginData.memberId}</p>
+                            <p className="text-xs text-gray-500 mt-1">토큰은 HttpOnly Cookie에 저장됨 (개발자 도구 → Application → Cookies에서 확인)</p>
+                        </div>
+                    )}
+
+                    {memberInfo && (
+                        <div className="mt-4 p-3 bg-teal-50 border border-teal-200 rounded">
+                            <h3 className="font-semibold text-teal-800 mb-2">회원 정보</h3>
+                            <pre className="text-sm whitespace-pre-wrap">{memberInfo}</pre>
+                        </div>
+                    )}
+
+                    {authError && (
+                        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded">
+                            <h3 className="font-semibold text-red-800 mb-2">오류</h3>
+                            <p className="text-sm text-red-600">{authError}</p>
+                        </div>
+                    )}
+                </section>
+
+                <section className="border p-4 rounded">
                     <h2 className="font-semibold mb-2">환경 변수</h2>
                     <pre className="bg-gray-100 p-2 rounded text-sm">
                         {JSON.stringify(
@@ -149,4 +271,27 @@ export default function DevPage() {
         </div>
     );
 }
+
+/*
+ * ========================================
+ * 함수 요약
+ * ========================================
+ *
+ * [API 테스트 - Server Action 사용]
+ * - handleHealthCheck: 백엔드 헬스체크 (GET /health)
+ * - handleHealthInfo: 서버 정보 조회 (GET /health/info)
+ * - handleHealthTime: 서버 시간 조회 (GET /health/time)
+ *
+ * [테스트 로그인 - BFF 패턴 + HttpOnly Cookie]
+ * - handleDevLogin: 테스트 계정 로그인 (POST /api/dev/login → GET /dev/login/{accountId})
+ *   → 토큰은 HttpOnly Cookie에 저장, 클라이언트는 memberId만 반환받음
+ *   → accessToken: 1시간, refreshToken: 7일 만료
+ *
+ * - handleGetMember: 로그인된 회원 정보 조회 (GET /api/dev/member → GET /dev/member)
+ *   → Cookie에서 accessToken 자동 전송, Authorization 헤더 불필요
+ *
+ * [흐름]
+ * 브라우저 → Next.js API Route → Spring 백엔드
+ * (브라우저가 직접 백엔드 호출하지 않음)
+ */
 

@@ -4,12 +4,12 @@ import axios, {
     InternalAxiosRequestConfig,
 } from 'axios';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+const SERVER_API_URL = process.env.NEXT_PUBLIC_SERVER_API_URL;
 
 // 공통 인스턴스 (로그인 불필요)
 export const publicApi: AxiosInstance = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: SERVER_API_URL,
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
@@ -18,7 +18,7 @@ export const publicApi: AxiosInstance = axios.create({
 
 // 개인별 인스턴스 (로그인 필요)
 export const privateApi: AxiosInstance = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: SERVER_API_URL,
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
@@ -144,4 +144,4 @@ const handleApiError = (error: AxiosError) => {
 publicApi.interceptors.response.use((response) => response, handleApiError);
 
 // 헬스체크
-export const healthCheck = () => axios.get(`${BASE_URL}/health`);
+export const healthCheck = () => axios.get(`${SERVER_URL}/health`);

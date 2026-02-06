@@ -1,0 +1,1 @@
+src/app/api/**/*.ts (또는 route.ts)는 모두 Next.js 서버에서 실행되는 API Route이다.

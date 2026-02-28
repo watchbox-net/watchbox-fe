@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     // accessToken 쿠키
     res.cookies.set('accessToken', data.accessToken, {
       httpOnly: true,
-      // secure: process.env.NODE_ENV === 'production',
+      // secure: process..env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60, // 1시간
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     // refreshToken 쿠키
     res.cookies.set('refreshToken', data.refreshToken, {
       httpOnly: true,
-      // secure: process.env.NODE_ENV === 'production',
+      // secure: process..env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // 7일
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
   }
 }
 /*
-secure: process.env.NODE_ENV === 'production'
+secure: process..env.NODE_ENV === 'production'
 → 배포 환경에서만 secure: true (HTTPS 필수)
 → 로컬에서는 secure: false (HTTP 허용)
  */

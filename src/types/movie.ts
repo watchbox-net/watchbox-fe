@@ -1,21 +1,12 @@
-// export interface MovieCard {}
-// export interface MovieDetail {}
+/** 영화 요약 (ContentSummary → MOVIE) */
 export interface MovieSummary {
-  id: number;
+  contentId: number;
+  mediaType: 'MOVIE';
+  popularity: number | null;
+  posterPath: string | null;
+  voteAverage: number | null;
+  voteCount: number | null;
+  year: number | null;
   title: string;
-  titleOriginal: string;
-  posterPath: string;
-  popularity: number;
-  voteAverage: number;
-  voteCount: number;
-  year: number;
-  genres: string[];
-}
-
-// 영화 목록 응답
-export interface MovieListResponse {
-  page: number;
-  totalPages: number;
-  totalResults: number;
-  movieList: MovieSummary[];
+  titleOriginal: string | null;
 }

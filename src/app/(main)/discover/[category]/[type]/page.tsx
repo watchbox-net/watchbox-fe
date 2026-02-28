@@ -25,41 +25,26 @@ const TYPE_MAP: Record<string, string> = {
 export default async function DiscoverCategoryPage({ params }: PageProps) {
   const { category, type } = await params;
 
-  // 유효하지 않은 경로 처리
   if (!CATEGORY_MAP[category] || !TYPE_MAP[type]) {
     notFound();
   }
 
   const title = `${CATEGORY_MAP[category]} ${TYPE_MAP[type]}`;
 
-  // 현재는 popular만 구현
-  // if (category !== 'popular') {
-  //   return (
-  //     <MobileFrame>
-  //       <Header />
-  //       <main className="p-4">
-  //         <h1 className="text-xl font-bold mb-4">{title}</h1>
-  //         <p>준비 중입니다.</p>
-  //       </main>
-  //       <BottomMenu />
-  //     </MobileFrame>
-  //   );
-  // }
-
   try {
     if (type === 'movie') {
-      const movieList = await fetchPopularMovieList();
+      const { contentItemList } = await fetchPopularMovieList();
       return (
         <MobileFrame>
           <Header />
           <main className="p-4">
             <h1 className="text-xl font-bold mb-4">{title}</h1>
             <div>
-              {movieList.map((movie) => (
-                <div key={movie.id} className="flex gap-2 mb-2">
-                  <span>{movie.id}</span>
-                  <span>{movie.title}</span>
-                  <span>{movie.voteAverage}</span>
+              {contentItemList.map((item) => (
+                <div key={item.contentSummary.contentId} className="flex gap-2 mb-2">
+                  <span>{item.contentSummary.contentId}</span>
+                  <span>{item.contentSummary.title}</span>
+                  <span>{item.contentSummary.voteAverage}</span>
                 </div>
               ))}
             </div>
@@ -69,19 +54,19 @@ export default async function DiscoverCategoryPage({ params }: PageProps) {
       );
     }
 
-    else if (type === 'tv') {
-      const tvList = await fetchPopularTvList();
+    if (type === 'tv') {
+      const { contentItemList } = await fetchPopularTvList();
       return (
         <MobileFrame>
           <Header />
           <main className="p-4">
             <h1 className="text-xl font-bold mb-4">{title}</h1>
             <div>
-              {tvList.map((tv) => (
-                <div key={tv.id} className="flex gap-2 mb-2">
-                  <span>{tv.id}</span>
-                  <span>{tv.nameKo || tv.nameEn}</span>
-                  <span>{tv.voteAverage}</span>
+              {contentItemList.map((item) => (
+                <div key={item.contentSummary.contentId} className="flex gap-2 mb-2">
+                  <span>{item.contentSummary.contentId}</span>
+                  <span>{item.contentSummary.name}</span>
+                  <span>{item.contentSummary.voteAverage}</span>
                 </div>
               ))}
             </div>
@@ -91,7 +76,7 @@ export default async function DiscoverCategoryPage({ params }: PageProps) {
       );
     }
   } catch (error) {
-      console.error(error);
+    console.error(error);
     return (
       <MobileFrame>
         <Header />

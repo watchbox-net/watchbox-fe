@@ -7,7 +7,7 @@ export default function SearchPage() {
         <MobileFrame>
             <Header />
             <main>
-                <h1>검색 화면</h1>
+                <h1 className="text-xl font-bold mb-4">검색화면</h1>
                 {/* 콘텐츠 */}
             </main>
             <BottomMenu />

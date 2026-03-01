@@ -106,7 +106,13 @@ export default function DevPage() {
                 throw new Error(result.message || '로그인 실패');
             }
 
-            // 토큰은 HttpOnly Cookie에 저장됨, 클라이언트는 memberId만 받음
+            // localStorage에도 토큰 저장 (privateApi 인증 헤더용)
+            if (result.data.accessToken) {
+                localStorage.setItem('accessToken', result.data.accessToken);
+            }
+            if (result.data.refreshToken) {
+                localStorage.setItem('refreshToken', result.data.refreshToken);
+            }
             setLoginData(result.data);
         } catch (err: any) {
             setAuthError(err.message ?? '로그인 실패');

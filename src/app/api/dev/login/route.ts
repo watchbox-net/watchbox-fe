@@ -19,10 +19,14 @@ export async function POST(request: NextRequest) {
 
     const data = await response.json();
 
-    // HttpOnly Cookie로 토큰 저장
+    // HttpOnly Cookie + localStorage용 토큰 함께 반환
     const res = NextResponse.json({
       success: true,
-      data: { memberId: data.memberId },
+      data: {
+        memberId: data.memberId,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+      },
     });
 
     // accessToken 쿠키

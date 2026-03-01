@@ -39,13 +39,20 @@ export default function BoxPage() {
   };
 
   const sheetItems = [
-    {
-      icon: '✓',
-      label: '초대',
-      onClick: () => {
-        // TODO: 초대 기능 구현
-      },
-    },
+    // 초대: 공유 박스에서만 표시
+    ...(selectedBox?.boxType === 'SHARED'
+      ? [
+          {
+            icon: '✓',
+            label: '초대',
+            onClick: () => {
+              if (selectedBox) {
+                router.push(`/box/invite/${selectedBox.boxId}`);
+              }
+            },
+          },
+        ]
+      : []),
     {
       icon: '✎',
       label: '수정',
@@ -62,12 +69,21 @@ export default function BoxPage() {
       {/* 헤더 */}
       <div className="flex items-center justify-between py-4 px-4">
         <h1 className="text-lg font-bold">박스</h1>
-        <button
-          onClick={() => router.push('/box/create')}
-          className="text-sm text-emerald-500 font-semibold cursor-pointer"
-        >
-          + 새 박스 만들기
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => router.push('/box/invitations')}
+            className="text-xl cursor-pointer"
+            title="초대 요청"
+          >
+            🔔
+          </button>
+          <button
+            onClick={() => router.push('/box/create')}
+            className="text-sm text-emerald-500 font-semibold cursor-pointer"
+          >
+            + 새 박스 만들기
+          </button>
+        </div>
       </div>
 
       <main className="flex-1 overflow-y-auto pb-24 px-4">

@@ -5,20 +5,19 @@ import axios, {
 } from 'axios';
 
 const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
-const SERVER_API_URL = process.env.NEXT_PUBLIC_SERVER_API_URL;
 
-// 공통 인스턴스 (로그인 불필요)
+// 공통 인스턴스 (로그인 불필요) - Next.js BFF 프록시 경유
 export const publicApi: AxiosInstance = axios.create({
-    baseURL: SERVER_API_URL,
+    baseURL: '/api',
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-// 개인별 인스턴스 (로그인 필요)
+// 개인별 인스턴스 (로그인 필요) - Next.js BFF 프록시 경유
 export const privateApi: AxiosInstance = axios.create({
-    baseURL: SERVER_API_URL,
+    baseURL: '/api',
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',

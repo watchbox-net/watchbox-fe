@@ -10,6 +10,7 @@ import type {
   BoxUpdateRequest,
   BoxUpdateResponse,
 } from '@/types/box';
+import type { ContentPageResponse } from '@/types/content';
 import type { ApiResponse } from '@/types/api';
 
 function authHeaders() {
@@ -79,6 +80,24 @@ export async function updateSharedBox(boxId: number, req: BoxUpdateRequest): Pro
   const { data } = await privateApi.patch<ApiResponse<BoxUpdateResponse>>(
     `/boxes/shared/${boxId}`,
     req,
+    { headers: authHeaders() },
+  );
+  return data.data;
+}
+
+/** 마이 박스 컨텐츠 리스트 조회 */
+export async function fetchMyBoxContents(boxId: number): Promise<ContentPageResponse> {
+  const { data } = await privateApi.get<ApiResponse<ContentPageResponse>>(
+    `/boxes/my/${boxId}/contents`,
+    { headers: authHeaders() },
+  );
+  return data.data;
+}
+
+/** 공유 박스 컨텐츠 리스트 조회 */
+export async function fetchSharedBoxContents(boxId: number): Promise<ContentPageResponse> {
+  const { data } = await privateApi.get<ApiResponse<ContentPageResponse>>(
+    `/boxes/shared/${boxId}/contents`,
     { headers: authHeaders() },
   );
   return data.data;

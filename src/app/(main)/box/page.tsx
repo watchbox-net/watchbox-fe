@@ -34,6 +34,10 @@ export default function BoxPage() {
     setSheetOpen(true);
   };
 
+  const goToContents = (boxId: number, boxType: BoxType, name: string) => {
+    router.push(`/box/${boxId}/contents?type=${boxType}&name=${encodeURIComponent(name)}`);
+  };
+
   const sheetItems = [
     {
       icon: '✓',
@@ -93,11 +97,16 @@ export default function BoxPage() {
                       key={box.boxId}
                       className="flex items-center gap-3 py-2 border-b border-neutral-800"
                     >
-                      <div className="w-24 h-16 rounded bg-neutral-800 shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-black truncate">
-                          {box.name}
-                        </p>
+                      <div
+                        className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"
+                        onClick={() => goToContents(box.boxId, 'MY', box.name)}
+                      >
+                        <div className="w-24 h-16 rounded bg-neutral-800 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-black truncate">
+                            {box.name}
+                          </p>
+                        </div>
                       </div>
                       <button
                         onClick={() => openMenu(box.boxId, 'MY')}
@@ -125,14 +134,19 @@ export default function BoxPage() {
                       key={box.boxId}
                       className="flex items-center gap-3 py-2 border-b border-neutral-800"
                     >
-                      <div className="w-24 h-16 rounded bg-neutral-800 shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-black truncate">
-                          {box.name}
-                        </p>
-                        <p className="text-xs text-neutral-500 truncate">
-                          {box.members.map((m) => m.boxMemberName).join(', ')}
-                        </p>
+                      <div
+                        className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"
+                        onClick={() => goToContents(box.boxId, 'SHARED', box.name)}
+                      >
+                        <div className="w-24 h-16 rounded bg-neutral-800 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-black truncate">
+                            {box.name}
+                          </p>
+                          <p className="text-xs text-neutral-500 truncate">
+                            {box.members.map((m) => m.boxMemberName).join(', ')}
+                          </p>
+                        </div>
                       </div>
                       <button
                         onClick={() => openMenu(box.boxId, 'SHARED')}

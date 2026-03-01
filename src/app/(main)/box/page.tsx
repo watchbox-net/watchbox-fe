@@ -1,16 +1,23 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
+import BottomSheet from '@/components/common/BottomSheet';
 import { fetchMyBoxList, fetchSharedBoxList } from '@/lib/api/box';
-import type { MyBoxResponse, SharedBoxResponse } from '@/types/box';
+import type { MyBoxResponse, SharedBoxResponse, BoxType } from '@/types/box';
 
 export default function BoxPage() {
+  const router = useRouter();
   const [myBoxes, setMyBoxes] = useState<MyBoxResponse[]>([]);
   const [sharedBoxes, setSharedBoxes] = useState<SharedBoxResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+
+  // 바텀시트 상태
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [selectedBox, setSelectedBox] = useState<{ boxId: number; boxType: BoxType } | null>(null);
 
   useEffect(() => {
     Promise.all([fetchMyBoxList(), fetchSharedBoxList()])
@@ -22,11 +29,41 @@ export default function BoxPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const openMenu = (boxId: number, boxType: BoxType) => {
+    setSelectedBox({ boxId, boxType });
+    setSheetOpen(true);
+  };
+
+  const sheetItems = [
+    {
+      icon: '✓',
+      label: '초대',
+      onClick: () => {
+        // TODO: 초대 기능 구현
+      },
+    },
+    {
+      icon: '✎',
+      label: '수정',
+      onClick: () => {
+        if (selectedBox) {
+          router.push(`/box/edit/${selectedBox.boxId}?type=${selectedBox.boxType}`);
+        }
+      },
+    },
+  ];
+
   return (
     <MobileFrame>
       {/* 헤더 */}
-      <div className="flex items-center justify-center py-4">
+      <div className="flex items-center justify-between py-4 px-4">
         <h1 className="text-lg font-bold">박스</h1>
+        <button
+          onClick={() => router.push('/box/create')}
+          className="text-sm text-emerald-500 font-semibold cursor-pointer"
+        >
+          + 새 박스 만들기
+        </button>
       </div>
 
       <main className="flex-1 overflow-y-auto pb-24 px-4">
@@ -62,6 +99,12 @@ export default function BoxPage() {
                           {box.name}
                         </p>
                       </div>
+                      <button
+                        onClick={() => openMenu(box.boxId, 'MY')}
+                        className="text-neutral-400 text-xl px-1 cursor-pointer shrink-0"
+                      >
+                        ⋮
+                      </button>
                     </li>
                   ))}
                 </ul>
@@ -91,6 +134,12 @@ export default function BoxPage() {
                           {box.members.map((m) => m.boxMemberName).join(', ')}
                         </p>
                       </div>
+                      <button
+                        onClick={() => openMenu(box.boxId, 'SHARED')}
+                        className="text-neutral-400 text-xl px-1 cursor-pointer shrink-0"
+                      >
+                        ⋮
+                      </button>
                     </li>
                   ))}
                 </ul>
@@ -99,6 +148,13 @@ export default function BoxPage() {
           </>
         )}
       </main>
+
+      {/* 바텀시트 */}
+      <BottomSheet
+        visible={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        items={sheetItems}
+      />
 
       <BottomMenu />
     </MobileFrame>

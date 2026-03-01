@@ -22,6 +22,19 @@ const searchByTab = {
   person: searchPerson,
 } as const;
 
+const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w185';
+
+/** ContentSummary에서 이미지 경로 추출 */
+function getImageUrl(summary: ContentSummary): string | null {
+  switch (summary.mediaType) {
+    case 'MOVIE':
+    case 'TV':
+      return summary.posterPath ? `${TMDB_IMAGE_BASE}${summary.posterPath}` : null;
+    case 'PERSON':
+      return summary.profilePath ? `${TMDB_IMAGE_BASE}${summary.profilePath}` : null;
+  }
+}
+
 /** ContentSummary에서 표시용 제목 추출 */
 function getDisplayTitle(summary: ContentSummary): string {
   switch (summary.mediaType) {
@@ -165,9 +178,17 @@ export default function SearchPage() {
                   key={`${item.contentSummary.mediaType}-${item.contentSummary.contentId}`}
                   className="flex items-center gap-3 px-4 py-3 border-b border-neutral-800"
                 >
-                  <span className="text-xs text-neutral-500 w-8 shrink-0 text-center uppercase">
-                    {item.contentSummary.mediaType}
-                  </span>
+                  {getImageUrl(item.contentSummary) ? (
+                    <img
+                      src={getImageUrl(item.contentSummary)!}
+                      alt={getDisplayTitle(item.contentSummary)}
+                      className="w-16 h-22 rounded object-cover shrink-0 bg-neutral-800"
+                    />
+                  ) : (
+                    <div className="w-16 h-22 rounded bg-neutral-800 shrink-0 flex items-center justify-center text-neutral-600 text-xs">
+                      No img
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-black truncate">
                       {getDisplayTitle(item.contentSummary)}

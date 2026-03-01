@@ -4,7 +4,8 @@ import { useState } from 'react';
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
 import { searchMulti, searchMovies, searchTv, searchPerson } from '@/lib/api/search';
-import type { ContentItem, ContentPageResponse, ContentSummary } from '@/types/content';
+import type { ContentItem, ContentPageResponse } from '@/types/content';
+import { getImageUrl, getDisplayTitle, getSubText } from '@/lib/utils/content';
 
 const TABS = [
   { key: 'multi', label: '전체' },
@@ -21,42 +22,6 @@ const searchByTab = {
   tv: searchTv,
   person: searchPerson,
 } as const;
-
-const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w185';
-
-/** ContentSummary에서 이미지 경로 추출 */
-function getImageUrl(summary: ContentSummary): string | null {
-  switch (summary.mediaType) {
-    case 'MOVIE':
-    case 'TV':
-      return summary.posterPath ? `${TMDB_IMAGE_BASE}${summary.posterPath}` : null;
-    case 'PERSON':
-      return summary.profilePath ? `${TMDB_IMAGE_BASE}${summary.profilePath}` : null;
-  }
-}
-
-/** ContentSummary에서 표시용 제목 추출 */
-function getDisplayTitle(summary: ContentSummary): string {
-  switch (summary.mediaType) {
-    case 'MOVIE':
-      return summary.title;
-    case 'TV':
-    case 'PERSON':
-      return summary.name;
-  }
-}
-
-/** ContentSummary에서 부제 추출 */
-function getSubText(summary: ContentSummary): string {
-  switch (summary.mediaType) {
-    case 'MOVIE':
-      return [summary.year, summary.titleOriginal].filter(Boolean).join(' · ');
-    case 'TV':
-      return [summary.year, summary.nameOriginal].filter(Boolean).join(' · ');
-    case 'PERSON':
-      return summary.nameOriginal ?? '';
-  }
-}
 
 export default function SearchPage() {
   const [activeTab, setActiveTab] = useState<TabKey>('multi');

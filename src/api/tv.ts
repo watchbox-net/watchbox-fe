@@ -2,13 +2,13 @@ import { ApiResponse } from '@/types/api';
 import type { ContentPageResponse } from '@/types/content';
 import type { TvSummary } from '@/types/tv';
 
-const SERVER_API_URL = process.env.NEXT_PUBLIC_SERVER_API_URL;
+const BACKEND_API_URL = process.env.BACKEND_API_URL || 'http://localhost:9000/api';
 
 export async function fetchPopularTvList(
   page: number = 1,
 ): Promise<ContentPageResponse<TvSummary>> {
   const response = await fetch(
-    `${SERVER_API_URL}/discover/popular/tv?page=${page}`,
+    `${BACKEND_API_URL}/discover/popular/tv?page=${page}`,
   );
   if (!response.ok) {
     throw new Error('Failed to fetch popular tv');

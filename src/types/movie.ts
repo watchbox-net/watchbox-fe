@@ -9,4 +9,5 @@ export interface MovieSummary {
   year: number | null;
   title: string;
   titleOriginal: string | null;
+  genreList: string[] | null;
 }

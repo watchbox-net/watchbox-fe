@@ -28,9 +28,10 @@ export function getDisplayTitle(summary: ContentSummary): string {
 export function getSubText(summary: ContentSummary): string {
   switch (summary.mediaType) {
     case 'MOVIE':
-      return [summary.year, summary.titleOriginal].filter(Boolean).join(' · ');
-    case 'TV':
-      return [summary.year, summary.nameOriginal].filter(Boolean).join(' · ');
+    case 'TV': {
+      const genres = summary.genreList?.join(', ') || '';
+      return [summary.year, genres].filter(Boolean).join(' · ');
+    }
     case 'PERSON':
       return summary.nameOriginal ?? '';
   }

@@ -6,9 +6,20 @@ export interface MemberResponse {
   profileImage: string | null;
 }
 
+/** 박스 초대 상태 */
+export type BoxInviteStatus = 'NONE' | 'PENDING' | 'MEMBER';
+
+/** 회원 검색 결과 (박스 초대 상태 포함) */
+export interface MemberSearchResponse {
+  memberId: number;
+  nickname: string;
+  profileImage: string | null;
+  boxInviteStatus: BoxInviteStatus;
+}
+
 /** 회원 검색 페이지 응답 */
 export interface MemberSearchPageResponse {
-  memberList: MemberResponse[];
+  memberSearchList: MemberSearchResponse[];
   totalCount: number;
   totalPages: number;
   currentPage: number;

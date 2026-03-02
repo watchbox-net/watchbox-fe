@@ -10,6 +10,7 @@ import {
   fetchSentInvitations,
   acceptInvitation,
   rejectInvitation,
+  cancelInvitation,
 } from '@/lib/api/member';
 import type { InvitationReceivedResponse, InvitationSentResponse } from '@/types/member';
 
@@ -55,6 +56,16 @@ export default function BoxInvitationsPage() {
       setToast('초대를 거절했습니다.');
     } catch {
       setToast('거절에 실패했습니다.');
+    }
+  };
+
+  const handleCancel = async (requestId: number) => {
+    try {
+      await cancelInvitation(requestId);
+      setSent((prev) => prev.filter((inv) => inv.requestId !== requestId));
+      setToast('초대를 취소했습니다.');
+    } catch {
+      setToast('취소에 실패했습니다.');
     }
   };
 
@@ -166,6 +177,15 @@ export default function BoxInvitationsPage() {
                             </p>
                           </div>
                         </div>
+
+                        {inv.status === 'PENDING' && (
+                          <button
+                            onClick={() => handleCancel(inv.requestId)}
+                            className="px-4 py-1.5 rounded-lg bg-neutral-700 text-white text-xs font-semibold cursor-pointer shrink-0"
+                          >
+                            취소
+                          </button>
+                        )}
                       </div>
                     </li>
                   ))}

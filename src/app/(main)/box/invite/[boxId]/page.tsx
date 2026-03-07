@@ -6,7 +6,7 @@ import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
 import Toast from '@/components/common/Toast';
 import { searchMembers, inviteToBox } from '@/lib/api/member';
-import type { MemberResponse } from '@/types/member';
+import type { MemberSearchResponse } from '@/types/member';
 
 export default function BoxInvitePage() {
   const router = useRouter();
@@ -14,11 +14,11 @@ export default function BoxInvitePage() {
   const boxId = Number(params.boxId);
 
   const [keyword, setKeyword] = useState('');
-  const [results, setResults] = useState<MemberResponse[]>([]);
+  const [results, setResults] = useState<MemberSearchResponse[]>([]);
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // 초대 완료된 memberId 목록
+  // 이번 세션에서 초대 보낸 memberId 목록
   const [invitedIds, setInvitedIds] = useState<Set<number>>(new Set());
   const [toast, setToast] = useState('');
 
@@ -28,8 +28,8 @@ export default function BoxInvitePage() {
 
     setLoading(true);
     try {
-      const res = await searchMembers(trimmed);
-      setResults(res.memberList);
+      const res = await searchMembers(trimmed, boxId);
+      setResults(res.memberSearchList);
     } catch {
       setResults([]);
     } finally {
@@ -49,6 +49,22 @@ export default function BoxInvitePage() {
       setToast(`${nickname}님에게 초대를 보냈습니다.`);
     } catch {
       setToast('초대에 실패했습니다.');
+    }
+  };
+
+  const getStatusInfo = (member: MemberSearchResponse) => {
+    // 이번 세션에서 방금 초대한 경우
+    if (invitedIds.has(member.memberId)) {
+      return { canInvite: false, label: 'sent' };
+    }
+    switch (member.boxInviteStatus) {
+      case 'MEMBER':
+        return { canInvite: false, label: 'member' };
+      case 'PENDING':
+        return { canInvite: false, label: 'pending' };
+      case 'NONE':
+      default:
+        return { canInvite: true, label: 'none' };
     }
   };
 
@@ -108,7 +124,7 @@ export default function BoxInvitePage() {
             </h2>
             <ul className="space-y-1">
               {results.map((member) => {
-                const isInvited = invitedIds.has(member.memberId);
+                const { canInvite, label } = getStatusInfo(member);
 
                 return (
                   <li
@@ -133,22 +149,21 @@ export default function BoxInvitePage() {
                       {member.nickname}
                     </span>
 
-                    {/* 초대 버튼 */}
-                    <button
-                      onClick={() => handleInvite(member.memberId, member.nickname)}
-                      disabled={isInvited}
-                      className="shrink-0 cursor-pointer"
-                    >
-                      {isInvited ? (
-                        <span className="w-7 h-7 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs">
-                          ✓
-                        </span>
-                      ) : (
+                    {/* 상태별 버튼 */}
+                    {canInvite ? (
+                      <button
+                        onClick={() => handleInvite(member.memberId, member.nickname)}
+                        className="shrink-0 cursor-pointer"
+                      >
                         <span className="w-7 h-7 rounded-full border border-neutral-500 flex items-center justify-center text-neutral-400 text-xs">
                           +
                         </span>
-                      )}
-                    </button>
+                      </button>
+                    ) : (
+                      <span className="w-7 h-7 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs shrink-0">
+                        ✓
+                      </span>
+                    )}
                   </li>
                 );
               })}

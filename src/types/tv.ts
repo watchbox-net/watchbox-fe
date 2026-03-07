@@ -9,4 +9,5 @@ export interface TvSummary {
   year: number | null;
   name: string;
   nameOriginal: string | null;
+  genreList: string[] | null;
 }

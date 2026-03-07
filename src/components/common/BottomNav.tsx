@@ -43,7 +43,9 @@ export default function BottomNav({ overridePathname }: BottomNavProps) {
     href === '/' ? pathname === '/' : pathname.startsWith(href);
 
   return (
-    <nav className="w-full bg-wb-dark-01 flex items-center justify-between px-4">
+    <nav className={`bg-wb-dark-01 flex items-center justify-between px-4 ${
+      overridePathname ? 'w-full' : 'fixed bottom-0 left-0 right-0 mx-auto max-w-[393px]'
+    }`}>
       {TABS.map((tab) => {
         const active = isActive(tab.href);
 

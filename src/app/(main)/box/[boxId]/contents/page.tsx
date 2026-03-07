@@ -120,10 +120,10 @@ export default function BoxContentsPage() {
                     )}
                   </div>
 
-                  {/* 시청 상태 아이콘 (간이) */}
+                  {/* 시청 상태 */}
                   {item.memberInteraction?.watchStatus && (
-                    <span className="text-xs text-neutral-500 shrink-0">
-                      ⊙
+                    <span className="text-xs text-neutral-400 shrink-0">
+                      {item.memberInteraction.watchStatus}
                     </span>
                   )}
                 </li>

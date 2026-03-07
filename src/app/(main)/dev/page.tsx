@@ -266,6 +266,14 @@ export default function DevPage() {
                 </section>
 
                 <section className="border p-4 rounded">
+                    <h2 className="font-semibold mb-2">디자인 시스템</h2>
+                    <div className="flex flex-wrap gap-2">
+                        <Link href="/dev/components" className="bg-purple-100 text-purple-800 px-3 py-1 rounded">Components</Link>
+                        <Link href="/dev/styles" className="bg-blue-100 text-blue-800 px-3 py-1 rounded">Styles</Link>
+                    </div>
+                </section>
+
+                <section className="border p-4 rounded">
                     <h2 className="font-semibold mb-2">빠른 네비게이션</h2>
                     <div className="flex flex-wrap gap-2">
                         <Link href="/" className="bg-gray-200 px-3 py-1 rounded">홈</Link>

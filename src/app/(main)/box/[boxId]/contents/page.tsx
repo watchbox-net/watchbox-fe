@@ -45,14 +45,14 @@ export default function BoxContentsPage() {
       <div className="flex items-center py-4 px-4 relative">
         <button
           onClick={() => router.back()}
-          className="text-black text-xl cursor-pointer"
+          className="text-wb-white text-xl cursor-pointer"
         >
           ‹
         </button>
         <h1 className="text-lg font-bold flex-1 text-center truncate px-8">
           {isShared ? '공유 박스 컨텐츠' : '마이 박스 컨텐츠'}
         </h1>
-        <button className="text-black text-xl cursor-pointer">+</button>
+        <button className="text-wb-white text-xl cursor-pointer">+</button>
       </div>
 
       <main className="flex-1 overflow-y-auto pb-24 px-4">
@@ -100,7 +100,7 @@ export default function BoxContentsPage() {
 
                   {/* 텍스트 정보 */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-black truncate">{title}</p>
+                    <p className="text-sm text-wb-white truncate">{title}</p>
                     <p className="text-xs text-neutral-400 truncate mt-0.5">
                       {sub}
                     </p>

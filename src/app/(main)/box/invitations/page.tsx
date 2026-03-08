@@ -84,7 +84,7 @@ export default function BoxInvitationsPage() {
       <div className="flex items-center py-4 px-4 relative">
         <button
           onClick={() => router.back()}
-          className="text-black text-xl cursor-pointer"
+          className="text-wb-white text-xl cursor-pointer"
         >
           ‹
         </button>
@@ -101,7 +101,7 @@ export default function BoxInvitationsPage() {
           <>
             {/* 받은 초대 요청 */}
             <section className="mb-8">
-              <h2 className="text-base font-bold text-black mb-4">받은 초대 요청</h2>
+              <h2 className="text-base font-bold text-wb-white mb-4">받은 초대 요청</h2>
               {received.length === 0 ? (
                 <p className="text-sm text-neutral-500">받은 초대가 없습니다.</p>
               ) : (
@@ -153,7 +153,7 @@ export default function BoxInvitationsPage() {
 
             {/* 보낸 초대 요청 */}
             <section>
-              <h2 className="text-base font-bold text-black mb-4">보낸 초대 요청</h2>
+              <h2 className="text-base font-bold text-wb-white mb-4">보낸 초대 요청</h2>
               {sent.length === 0 ? (
                 <p className="text-sm text-neutral-500">보낸 초대가 없습니다.</p>
               ) : (

@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Header from '@/components/common/Header';
+import { ChevronDownOutline } from '@/components/icons';
 import type { BoxType } from '@/types/box';
 
 interface BoxFormProps {
@@ -53,61 +55,63 @@ export default function BoxForm({
 
   return (
     <>
-      {/* 헤더 */}
-      <div className="flex items-center py-4 px-4 relative">
-        <button
-          onClick={() => router.back()}
-          className="text-black text-xl cursor-pointer"
-        >
-          ‹
-        </button>
-        <h1 className="text-lg font-bold flex-1 text-center">{title}</h1>
-        <div className="w-6" />
-      </div>
+      <Header variant="back" title={title} onBack={() => router.back()} />
 
-      <main className="flex-1 px-4 flex flex-col">
+      <main className="flex-1 px-[12px] flex flex-col">
         {/* 이름 */}
         <div className="mb-5">
-          <label className="block text-sm text-black mb-2">이름</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value.slice(0, 30))}
-            placeholder="박스 이름"
-            className="w-full bg-neutral-800 text-white rounded-lg px-4 py-3 text-sm outline-none placeholder-neutral-500"
-          />
-          <p className="text-xs text-neutral-500 text-right mt-1">
+          <label className="block text-[14px] font-medium text-wb-grey-03 mb-[5px]">
+            이름
+          </label>
+          <div className="py-[5px]">
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value.slice(0, 30))}
+              placeholder="박스 이름"
+              className="w-full h-[48px] bg-wb-dark-03 border-[0.5px] border-wb-dark-05 rounded-[8px] px-[15px] text-[15px] font-medium text-wb-white outline-none placeholder:text-wb-grey-01"
+            />
+          </div>
+          <p className="text-[10px] font-medium text-wb-grey-01 text-right mt-[2px] mr-[2px]">
             {name.length} / 30
           </p>
         </div>
 
         {/* 설명 */}
         <div className="mb-5">
-          <label className="block text-sm text-black mb-2">설명(선택)</label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value.slice(0, 100))}
-            placeholder="박스 설명"
-            rows={3}
-            className="w-full bg-neutral-800 text-white rounded-lg px-4 py-3 text-sm outline-none placeholder-neutral-500 resize-none"
-          />
-          <p className="text-xs text-neutral-500 text-right mt-1">
+          <label className="block text-[14px] font-medium text-wb-grey-03 mb-[5px]">
+            설명(선택)
+          </label>
+          <div className="py-[5px]">
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value.slice(0, 100))}
+              placeholder="박스 설명"
+              className="w-full h-[87px] bg-wb-dark-03 border-[0.5px] border-wb-dark-05 rounded-[8px] px-[15px] py-[16px] text-[15px] font-medium text-wb-white outline-none placeholder:text-wb-grey-01 resize-none"
+            />
+          </div>
+          <p className="text-[10px] font-medium text-wb-grey-01 text-right mt-[2px] mr-[2px]">
             {description.length} / 100
           </p>
         </div>
 
         {/* 박스 유형 */}
         <div className="mb-5">
-          <label className="block text-sm text-black mb-2">박스 유형</label>
-          <select
-            value={boxType}
-            onChange={(e) => setBoxType(e.target.value as BoxType)}
-            disabled={boxTypeDisabled}
-            className="w-full bg-neutral-800 text-white rounded-lg px-4 py-3 text-sm outline-none appearance-none cursor-pointer disabled:opacity-60"
-          >
-            <option value="MY">마이 박스</option>
-            <option value="SHARED">공유 박스</option>
-          </select>
+          <label className="block text-[14px] font-medium text-wb-grey-03 mb-[5px]">
+            박스 유형
+          </label>
+          <div className="py-[5px] relative">
+            <select
+              value={boxType}
+              onChange={(e) => setBoxType(e.target.value as BoxType)}
+              disabled={boxTypeDisabled}
+              className="w-full h-[48px] bg-wb-dark-03 border-[0.5px] border-wb-dark-05 rounded-[8px] px-[15px] pr-[40px] text-[15px] font-medium text-wb-white outline-none appearance-none cursor-pointer disabled:opacity-60"
+            >
+              <option value="MY">마이 박스</option>
+              <option value="SHARED">공유 박스</option>
+            </select>
+            <ChevronDownOutline className="absolute right-[15px] top-1/2 -translate-y-1/2 size-[22px] text-wb-grey-04 pointer-events-none" />
+          </div>
         </div>
 
         <div className="flex-1" />
@@ -116,8 +120,8 @@ export default function BoxForm({
         <button
           onClick={handleSubmit}
           disabled={!name.trim() || submitting}
-          className="w-full py-4 rounded-lg text-base font-bold mb-6 cursor-pointer
-            bg-emerald-500 text-black disabled:bg-neutral-700 disabled:text-neutral-500"
+          className="w-full h-[48px] rounded-[8px] text-[15px] font-bold text-wb-white mb-6 cursor-pointer shadow-[0px_1px_2px_0px_rgba(10,13,18,0.05)]
+            bg-wb-watched disabled:bg-wb-dark-04 disabled:text-wb-grey-01"
         >
           {submitting ? buttonLoadingText : buttonText}
         </button>

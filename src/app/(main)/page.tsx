@@ -15,13 +15,13 @@ export default function HomePage(){
         <MobileFrame>
             <Header variant="center" />
             <main className="p-4">
-                <h1 className="text-xl font-bold mb-4">홈화면</h1>
+                <h1 className="text-xl font-bold mb-4 text-wb-white">홈화면</h1>
                 <div className="flex flex-col gap-2">
                     {DISCOVER_LINKS.map((link) => (
                         <Link
                             key={link.href}
                             href={link.href}
-                            className="p-3 bg-gray-100 rounded hover:bg-gray-200"
+                            className="p-3 bg-wb-dark-04 text-wb-white rounded hover:bg-wb-dark-05"
                         >
                             {link.label}
                         </Link>

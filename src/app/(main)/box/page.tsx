@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
+import Header from '@/components/common/Header';
 import BottomSheet from '@/components/common/BottomSheet';
+import { PlusOutline } from '@/components/icons';
 import { fetchMyBoxList, fetchSharedBoxList } from '@/lib/api/box';
 import type { MyBoxResponse, SharedBoxResponse, BoxType } from '@/types/box';
 
@@ -66,25 +68,12 @@ export default function BoxPage() {
 
   return (
     <MobileFrame>
-      {/* 헤더 */}
-      <div className="flex items-center justify-between py-4 px-4">
-        <h1 className="text-lg font-bold">박스</h1>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => router.push('/box/invitations')}
-            className="text-xl cursor-pointer"
-            title="초대 요청"
-          >
-            🔔
-          </button>
-          <button
-            onClick={() => router.push('/box/create')}
-            className="text-sm text-emerald-500 font-semibold cursor-pointer"
-          >
-            + 새 박스 만들기
-          </button>
-        </div>
-      </div>
+      <Header
+        variant="icon2"
+        title="박스"
+        onAlarm={() => router.push('/box/invitations')}
+        onSearch={() => {/* TODO: 박스 검색 */}}
+      />
 
       <main className="flex-1 overflow-y-auto pb-24 px-4">
         {loading && (
@@ -101,12 +90,10 @@ export default function BoxPage() {
           <>
             {/* 마이 박스 */}
             <section className="mb-8">
-              <h2 className="text-base font-bold mb-3">
+              <h2 className="text-base font-bold mb-3 text-wb-white">
                 마이 박스 ({myBoxes.length})
               </h2>
-              {myBoxes.length === 0 ? (
-                <p className="text-sm text-neutral-500">박스가 없습니다.</p>
-              ) : (
+              {myBoxes.length > 0 && (
                 <ul className="space-y-3">
                   {myBoxes.map((box) => (
                     <li
@@ -119,7 +106,7 @@ export default function BoxPage() {
                       >
                         <div className="w-24 h-16 rounded bg-neutral-800 shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-black truncate">
+                          <p className="text-sm text-wb-white truncate">
                             {box.name}
                           </p>
                         </div>
@@ -134,16 +121,21 @@ export default function BoxPage() {
                   ))}
                 </ul>
               )}
+              <button
+                onClick={() => router.push('/box/create')}
+                className="flex items-center justify-center gap-2 w-full py-4 cursor-pointer"
+              >
+                <PlusOutline className="size-5 text-wb-grey-02" />
+                <span className="text-sm text-wb-grey-02">새 박스 만들기</span>
+              </button>
             </section>
 
             {/* 공유 박스 */}
             <section>
-              <h2 className="text-base font-bold mb-3">
+              <h2 className="text-base font-bold mb-3 text-wb-white">
                 공유 박스 ({sharedBoxes.length})
               </h2>
-              {sharedBoxes.length === 0 ? (
-                <p className="text-sm text-neutral-500">공유 박스가 없습니다.</p>
-              ) : (
+              {sharedBoxes.length > 0 && (
                 <ul className="space-y-3">
                   {sharedBoxes.map((box) => (
                     <li
@@ -156,7 +148,7 @@ export default function BoxPage() {
                       >
                         <div className="w-24 h-16 rounded bg-neutral-800 shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-black truncate">
+                          <p className="text-sm text-wb-white truncate">
                             {box.name}
                           </p>
                           <p className="text-xs text-neutral-500 truncate">
@@ -174,6 +166,13 @@ export default function BoxPage() {
                   ))}
                 </ul>
               )}
+              <button
+                onClick={() => router.push('/box/create')}
+                className="flex items-center justify-center gap-2 w-full py-4 cursor-pointer"
+              >
+                <PlusOutline className="size-5 text-wb-grey-02" />
+                <span className="text-sm text-wb-grey-02">새 박스 만들기</span>
+              </button>
             </section>
           </>
         )}

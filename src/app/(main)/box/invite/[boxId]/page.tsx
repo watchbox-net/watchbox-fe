@@ -74,7 +74,7 @@ export default function BoxInvitePage() {
       <div className="flex items-center py-4 px-4 relative">
         <button
           onClick={() => router.back()}
-          className="text-black text-xl cursor-pointer"
+          className="text-wb-white text-xl cursor-pointer"
         >
           ‹
         </button>
@@ -119,7 +119,7 @@ export default function BoxInvitePage() {
 
         {!loading && results.length > 0 && (
           <>
-            <h2 className="text-sm font-bold text-black mb-3">
+            <h2 className="text-sm font-bold text-wb-white mb-3">
               회원 검색 결과
             </h2>
             <ul className="space-y-1">
@@ -145,7 +145,7 @@ export default function BoxInvitePage() {
                     )}
 
                     {/* 닉네임 */}
-                    <span className="flex-1 text-sm text-black truncate">
+                    <span className="flex-1 text-sm text-wb-white truncate">
                       {member.nickname}
                     </span>
 

@@ -68,7 +68,7 @@ export default async function DiscoverCategoryPage({ params }: PageProps) {
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-black truncate">
+                  <p className="text-sm text-wb-white truncate">
                     {getDisplayTitle(item.contentSummary)}
                   </p>
                   <p className="text-xs text-neutral-500 truncate">

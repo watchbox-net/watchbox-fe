@@ -13,7 +13,7 @@ const DISCOVER_LINKS = [
 export default function HomePage(){
     return (
         <MobileFrame>
-            <Header />
+            <Header variant="center" />
             <main className="p-4">
                 <h1 className="text-xl font-bold mb-4">홈화면</h1>
                 <div className="flex flex-col gap-2">

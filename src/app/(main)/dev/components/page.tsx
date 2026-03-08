@@ -2,14 +2,31 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Header, { type HeaderVariant } from '@/components/common/Header';
 import BottomNav from '@/components/common/BottomNav';
 
-// ─── 탭별 데모 경로 ─────────────────────────────────────────
+// ─── BottomNav 데모 ────────────────────────────────────────
 const DEMO_PATHS = ['/', '/search', '/box', '/record', '/my'] as const;
 const DEMO_LABELS = ['홈', '검색', '박스', '기록', '마이'] as const;
 
+// ─── Header 데모 ───────────────────────────────────────────
+const HEADER_VARIANTS: { variant: HeaderVariant; label: string }[] = [
+  { variant: 'center', label: 'center' },
+  { variant: 'back', label: 'back' },
+  { variant: 'icon1', label: 'icon1' },
+  { variant: 'icon1-back', label: 'icon1 & back' },
+  { variant: 'icon2', label: 'icon2' },
+  { variant: 'icon2-back', label: 'icon2 & back' },
+  { variant: 'search-before', label: 'search before' },
+  { variant: 'search-after', label: 'search after' },
+  { variant: 'search-with-header', label: 'search with header' },
+  { variant: 'edit', label: 'edit' },
+  { variant: 'done', label: 'done' },
+];
+
 export default function DevComponentsPage() {
   const [activePath, setActivePath] = useState('/');
+  const [searchText, setSearchText] = useState('주토피아');
 
   return (
     <div className="min-h-screen bg-white p-6 max-w-5xl mx-auto">
@@ -26,6 +43,79 @@ export default function DevComponentsPage() {
           <Link href="/dev" className="text-blue-600 hover:underline">Dev 홈</Link>
         </div>
       </div>
+
+      {/* ── Header ────────────────────────────────────── */}
+      <section className="mb-12">
+        <h2 className="text-xl font-bold text-black mb-1">Header</h2>
+        <p className="text-sm text-neutral-500 mb-4">
+          <code className="bg-neutral-100 px-1 rounded text-xs">{'<Header />'}</code> — 11개 variant, 페이지별 헤더 구성
+        </p>
+
+        {/* 라이브 프리뷰 — 전체 variant */}
+        <div className="mx-auto w-[393px] bg-wb-dark-02 rounded-2xl overflow-hidden shadow-lg border border-neutral-200">
+          {HEADER_VARIANTS.map(({ variant, label }) => (
+            <div key={variant} className="border-b border-wb-dark-04 last:border-b-0">
+              <Header
+                variant={variant}
+                searchValue={variant === 'search-after' ? searchText : undefined}
+                onSearchChange={variant === 'search-after' ? setSearchText : undefined}
+                onSearchClear={variant === 'search-after' ? () => setSearchText('') : undefined}
+              />
+              <p className="text-[10px] text-wb-grey-01 text-center pb-1">{label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* 스펙 */}
+        <div className="mt-6 grid grid-cols-2 gap-4">
+          <div className="bg-neutral-50 rounded-lg p-4 text-xs">
+            <p className="font-semibold text-black mb-2">디자인 스펙</p>
+            <ul className="space-y-1 text-neutral-600">
+              <li>높이: <code className="bg-neutral-200 px-1 rounded">50px</code> (검색: 60px)</li>
+              <li>패딩: <code className="bg-neutral-200 px-1 rounded">px-10</code> <code className="bg-neutral-200 px-1 rounded">py-12</code></li>
+              <li>타이틀: <code className="bg-neutral-200 px-1 rounded">wb-header-title</code> 16px/Bold</li>
+              <li>타이틀 색상: <code className="bg-neutral-200 px-1 rounded">wb-grey-04</code> #D9D9D9</li>
+              <li>편집/완료: <code className="bg-neutral-200 px-1 rounded">wb-header-edit</code> 14px/Medium</li>
+              <li>편집/완료 색상: <code className="bg-neutral-200 px-1 rounded">wb-primary</code> #F59E0B</li>
+              <li>아이콘: 24×24px, <code className="bg-neutral-200 px-1 rounded">wb-grey-04</code></li>
+              <li>알림↔검색 간격: 15px</li>
+              <li>검색바: <code className="bg-neutral-200 px-1 rounded">wb-dark-05</code> h-36 rounded-10</li>
+              <li>검색 아이콘: 17×17px, <code className="bg-neutral-200 px-1 rounded">wb-grey-02</code></li>
+              <li>검색 텍스트: 15px/Regular, <code className="bg-neutral-200 px-1 rounded">wb-grey-02</code></li>
+            </ul>
+          </div>
+          <div className="bg-neutral-50 rounded-lg p-4 text-xs">
+            <p className="font-semibold text-black mb-2">사용법</p>
+            <pre className="overflow-x-auto text-neutral-700 whitespace-pre-wrap">{`import Header from
+  '@/components/common/Header';
+
+// 기본 (center)
+<Header />
+
+// 뒤로가기 + 아이콘 2개
+<Header
+  variant="icon2-back"
+  onBack={() => router.back()}
+  onAlarm={() => {}}
+  onSearch={() => {}}
+/>
+
+// 검색 입력
+<Header
+  variant="search-after"
+  searchValue={query}
+  onSearchChange={setQuery}
+  onSearchClear={() => setQuery('')}
+  onBack={() => router.back()}
+/>
+
+// 편집 모드
+<Header variant="edit" onEdit={...} />
+<Header variant="done"
+  onBack={...} onDone={...} />`}</pre>
+          </div>
+        </div>
+      </section>
 
       {/* ── Bottom Navigation Bar ─────────────────────────── */}
       <section className="mb-12">

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
+import Header from '@/components/common/Header';
 import { searchMulti, searchMovies, searchTv, searchPerson } from '@/lib/api/search';
 import type { ContentItem, ContentPageResponse } from '@/types/content';
 import { getImageUrl, getDisplayTitle, getSubText } from '@/lib/utils/content';
@@ -30,6 +31,7 @@ export default function SearchPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [isSearchActive, setIsSearchActive] = useState(false);
 
   const executeSearch = async (tab: TabKey, q: string) => {
     const trimmed = q.trim();
@@ -52,10 +54,6 @@ export default function SearchPage() {
 
   const handleSearch = () => executeSearch(activeTab, query);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') handleSearch();
-  };
-
   const handleTabChange = (tab: TabKey) => {
     setActiveTab(tab);
     if (query.trim()) {
@@ -63,46 +61,28 @@ export default function SearchPage() {
     }
   };
 
+  const handleClear = () => {
+    setQuery('');
+    setItems([]);
+    setSearched(false);
+  };
+
+  const handleBack = () => {
+    setIsSearchActive(false);
+    handleClear();
+  };
+
   return (
     <MobileFrame>
-      {/* 검색바 */}
-      <div className="px-4 pt-4 pb-2">
-        <div className="flex items-center gap-2 bg-neutral-800 rounded-full px-4 py-3">
-          <svg
-            className="w-5 h-5 text-neutral-400 shrink-0"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"
-            />
-          </svg>
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="영화, 시리즈, 인물을 검색해보세요"
-            className="flex-1 bg-transparent text-white text-sm placeholder-neutral-400 outline-none"
-          />
-          {query && (
-            <button
-              onClick={() => {
-                setQuery('');
-                setItems([]);
-                setSearched(false);
-              }}
-              className="text-neutral-400 cursor-pointer"
-            >
-              ✕
-            </button>
-          )}
-        </div>
-      </div>
+      <Header
+        variant={isSearchActive ? 'search-after' : 'search-before'}
+        searchValue={query}
+        onSearchChange={setQuery}
+        onSearchClear={handleClear}
+        onSearchSubmit={handleSearch}
+        onSearchBarClick={() => setIsSearchActive(true)}
+        onBack={searched ? handleBack : undefined}
+      />
 
       {/* 탭 */}
       <div className="flex border-b border-neutral-800">
@@ -110,7 +90,7 @@ export default function SearchPage() {
           <button
             key={tab.key}
             onClick={() => handleTabChange(tab.key)}
-            className={`flex-1 py-3 text-sm font-medium text-center cursor-pointer transition-colors
+            className={`flex-1 py-3 text-sm font-medium text-center transition-colors
               ${
                 activeTab === tab.key
                   ? 'text-black border-b-2 border-white'

@@ -1,5 +1,6 @@
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
+import Header from '@/components/common/Header';
 import { fetchPopularMovieList } from '@/api/movie';
 import { fetchPopularTvList } from '@/api/tv';
 import { notFound } from 'next/navigation';
@@ -45,8 +46,8 @@ export default async function DiscoverCategoryPage({ params }: PageProps) {
 
     return (
       <MobileFrame>
+        <Header variant="back" title={title} />
         <main className="flex-1 overflow-y-auto pb-24">
-          <h1 className="text-lg font-bold px-4 py-3">{title}</h1>
           <ul>
             {contentItems.map((item) => (
               <li
@@ -83,8 +84,8 @@ export default async function DiscoverCategoryPage({ params }: PageProps) {
     console.error(error);
     return (
       <MobileFrame>
+        <Header variant="back" title={title} />
         <main className="p-4">
-          <h1 className="text-lg font-bold mb-4">{title}</h1>
           <p className="text-neutral-500">오류가 발생했습니다.</p>
         </main>
         <BottomMenu />

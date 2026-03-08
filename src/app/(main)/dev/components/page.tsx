@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Header, { type HeaderVariant } from '@/components/common/Header';
+import TabNav from '@/components/common/TabNav';
 import BottomNav from '@/components/common/BottomNav';
 
 // ─── BottomNav 데모 ────────────────────────────────────────
@@ -27,6 +28,9 @@ const HEADER_VARIANTS: { variant: HeaderVariant; label: string }[] = [
 export default function DevComponentsPage() {
   const [activePath, setActivePath] = useState('/');
   const [searchText, setSearchText] = useState('주토피아');
+  const [tab2, setTab2] = useState(0);
+  const [tab3, setTab3] = useState(0);
+  const [tab4, setTab4] = useState(0);
 
   return (
     <div className="min-h-screen bg-white p-6 max-w-5xl mx-auto">
@@ -180,6 +184,145 @@ export default function DevComponentsPage() {
 //   박스(/box), 기록(/record), 마이(/my)
 // 활성: solid 아이콘 + white 텍스트
 // 비활성: outline 아이콘 + dark-05 텍스트`}</pre>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Tab Navigation ──────────────────────────────────── */}
+      <section className="mb-12">
+        <h2 className="text-xl font-bold text-black mb-1">Tab Navigation</h2>
+        <p className="text-sm text-neutral-500 mb-4">
+          <code className="bg-neutral-100 px-1 rounded text-xs">{'<TabNav />'}</code> — 탭 라벨 배열 + activeIndex, 2/3/4탭 지원
+        </p>
+
+        <div className="flex flex-col gap-8">
+          {/* ── 2탭 ── */}
+          <div>
+            <div className="flex flex-wrap gap-2 mb-3">
+              <span className="text-xs font-semibold text-black py-1">2탭:</span>
+              {['Tab1', 'Tab2'].map((label, i) => (
+                <button
+                  key={label}
+                  onClick={() => setTab2(i)}
+                  className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                    tab2 === i
+                      ? 'bg-black text-white border-black'
+                      : 'bg-white text-black border-neutral-300 hover:border-neutral-500'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <div className="mx-auto w-[393px] bg-wb-dark-02 rounded-2xl overflow-hidden shadow-lg border border-neutral-200">
+              <TabNav tabs={['Tab1', 'Tab2']} activeIndex={tab2} onChange={setTab2} />
+              <div className="h-24 flex items-center justify-center">
+                <p className="text-wb-grey-02 text-sm">
+                  활성: <span className="text-wb-white font-semibold">{['Tab1', 'Tab2'][tab2]}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* ── 3탭 ── */}
+          <div>
+            <div className="flex flex-wrap gap-2 mb-3">
+              <span className="text-xs font-semibold text-black py-1">3탭:</span>
+              {['Tab1', 'Tab2', 'Tab3'].map((label, i) => (
+                <button
+                  key={label}
+                  onClick={() => setTab3(i)}
+                  className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                    tab3 === i
+                      ? 'bg-black text-white border-black'
+                      : 'bg-white text-black border-neutral-300 hover:border-neutral-500'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <div className="mx-auto w-[393px] bg-wb-dark-02 rounded-2xl overflow-hidden shadow-lg border border-neutral-200">
+              <TabNav tabs={['Tab1', 'Tab2', 'Tab3']} activeIndex={tab3} onChange={setTab3} />
+              <div className="h-24 flex items-center justify-center">
+                <p className="text-wb-grey-02 text-sm">
+                  활성: <span className="text-wb-white font-semibold">{['Tab1', 'Tab2', 'Tab3'][tab3]}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* ── 4탭 ── */}
+          <div>
+            <div className="flex flex-wrap gap-2 mb-3">
+              <span className="text-xs font-semibold text-black py-1">4탭:</span>
+              {['Tab1', 'Tab2', 'Tab3', 'Tab4'].map((label, i) => (
+                <button
+                  key={label}
+                  onClick={() => setTab4(i)}
+                  className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                    tab4 === i
+                      ? 'bg-black text-white border-black'
+                      : 'bg-white text-black border-neutral-300 hover:border-neutral-500'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <div className="mx-auto w-[393px] bg-wb-dark-02 rounded-2xl overflow-hidden shadow-lg border border-neutral-200">
+              <TabNav tabs={['Tab1', 'Tab2', 'Tab3', 'Tab4']} activeIndex={tab4} onChange={setTab4} />
+              <div className="h-24 flex items-center justify-center">
+                <p className="text-wb-grey-02 text-sm">
+                  활성: <span className="text-wb-white font-semibold">{['Tab1', 'Tab2', 'Tab3', 'Tab4'][tab4]}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 스펙 */}
+        <div className="mt-6 grid grid-cols-2 gap-4">
+          <div className="bg-neutral-50 rounded-lg p-4 text-xs">
+            <p className="font-semibold text-black mb-2">디자인 스펙</p>
+            <ul className="space-y-1 text-neutral-600">
+              <li>각 탭: <code className="bg-neutral-200 px-1 rounded">flex-1</code> (균등 분할)</li>
+              <li>패딩: <code className="bg-neutral-200 px-1 rounded">pt-9 pb-10 px-10</code></li>
+              <li>텍스트: <code className="bg-neutral-200 px-1 rounded">wb-menu-tab</code> 16px/Medium</li>
+              <li>활성 텍스트: <code className="bg-neutral-200 px-1 rounded">wb-grey-04</code> #D9D9D9</li>
+              <li>활성 보더: <code className="bg-neutral-200 px-1 rounded">wb-white</code> #FFFFFF</li>
+              <li>비활성 텍스트: <code className="bg-neutral-200 px-1 rounded">wb-grey-02</code> #A3A3A3</li>
+              <li>비활성 보더: <code className="bg-neutral-200 px-1 rounded">wb-grey-02</code> #A3A3A3</li>
+              <li>2탭: 393/2 = 196.5px</li>
+              <li>3탭: 393/3 = 131px</li>
+              <li>4탭: 393/4 = 98.25px</li>
+            </ul>
+          </div>
+          <div className="bg-neutral-50 rounded-lg p-4 text-xs">
+            <p className="font-semibold text-black mb-2">사용법</p>
+            <pre className="overflow-x-auto text-neutral-700 whitespace-pre-wrap">{`import TabNav from
+  '@/components/common/TabNav';
+
+// 2탭
+<TabNav
+  tabs={['영화', '시리즈']}
+  activeIndex={active}
+  onChange={setActive}
+/>
+
+// 3탭
+<TabNav
+  tabs={['전체', '영화', '시리즈']}
+  activeIndex={active}
+  onChange={setActive}
+/>
+
+// 4탭
+<TabNav
+  tabs={['전체', '영화', '시리즈', '인물']}
+  activeIndex={active}
+  onChange={setActive}
+/>`}</pre>
           </div>
         </div>
       </section>

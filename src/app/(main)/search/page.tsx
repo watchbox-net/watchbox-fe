@@ -4,6 +4,7 @@ import { useState } from 'react';
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
+import TabNav from '@/components/common/TabNav';
 import { searchMulti, searchMovies, searchTv, searchPerson } from '@/lib/api/search';
 import type { ContentItem, ContentPageResponse } from '@/types/content';
 import { getImageUrl, getDisplayTitle, getSubText } from '@/lib/utils/content';
@@ -54,7 +55,8 @@ export default function SearchPage() {
 
   const handleSearch = () => executeSearch(activeTab, query);
 
-  const handleTabChange = (tab: TabKey) => {
+  const handleTabChange = (index: number) => {
+    const tab = TABS[index].key;
     setActiveTab(tab);
     if (query.trim()) {
       executeSearch(tab, query);
@@ -85,22 +87,11 @@ export default function SearchPage() {
       />
 
       {/* 탭 */}
-      <div className="flex border-b border-neutral-800">
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => handleTabChange(tab.key)}
-            className={`flex-1 py-3 text-sm font-medium text-center transition-colors
-              ${
-                activeTab === tab.key
-                  ? 'text-black border-b-2 border-white'
-                  : 'text-neutral-500'
-              }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <TabNav
+        tabs={TABS.map((t) => t.label)}
+        activeIndex={TABS.findIndex((t) => t.key === activeTab)}
+        onChange={handleTabChange}
+      />
 
       {/* 검색 결과 */}
       <main className="flex-1 overflow-y-auto pb-24">

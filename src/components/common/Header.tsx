@@ -30,6 +30,9 @@ interface HeaderProps {
   onAlarm?: () => void;
   onEdit?: () => void;
   onDone?: () => void;
+  /** icon1 / icon1-back 우측 아이콘을 커스텀할 때 사용 */
+  rightIcon?: React.ReactNode;
+  onRightIconClick?: () => void;
   searchValue?: string;
   onSearchChange?: (value: string) => void;
   onSearchClear?: () => void;
@@ -48,6 +51,8 @@ export default function Header({
   onAlarm,
   onEdit,
   onDone,
+  rightIcon,
+  onRightIconClick,
   searchValue,
   onSearchChange,
   onSearchClear,
@@ -100,8 +105,8 @@ export default function Header({
           )}
 
           {(variant === 'icon1' || variant === 'icon1-back') && (
-            <button type="button" onClick={onSearch} className="ml-auto">
-              <MagnifyingGlassOutline className="size-6 text-wb-grey-04" />
+            <button type="button" onClick={onRightIconClick ?? onSearch} className="ml-auto">
+              {rightIcon ?? <MagnifyingGlassOutline className="size-6 text-wb-grey-04" />}
             </button>
           )}
 

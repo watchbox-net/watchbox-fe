@@ -3,6 +3,9 @@
 import { useEffect, useState } from 'react';
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
+import Header from '@/components/common/Header';
+import TabNav from '@/components/common/TabNav';
+import { PlusOutline } from '@/components/icons';
 import { fetchWatchStatusList } from '@/lib/api/record';
 import type { ContentItem, WatchStatus } from '@/types/content';
 import { getImageUrl, getDisplayTitle, getSubText } from '@/lib/utils/content';
@@ -23,7 +26,7 @@ const WATCH_STATUS_LABEL: Record<WatchStatus, string> = {
 };
 
 export default function RecordPage() {
-  const [activeTab, setActiveTab] = useState<TabKey>('all');
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [allItems, setAllItems] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -35,6 +38,7 @@ export default function RecordPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const activeTab = TABS[activeTabIndex].key;
   const filteredItems =
     activeTab === 'all'
       ? allItems
@@ -45,28 +49,17 @@ export default function RecordPage() {
 
   return (
     <MobileFrame>
-      {/* 헤더 */}
-      <div className="flex items-center justify-center py-4">
-        <h1 className="text-lg font-bold">시청 기록</h1>
-      </div>
-
-      {/* 탭 */}
-      <div className="flex border-b border-neutral-800">
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`flex-1 py-3 text-sm font-medium text-center cursor-pointer transition-colors
-              ${
-                activeTab === tab.key
-                  ? 'text-black border-b-2 border-white'
-                  : 'text-neutral-500'
-              }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <Header
+        variant="icon1"
+        title="시청 기록"
+        rightIcon={<PlusOutline className="size-6 text-wb-grey-04" />}
+        onRightIconClick={() => {/* TODO: 추가 기능 */}}
+      />
+      <TabNav
+        tabs={TABS.map((t) => t.label)}
+        activeIndex={activeTabIndex}
+        onChange={setActiveTabIndex}
+      />
 
       {/* 리스트 */}
       <main className="flex-1 overflow-y-auto pb-24">

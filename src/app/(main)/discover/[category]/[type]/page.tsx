@@ -32,7 +32,7 @@ export default async function DiscoverCategoryPage({ params }: PageProps) {
     notFound();
   }
 
-  const title = `${CATEGORY_MAP[category]} 리스트`;
+  const title = `${CATEGORY_MAP[category]} 컨텐츠 리스트`;
 
   try {
     let contentItems: ContentItem[] = [];

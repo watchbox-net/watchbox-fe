@@ -40,7 +40,9 @@ export default function BottomNav({ overridePathname }: BottomNavProps) {
   const pathname = overridePathname ?? realPathname;
 
   const isActive = (href: string) =>
-    href === '/' ? pathname === '/' : pathname.startsWith(href);
+    href === '/'
+      ? pathname === '/' || pathname.startsWith('/discover')
+      : pathname.startsWith(href);
 
   return (
     <nav className={`bg-wb-dark-01 flex items-center justify-between px-4 ${

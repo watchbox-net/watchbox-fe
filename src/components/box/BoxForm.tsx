@@ -121,7 +121,7 @@ export default function BoxForm({
           onClick={handleSubmit}
           disabled={!name.trim() || submitting}
           className="w-full h-[48px] rounded-[8px] text-[15px] font-bold text-wb-white mb-6 cursor-pointer shadow-[0px_1px_2px_0px_rgba(10,13,18,0.05)]
-            bg-wb-watched disabled:bg-wb-dark-04 disabled:text-wb-grey-01"
+            bg-wb-green disabled:bg-wb-dark-04 disabled:text-wb-grey-01"
         >
           {submitting ? buttonLoadingText : buttonText}
         </button>

@@ -54,6 +54,7 @@ import {
   Squares2X2Icon as Squares2X2O,
   StopIcon as StopO,
   StopCircleIcon as StopCircleO,
+  TrashIcon as TrashO,
   UserIcon as UserO,
   UserCircleIcon as UserCircleO,
   UserGroupIcon as UserGroupO,
@@ -94,6 +95,7 @@ import {
   RectangleStackIcon as RectangleStackS,
   Squares2X2Icon as Squares2X2S,
   StopCircleIcon as StopCircleS,
+  TrashIcon as TrashS,
   UserIcon as UserS,
   UserCircleIcon as UserCircleS,
   UserGroupIcon as UserGroupS,
@@ -144,22 +146,24 @@ const COLOR_GROUPS: ColorGroup[] = [
     ],
   },
   {
-    title: 'Base',
-    description: '기본 흑백',
+    title: 'Light Theme',
+    description: '기본 흑백 및 라이트 테마',
     colors: [
-      { token: '--wb-black', twClass: 'wb-black', hex: '#000000', label: 'black' },
-      { token: '--wb-white', twClass: 'wb-white', hex: '#ffffff', label: 'white' },
+      { token: '--wb-black',    twClass: 'wb-black',    hex: '#000000', label: 'black' },
+      { token: '--wb-white-01', twClass: 'wb-white-01', hex: '#ffffff', label: 'white01' },
+      { token: '--wb-white-02', twClass: 'wb-white-02', hex: '#ebebeb', label: 'white02' },
     ],
   },
   {
     title: 'Brand',
-    description: '브랜드 컬러 및 시청 상태별 색상',
+    description: '브랜드 컬러',
     colors: [
-      { token: '--wb-primary',  twClass: 'wb-primary',  hex: '#f59e0b', label: 'primary (브랜드)' },
-      { token: '--wb-watched',  twClass: 'wb-watched',  hex: '#10b981', label: 'watched (완료)' },
-      { token: '--wb-watching', twClass: 'wb-watching', hex: '#3b82f6', label: 'watching (시청중)' },
-      { token: '--wb-paused',   twClass: 'wb-paused',   hex: '#f97316', label: 'paused (일시정지)' },
-      { token: '--wb-planned',  twClass: 'wb-planned',  hex: '#a855f7', label: 'planned (볼예정)' },
+      { token: '--wb-primary', twClass: 'wb-primary', hex: '#f59e0b', label: 'primary' },
+      { token: '--wb-green',   twClass: 'wb-green',   hex: '#10b981', label: 'green' },
+      { token: '--wb-blue',    twClass: 'wb-blue',    hex: '#3b82f6', label: 'blue' },
+      { token: '--wb-orange',  twClass: 'wb-orange',  hex: '#f97316', label: 'orange' },
+      { token: '--wb-purple',  twClass: 'wb-purple',  hex: '#a855f7', label: 'purple' },
+      { token: '--wb-red',     twClass: 'wb-red',     hex: '#ef4444', label: 'red' },
     ],
   },
 ];
@@ -232,7 +236,23 @@ const TEXT_STYLES: TextStyleGroup[] = [
   {
     category: 'Modal',
     styles: [
-      { name: 'body', twClass: 'wb-modal-body', size: 16, weight: 400, weightLabel: 'Regular', lineHeight: '1' },
+      { name: 'header', twClass: 'wb-modal-header', size: 20, weight: 700, weightLabel: 'Bold',    lineHeight: '1' },
+      { name: 'body',   twClass: 'wb-modal-body',   size: 16, weight: 400, weightLabel: 'Regular', lineHeight: '1' },
+    ],
+  },
+  {
+    category: 'Button',
+    styles: [
+      { name: 'small',  twClass: 'wb-button-small',  size: 13, weight: 500, weightLabel: 'Medium', lineHeight: '16px' },
+      { name: 'medium', twClass: 'wb-button-medium', size: 16, weight: 500, weightLabel: 'Medium', lineHeight: '24px' },
+    ],
+  },
+  {
+    category: 'Input',
+    styles: [
+      { name: 'tag',    twClass: 'wb-input-tag',    size: 14, weight: 500, weightLabel: 'Medium', lineHeight: '1' },
+      { name: 'body',   twClass: 'wb-input-body',   size: 15, weight: 500, weightLabel: 'Medium', lineHeight: '1' },
+      { name: 'footer', twClass: 'wb-input-footer', size: 10, weight: 500, weightLabel: 'Medium', lineHeight: '1' },
     ],
   },
 ];
@@ -297,6 +317,7 @@ const ICONS: IconEntry[] = [
   { name: 'squares-2x2', outline: Squares2X2O, solid: Squares2X2S },
   { name: 'stop', outline: StopO },
   { name: 'stop-circle', outline: StopCircleO, solid: StopCircleS },
+  { name: 'trash', outline: TrashO, solid: TrashS },
   { name: 'user', outline: UserO, solid: UserS },
   { name: 'user-circle', outline: UserCircleO, solid: UserCircleS },
   { name: 'user-group', outline: UserGroupO, solid: UserGroupS },
@@ -328,7 +349,7 @@ const CATEGORIES: Record<string, string[]> = {
   'Action': [
     'heart', 'hand-thumb-up', 'hand-thumb-down',
     'check', 'check-circle', 'plus', 'plus-circle',
-    'pencil', 'pencil-square', 'archive-box',
+    'pencil', 'pencil-square', 'archive-box', 'trash',
     'magnifying-glass', 'adjustments-horizontal',
     'x-circle', 'x-mark',
   ],
@@ -578,7 +599,7 @@ import { OutlineIcons, SolidIcons } from '@/components/icons';
 
 // 크기·색상 지정 (디자인 토큰 색상 사용 가능)
 <HeartOutline className="w-5 h-5 text-wb-primary" />
-<HeartSolid   className="w-6 h-6 text-wb-watched" />`}</pre>
+<HeartSolid   className="w-6 h-6 text-wb-green" />`}</pre>
       </div>
 
       </section>  {/* /Icons */}

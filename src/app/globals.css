@@ -19,16 +19,18 @@
   --wb-grey-03: #b1b1b1;
   --wb-grey-04: #d9d9d9;
 
-  /* Base */
+  /* Light Theme */
   --wb-black: #000000;
-  --wb-white: #ffffff;
+  --wb-white-01: #ffffff;
+  --wb-white-02: #ebebeb;
 
   /* Brand */
-  --wb-primary:  #f59e0b;  /* amber  — 브랜드 메인 */
-  --wb-watched:  #10b981;  /* emerald — 시청 완료 */
-  --wb-watching: #3b82f6;  /* blue   — 시청 중 */
-  --wb-paused:   #f97316;  /* orange — 일시정지 */
-  --wb-planned:  #a855f7;  /* purple — 볼 예정 */
+  --wb-primary: #f59e0b;
+  --wb-green:   #10b981;
+  --wb-blue:    #3b82f6;
+  --wb-orange:  #f97316;
+  --wb-purple:  #a855f7;
+  --wb-red:     #ef4444;
 }
 
 @theme inline {
@@ -48,16 +50,20 @@
   --color-wb-grey-03: var(--wb-grey-03);
   --color-wb-grey-04: var(--wb-grey-04);
 
-  /* Base */
+  /* Light Theme */
   --color-wb-black: var(--wb-black);
-  --color-wb-white: var(--wb-white);
+  --color-wb-white-01: var(--wb-white-01);
+  --color-wb-white-02: var(--wb-white-02);
+  /* 기존 wb-white 호환 alias */
+  --color-wb-white: var(--wb-white-01);
 
   /* Brand */
-  --color-wb-primary:  var(--wb-primary);
-  --color-wb-watched:  var(--wb-watched);
-  --color-wb-watching: var(--wb-watching);
-  --color-wb-paused:   var(--wb-paused);
-  --color-wb-planned:  var(--wb-planned);
+  --color-wb-primary: var(--wb-primary);
+  --color-wb-green:   var(--wb-green);
+  --color-wb-blue:    var(--wb-blue);
+  --color-wb-orange:  var(--wb-orange);
+  --color-wb-purple:  var(--wb-purple);
+  --color-wb-red:     var(--wb-red);
 
   /*--font-sans: var(--font-geist-sans);*/
   /*--font-mono: var(--font-geist-mono);*/
@@ -83,16 +89,24 @@ body {
  * 사용: className="wb-header-title"
  *
  * 확인된 속성 (Figma MCP):
- *   Header/title      — 16px Bold(700)   lh:1
- *   Category/title     — 20px Bold(700)   lh:1
- *   Menu/tab           — 16px Medium(500) lh:1
- *   Menu/bottom-bar    — 11px Regular(400) lh:normal  ls:-0.55px
- *   Menu/bottom-sheet  — 14px Medium(500) lh:24px
- *   List/Content/title — 16px Medium(500) lh:normal
+ *   Header/title       — 16px Bold(700)    lh:Auto
+ *   Header/edit        — 14px Medium(500)  lh:1
+ *   Category/title     — 20px Bold(700)    lh:1
+ *   List/Content/title — 16px Medium(500)  lh:normal
  *   List/Content/info  — 12px Regular(400) lh:normal
- *   List/Box/title     — 16px Medium(500) lh:24px
+ *   List/Box/title     — 16px Medium(500)  lh:24px
  *   List/Box/info      — 12px Regular(400) lh:20px
- *   List/Card/title    — 14px Medium(500) lh:normal
+ *   List/Card/title    — 14px Medium(500)  lh:normal
+ *   Menu/tab           — 16px Medium(500)  lh:1
+ *   Menu/bottom-sheet  — 14px Medium(500)  lh:24px
+ *   Menu/bottom-bar    — 11px Regular(400) lh:normal  ls:-0.55px
+ *   Modal/header       — 20px Bold(700)    lh:1
+ *   Modal/body         — 16px Regular(400) lh:1
+ *   Button/small       — 13px Medium(500)  lh:16px
+ *   Button/medium      — 16px Medium(500)  lh:24px
+ *   Input/tag          — 14px Medium(500)  lh:1
+ *   Input/body         — 15px Medium(500)  lh:1
+ *   Input/footer       — 10px Medium(500)  lh:1
  */
 
 /* ── Header ─────────────────────────────── */
@@ -176,8 +190,42 @@ body {
 }
 
 /* ── Modal ──────────────────────────────── */
+@utility wb-modal-header {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
 @utility wb-modal-body {
   font-size: 16px;
   font-weight: 400;
+  line-height: 1;
+}
+
+/* ── Button ─────────────────────────────── */
+@utility wb-button-small {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 16px;
+}
+@utility wb-button-medium {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+/* ── Input ──────────────────────────────── */
+@utility wb-input-tag {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+}
+@utility wb-input-body {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+}
+@utility wb-input-footer {
+  font-size: 10px;
+  font-weight: 500;
   line-height: 1;
 }

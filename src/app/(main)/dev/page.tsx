@@ -267,9 +267,18 @@ export default function DevPage() {
 
                 <section className="border p-4 rounded">
                     <h2 className="font-semibold mb-2">디자인 시스템</h2>
-                    <div className="flex flex-wrap gap-2">
-                        <Link href="/dev/components" className="bg-purple-100 text-purple-800 px-3 py-1 rounded">Components</Link>
-                        <Link href="/dev/styles" className="bg-blue-100 text-blue-800 px-3 py-1 rounded">Styles</Link>
+                    <div className="flex flex-col gap-3">
+                        <div className="flex flex-wrap gap-2">
+                            <Link href="/dev/styles" className="bg-blue-100 text-blue-800 px-3 py-1 rounded">Styles</Link>
+                        </div>
+                        <div>
+                            <p className="text-xs text-gray-500 mb-1">Components</p>
+                            <div className="flex flex-wrap gap-2">
+                                <Link href="/dev/components/navigation" className="bg-purple-100 text-purple-800 px-3 py-1 rounded">Navigation</Link>
+                                <Link href="/dev/components/user-action" className="bg-purple-100 text-purple-800 px-3 py-1 rounded">User Action</Link>
+                                <Link href="/dev/components/list" className="bg-purple-100 text-purple-800 px-3 py-1 rounded">List</Link>
+                            </div>
+                        </div>
                     </div>
                 </section>
 

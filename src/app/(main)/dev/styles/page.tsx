@@ -151,7 +151,7 @@ const COLOR_GROUPS: ColorGroup[] = [
     colors: [
       { token: '--wb-black',    twClass: 'wb-black',    hex: '#000000', label: 'black' },
       { token: '--wb-white-01', twClass: 'wb-white-01', hex: '#ffffff', label: 'white01' },
-      { token: '--wb-white-02', twClass: 'wb-white-02', hex: '#ebebeb', label: 'white02' },
+      { token: '--wb-white-02', twClass: 'wb-white-02', hex: '#d9d9d9', label: 'white02' },
     ],
   },
   {
@@ -163,7 +163,7 @@ const COLOR_GROUPS: ColorGroup[] = [
       { token: '--wb-blue',    twClass: 'wb-blue',    hex: '#3b82f6', label: 'blue' },
       { token: '--wb-orange',  twClass: 'wb-orange',  hex: '#f97316', label: 'orange' },
       { token: '--wb-purple',  twClass: 'wb-purple',  hex: '#a855f7', label: 'purple' },
-      { token: '--wb-red',     twClass: 'wb-red',     hex: '#ef4444', label: 'red' },
+      { token: '--wb-red',     twClass: 'wb-red',     hex: '#de4e4e', label: 'red' },
     ],
   },
 ];
@@ -236,8 +236,8 @@ const TEXT_STYLES: TextStyleGroup[] = [
   {
     category: 'Modal',
     styles: [
-      { name: 'header', twClass: 'wb-modal-header', size: 20, weight: 700, weightLabel: 'Bold',    lineHeight: '1' },
-      { name: 'body',   twClass: 'wb-modal-body',   size: 16, weight: 400, weightLabel: 'Regular', lineHeight: '1' },
+      { name: 'header', twClass: 'wb-modal-header', size: 20, weight: 600, weightLabel: 'SemiBold', lineHeight: '1' },
+      { name: 'body',   twClass: 'wb-modal-body',   size: 16, weight: 500, weightLabel: 'Medium',   lineHeight: '1' },
     ],
   },
   {

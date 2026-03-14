@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/common/Header';
 import { ChevronDownOutline } from '@/components/icons';
+import Button from '@/components/common/Button';
 import type { BoxType } from '@/types/box';
 
 interface BoxFormProps {
@@ -117,14 +118,16 @@ export default function BoxForm({
         <div className="flex-1" />
 
         {/* 제출 버튼 */}
-        <button
-          onClick={handleSubmit}
-          disabled={!name.trim() || submitting}
-          className="w-full h-[48px] rounded-[8px] text-[15px] font-bold text-wb-white mb-6 cursor-pointer shadow-[0px_1px_2px_0px_rgba(10,13,18,0.05)]
-            bg-wb-green disabled:bg-wb-dark-04 disabled:text-wb-grey-01"
-        >
-          {submitting ? buttonLoadingText : buttonText}
-        </button>
+        <div className="mb-6">
+          <Button
+            size="wide"
+            variant={!name.trim() || submitting ? 'off' : 'save'}
+            onClick={handleSubmit}
+            disabled={!name.trim() || submitting}
+          >
+            {submitting ? buttonLoadingText : buttonText}
+          </Button>
+        </div>
       </main>
     </>
   );

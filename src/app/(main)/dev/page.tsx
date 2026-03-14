@@ -276,6 +276,7 @@ export default function DevPage() {
                             <div className="flex flex-wrap gap-2">
                                 <Link href="/dev/components/navigation" className="bg-purple-100 text-purple-800 px-3 py-1 rounded">Navigation</Link>
                                 <Link href="/dev/components/user-action" className="bg-purple-100 text-purple-800 px-3 py-1 rounded">User Action</Link>
+                                <Link href="/dev/components/icons" className="bg-purple-100 text-purple-800 px-3 py-1 rounded">Icons</Link>
                                 <Link href="/dev/components/list" className="bg-purple-100 text-purple-800 px-3 py-1 rounded">List</Link>
                             </div>
                         </div>

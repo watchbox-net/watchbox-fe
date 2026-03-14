@@ -118,3 +118,18 @@ import * as _Solid from '@heroicons/react/24/solid';
 
 export const OutlineIcons = _Outline;
 export const SolidIcons = _Solid;
+
+// ─── Custom Icon Components (Figma Design) ──────────────────
+export { default as WatchStatusIcon } from './WatchStatusIcon';
+export { default as LikeIcon } from './LikeIcon';
+export { default as BoxIcon } from './BoxIcon';
+export { default as DeleteIcon } from './DeleteIcon';
+export { default as AddedStatusIcon } from './AddedStatusIcon';
+export { default as ProfileIcon } from './ProfileIcon';
+
+export type { WatchStatus, WatchStatusSize } from './WatchStatusIcon';
+export type { LikeIconSize } from './LikeIcon';
+export type { BoxIconVariant, BoxIconSize } from './BoxIcon';
+export type { DeleteIconVariant } from './DeleteIcon';
+export type { AddedStatusVariant } from './AddedStatusIcon';
+export type { ProfileIconVariant } from './ProfileIcon';

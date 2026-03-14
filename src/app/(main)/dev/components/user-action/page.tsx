@@ -97,6 +97,7 @@ export default function UserActionComponentsPage() {
           <p>본문 — wb-modal-body (16px Medium), text-wb-dark-05</p>
           <p>버튼 — Button modal 사이즈 사용, gap:10px, 우측 정렬</p>
           <p>error — ExclamationCircleSolid 아이콘 + 제목</p>
+          <p>Overlay — fixed inset-0, bg-wb-black/50 (반투명 검정), z-50</p>
         </div>
       </section>
 

@@ -47,7 +47,7 @@ import {
   PhotoIcon as PhotoO,
   PlayIcon as PlayO,
   PlayCircleIcon as PlayCircleO,
-  PlusIcon as PlusO,
+  PlusIcon as _PlusO,
   PlusCircleIcon as PlusCircleO,
   QuestionMarkCircleIcon as QuestionMarkCircleO,
   RectangleStackIcon as RectangleStackO,
@@ -64,8 +64,12 @@ import {
   VideoCameraIcon as VideoCameraO,
   VideoCameraSlashIcon as VideoCameraSlashO,
   XCircleIcon as XCircleO,
-  XMarkIcon as XMarkO,
+  XMarkIcon as _XMarkO,
 } from '@heroicons/react/24/outline';
+
+// plus, x-mark 기본 strokeWidth=2
+const PlusO = ((props: React.ComponentProps<typeof _PlusO>) => <_PlusO strokeWidth={2} {...props} />) as typeof _PlusO;
+const XMarkO = ((props: React.ComponentProps<typeof _XMarkO>) => <_XMarkO strokeWidth={2} {...props} />) as typeof _XMarkO;
 
 // ─── Solid 아이콘 ───────────────────────────────────────────
 import {

@@ -52,7 +52,7 @@ export {
   PhotoIcon as PhotoOutline,
   PlayIcon as PlayOutline,
   PlayCircleIcon as PlayCircleOutline,
-  PlusIcon as PlusOutline,
+  // PlusIcon → 아래에서 strokeWidth=2 래핑
   PlusCircleIcon as PlusCircleOutline,
   QuestionMarkCircleIcon as QuestionMarkCircleOutline,
   RectangleStackIcon as RectangleStackOutline,
@@ -69,8 +69,17 @@ export {
   VideoCameraIcon as VideoCameraOutline,
   VideoCameraSlashIcon as VideoCameraSlashOutline,
   XCircleIcon as XCircleOutline,
-  XMarkIcon as XMarkOutline,
+  // XMarkIcon → 아래에서 strokeWidth=2 래핑
 } from '@heroicons/react/24/outline';
+
+import React from 'react';
+import { PlusIcon as _PlusIcon, XMarkIcon as _XMarkIcon } from '@heroicons/react/24/outline';
+
+// Plus, XMark 기본 strokeWidth=2
+export const PlusOutline = ((props: React.ComponentProps<typeof _PlusIcon>) =>
+  React.createElement(_PlusIcon, { strokeWidth: 2, ...props })) as typeof _PlusIcon;
+export const XMarkOutline = ((props: React.ComponentProps<typeof _XMarkIcon>) =>
+  React.createElement(_XMarkIcon, { strokeWidth: 2, ...props })) as typeof _XMarkIcon;
 
 // ─── Solid (24x24 fill) ─────────────────────────────────────
 export {

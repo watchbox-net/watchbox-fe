@@ -22,6 +22,6 @@ export default function DeleteIcon({
   className,
 }: DeleteIconProps) {
   return (
-    <XMarkIcon className={`size-[24px] ${VARIANT_COLORS[variant]} ${className ?? ''}`} />
+    <XMarkIcon className={`size-[24px] ${VARIANT_COLORS[variant]} ${className ?? ''}`} strokeWidth={2} />
   );
 }

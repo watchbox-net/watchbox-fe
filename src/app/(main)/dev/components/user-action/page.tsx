@@ -6,6 +6,7 @@ import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal';
 import type { ModalVariant } from '@/components/common/Modal';
 import StatusMenu from '@/components/common/StatusMenu';
+import ContextMenu from '@/components/common/ContextMenu';
 
 const MODAL_DEMOS: { variant: ModalVariant; title: string; body: string; confirmLabel?: string }[] = [
   { variant: 'confirm',   title: '사용자 검색하기',     body: '공유 박스 멤버를 초대하기 위해\n사용자 검색 화면으로 이동하시겠습니까?' },
@@ -118,6 +119,46 @@ export default function UserActionComponentsPage() {
           <p>텍스트 — 14px Medium, lh:24px, text-wb-grey-03</p>
           <p>Hover — bg-wb-grey-01 (#525252), top/bottom rounded:10px</p>
           <p>아이콘 — WatchStatusIcon medium (24px)</p>
+        </div>
+      </section>
+
+      {/* ── Context Menu ────────────────────── */}
+      <section>
+        <h2 className="text-xl font-bold text-black mb-4">Context Menu</h2>
+
+        <div className="bg-wb-dark-02 rounded-lg p-6 flex gap-8">
+          <div>
+            <p className="text-xs font-semibold text-neutral-500 mb-3">초대 / 수정 / 삭제</p>
+            <ContextMenu
+              items={[
+                { type: 'invite', onClick: () => alert('초대') },
+                { type: 'edit',   onClick: () => alert('수정') },
+                { type: 'delete', onClick: () => alert('삭제') },
+              ]}
+            />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-neutral-500 mb-3">추가 / 도움말 / 수정 / 초대</p>
+            <ContextMenu
+              items={[
+                { type: 'add' },
+                { type: 'help' },
+                { type: 'edit' },
+                { type: 'invite' },
+              ]}
+            />
+          </div>
+        </div>
+
+        {/* 스펙 */}
+        <div className="bg-neutral-100 rounded-lg p-4 text-sm text-neutral-700 space-y-1 mt-4">
+          <p className="font-semibold text-black mb-2">디자인 스펙</p>
+          <p>배경 — bg-wb-dark-05 (#353535), rounded:15px, min-w:110px</p>
+          <p>아이템 — h:45px, px:16px, gap:24px</p>
+          <p>텍스트 — 14px Medium, lh:24px, text-wb-grey-03</p>
+          <p>Hover — bg-wb-grey-01 (#525252), top/bottom rounded:10px</p>
+          <p>아이콘 — heroicons outline 24px, text-wb-grey-03</p>
+          <p>항목 — invite(초대), edit(수정), delete(삭제), add(추가), help(도움말)</p>
         </div>
       </section>
 

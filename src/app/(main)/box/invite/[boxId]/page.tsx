@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
 import Toast from '@/components/common/Toast';
+import Modal from '@/components/common/Modal';
 import { searchMembers, inviteToBox } from '@/lib/api/member';
+import { fetchSharedBox } from '@/lib/api/box';
 import type { MemberSearchResponse } from '@/types/member';
 
 export default function BoxInvitePage() {
@@ -21,6 +23,14 @@ export default function BoxInvitePage() {
   // 이번 세션에서 초대 보낸 memberId 목록
   const [invitedIds, setInvitedIds] = useState<Set<number>>(new Set());
   const [toast, setToast] = useState('');
+
+  // 박스 이름 & 초대 확인 모달
+  const [boxName, setBoxName] = useState('');
+  const [confirmTarget, setConfirmTarget] = useState<{ memberId: number; nickname: string } | null>(null);
+
+  useEffect(() => {
+    fetchSharedBox(boxId).then((box) => setBoxName(box.name)).catch(() => {});
+  }, [boxId]);
 
   const handleSearch = async () => {
     const trimmed = keyword.trim();
@@ -42,7 +52,14 @@ export default function BoxInvitePage() {
     if (e.key === 'Enter') handleSearch();
   };
 
-  const handleInvite = async (memberId: number, nickname: string) => {
+  const handleInviteClick = (memberId: number, nickname: string) => {
+    setConfirmTarget({ memberId, nickname });
+  };
+
+  const handleInviteConfirm = async () => {
+    if (!confirmTarget) return;
+    const { memberId, nickname } = confirmTarget;
+    setConfirmTarget(null);
     try {
       await inviteToBox(boxId, memberId);
       setInvitedIds((prev) => new Set(prev).add(memberId));
@@ -152,7 +169,7 @@ export default function BoxInvitePage() {
                     {/* 상태별 버튼 */}
                     {canInvite ? (
                       <button
-                        onClick={() => handleInvite(member.memberId, member.nickname)}
+                        onClick={() => handleInviteClick(member.memberId, member.nickname)}
                         className="shrink-0 cursor-pointer"
                       >
                         <span className="w-7 h-7 rounded-full border border-neutral-500 flex items-center justify-center text-neutral-400 text-xs">
@@ -174,6 +191,15 @@ export default function BoxInvitePage() {
 
       <BottomMenu />
       <Toast message={toast} visible={!!toast} onClose={() => setToast('')} />
+
+      <Modal
+        visible={!!confirmTarget}
+        variant="body-only"
+        body={`${confirmTarget?.nickname}님을 박스에 초대하시겠습니까?`}
+        confirmLabel="초대"
+        onCancel={() => setConfirmTarget(null)}
+        onConfirm={handleInviteConfirm}
+      />
     </MobileFrame>
   );
 }

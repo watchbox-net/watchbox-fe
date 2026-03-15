@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal';
 import type { ModalVariant } from '@/components/common/Modal';
+import StatusMenu from '@/components/common/StatusMenu';
 
 const MODAL_DEMOS: { variant: ModalVariant; title: string; body: string; confirmLabel?: string }[] = [
   { variant: 'confirm',   title: '사용자 검색하기',     body: '공유 박스 멤버를 초대하기 위해\n사용자 검색 화면으로 이동하시겠습니까?' },
@@ -98,6 +99,25 @@ export default function UserActionComponentsPage() {
           <p>버튼 — Button modal 사이즈 사용, gap:10px, 우측 정렬</p>
           <p>error — ExclamationCircleSolid 아이콘 + 제목</p>
           <p>Overlay — fixed inset-0, bg-wb-black/50 (반투명 검정), z-50</p>
+        </div>
+      </section>
+
+      {/* ── Status Menu ─────────────────────── */}
+      <section>
+        <h2 className="text-xl font-bold text-black mb-4">Status Menu</h2>
+
+        <div className="bg-wb-dark-02 rounded-lg p-6 inline-block">
+          <StatusMenu onSelect={(action) => alert(`선택: ${action}`)} />
+        </div>
+
+        {/* 스펙 */}
+        <div className="bg-neutral-100 rounded-lg p-4 text-sm text-neutral-700 space-y-1 mt-4">
+          <p className="font-semibold text-black mb-2">디자인 스펙</p>
+          <p>배경 — bg-wb-dark-05 (#353535), rounded:15px, w:135px</p>
+          <p>아이템 — h:45px, py:5px, gap:24px</p>
+          <p>텍스트 — 14px Medium, lh:24px, text-wb-grey-03</p>
+          <p>Hover — bg-wb-grey-01 (#525252), top/bottom rounded:10px</p>
+          <p>아이콘 — WatchStatusIcon medium (24px)</p>
         </div>
       </section>
 

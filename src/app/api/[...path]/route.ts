@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_API_URL = process.env.BACKEND_API_URL || 'http://localhost:9000/api';
+const BACKEND_API_URL = process.env.BACKEND_API_URL;
 
 /**
  * catch-all BFF 프록시

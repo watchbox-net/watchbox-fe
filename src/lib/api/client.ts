@@ -4,7 +4,7 @@ import axios, {
     InternalAxiosRequestConfig,
 } from 'axios';
 
-const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+const SERVER_URL = process.env.BACKEND_URL;
 
 // 공통 인스턴스 (로그인 불필요) - Next.js BFF 프록시 경유
 export const publicApi: AxiosInstance = axios.create({

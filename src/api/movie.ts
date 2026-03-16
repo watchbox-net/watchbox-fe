@@ -2,7 +2,7 @@ import { ApiResponse } from '@/types/api';
 import type { ContentPageResponse } from '@/types/content';
 import type { MovieSummary } from '@/types/movie';
 
-const BACKEND_API_URL = process.env.BACKEND_API_URL || 'http://localhost:9000/api';
+const BACKEND_API_URL = process.env.BACKEND_API_URL;
 
 export async function fetchPopularMovieList(
   page: number = 1,

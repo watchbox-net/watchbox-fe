@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { healthCheckAction, healthInfoAction, healthTimeAction } from '@/actions/health-check.action';
 
 const TEST_ACCOUNTS = [-1, -2, -3, -4, -5];
 
@@ -15,6 +14,11 @@ export default function DevPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    // API Route 경유 헬스체크 상태
+    const [proxyResult, setProxyResult] = useState<any>(null);
+    const [proxyLoading, setProxyLoading] = useState(false);
+    const [proxyError, setProxyError] = useState<string | null>(null);
+
     // 테스트 로그인 상태
     const [selectedAccountId, setSelectedAccountId] = useState<number>(-1);
     const [loginData, setLoginData] = useState<LoginResponse | null>(null);
@@ -22,23 +26,32 @@ export default function DevPage() {
     const [authLoading, setAuthLoading] = useState(false);
     const [authError, setAuthError] = useState<string | null>(null);
 
+    const SPRING_BOOT_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+
     const handleHealthCheck = async () => {
         setIsLoading(true);
         setError(null);
         setHealthCheckResult(null);
 
         try {
-            // Server Action 호출
-            const result = await healthCheckAction();
+            const startTime = Date.now();
+            const response = await fetch(`${SPRING_BOOT_URL}/health`);
+            const responseTime = Date.now() - startTime;
 
-            if (!result.success) {
-                throw new Error(result.message || '헬스체크 실패');
+            if (!response.ok) {
+                throw new Error(`헬스체크 실패: ${response.status}`);
             }
 
-            setHealthCheckResult(result);
+            const data = await response.text();
+            setHealthCheckResult({
+                message: '브라우저 → Spring Boot 직접 호출 성공',
+                backendMessage: data,
+                responseTime: `${responseTime}ms`,
+                timestamp: new Date().toISOString(),
+                backendUrl: SPRING_BOOT_URL,
+            });
         } catch (err: any) {
             setError(err.message ?? '헬스체크 실패');
-            console.error('Health check error:', err);
         } finally {
             setIsLoading(false);
         }
@@ -50,16 +63,23 @@ export default function DevPage() {
         setHealthCheckResult(null);
 
         try {
-            const result = await healthInfoAction();
+            const startTime = Date.now();
+            const response = await fetch(`${SPRING_BOOT_URL}/health/info`);
+            const responseTime = Date.now() - startTime;
 
-            if (!result.success) {
-                throw new Error(result.message || 'Server Info 조회 실패');
+            if (!response.ok) {
+                throw new Error(`Server Info 조회 실패: ${response.status}`);
             }
 
-            setHealthCheckResult(result);
+            const data = await response.text();
+            setHealthCheckResult({
+                message: 'Server Info 조회 성공',
+                serverInfo: data,
+                responseTime: `${responseTime}ms`,
+                timestamp: new Date().toISOString(),
+            });
         } catch (err: any) {
             setError(err.message ?? 'Server Info 조회 실패');
-            console.error('Health info error:', err);
         } finally {
             setIsLoading(false);
         }
@@ -71,18 +91,89 @@ export default function DevPage() {
         setHealthCheckResult(null);
 
         try {
-            const result = await healthTimeAction();
+            const startTime = Date.now();
+            const response = await fetch(`${SPRING_BOOT_URL}/health/time`);
+            const responseTime = Date.now() - startTime;
+
+            if (!response.ok) {
+                throw new Error(`Server Time 조회 실패: ${response.status}`);
+            }
+
+            const data = await response.text();
+            setHealthCheckResult({
+                message: 'Server Time 조회 성공',
+                serverTime: data,
+                responseTime: `${responseTime}ms`,
+                timestamp: new Date().toISOString(),
+            });
+        } catch (err: any) {
+            setError(err.message ?? 'Server Time 조회 실패');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // API Route 경유 헬스체크 (브라우저 → Next.js API Route → Spring Boot)
+    const handleProxyHealthCheck = async () => {
+        setProxyLoading(true);
+        setProxyError(null);
+        setProxyResult(null);
+
+        try {
+            const response = await fetch('/api/dev/health');
+            const result = await response.json();
+
+            if (!result.success) {
+                throw new Error(result.message || '헬스체크 실패');
+            }
+
+            setProxyResult(result);
+        } catch (err: any) {
+            setProxyError(err.message ?? '헬스체크 실패');
+        } finally {
+            setProxyLoading(false);
+        }
+    };
+
+    const handleProxyHealthInfo = async () => {
+        setProxyLoading(true);
+        setProxyError(null);
+        setProxyResult(null);
+
+        try {
+            const response = await fetch('/api/dev/health/info');
+            const result = await response.json();
+
+            if (!result.success) {
+                throw new Error(result.message || 'Server Info 조회 실패');
+            }
+
+            setProxyResult(result);
+        } catch (err: any) {
+            setProxyError(err.message ?? 'Server Info 조회 실패');
+        } finally {
+            setProxyLoading(false);
+        }
+    };
+
+    const handleProxyHealthTime = async () => {
+        setProxyLoading(true);
+        setProxyError(null);
+        setProxyResult(null);
+
+        try {
+            const response = await fetch('/api/dev/health/time');
+            const result = await response.json();
 
             if (!result.success) {
                 throw new Error(result.message || 'Server Time 조회 실패');
             }
 
-            setHealthCheckResult(result);
+            setProxyResult(result);
         } catch (err: any) {
-            setError(err.message ?? 'Server Time 조회 실패');
-            console.error('Health time error:', err);
+            setProxyError(err.message ?? 'Server Time 조회 실패');
         } finally {
-            setIsLoading(false);
+            setProxyLoading(false);
         }
     };
 
@@ -154,7 +245,8 @@ export default function DevPage() {
             <h1 className="text-2xl font-bold mb-4">🛠️ 개발자 페이지</h1>
             <div className="space-y-4">
                 <section className="border p-4 rounded">
-                    <h2 className="font-semibold mb-2">API 테스트</h2>
+                    <h2 className="font-semibold mb-2">API 테스트 (직접 호출)</h2>
+                    <p className="text-xs text-gray-500 mb-3">브라우저 → Spring Boot 직접 호출</p>
                     <div className="flex flex-wrap gap-2 mb-4">
                         <button
                             onClick={handleHealthCheck}
@@ -192,6 +284,50 @@ export default function DevPage() {
                         <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded">
                             <h3 className="font-semibold text-red-800 mb-2">❌ 실패</h3>
                             <p className="text-sm text-red-600">{error}</p>
+                        </div>
+                    )}
+                </section>
+
+                <section className="border p-4 rounded">
+                    <h2 className="font-semibold mb-2">API 테스트 (via Next.js API Route)</h2>
+                    <p className="text-xs text-gray-500 mb-3">브라우저 → Next.js API Route → Spring Boot</p>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                        <button
+                            onClick={handleProxyHealthCheck}
+                            disabled={proxyLoading}
+                            className="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 disabled:bg-gray-400"
+                        >
+                            {proxyLoading ? '테스트 중...' : '헬스체크'}
+                        </button>
+                        <button
+                            onClick={handleProxyHealthInfo}
+                            disabled={proxyLoading}
+                            className="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800 disabled:bg-gray-400"
+                        >
+                            {proxyLoading ? '테스트 중...' : 'Server Info'}
+                        </button>
+                        <button
+                            onClick={handleProxyHealthTime}
+                            disabled={proxyLoading}
+                            className="bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-800 disabled:bg-gray-400"
+                        >
+                            {proxyLoading ? '테스트 중...' : 'Server Time'}
+                        </button>
+                    </div>
+
+                    {proxyResult && (
+                        <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded">
+                            <h3 className="font-semibold text-green-800 mb-2">성공</h3>
+                            <pre className="text-sm overflow-auto">
+                                {JSON.stringify(proxyResult, null, 2)}
+                            </pre>
+                        </div>
+                    )}
+
+                    {proxyError && (
+                        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded">
+                            <h3 className="font-semibold text-red-800 mb-2">실패</h3>
+                            <p className="text-sm text-red-600">{proxyError}</p>
                         </div>
                     )}
                 </section>
@@ -250,22 +386,6 @@ export default function DevPage() {
                 </section>
 
                 <section className="border p-4 rounded">
-                    <h2 className="font-semibold mb-2">환경 변수</h2>
-                    <pre className="bg-gray-100 p-2 rounded text-sm">
-                        {JSON.stringify(
-                            {
-                                NODE_ENV: process.env.NODE_ENV,
-                                NEXT_PUBLIC_SERVER_URL: process.env.NEXT_PUBLIC_SERVER_URL,
-                                NEXT_PUBLIC_SERVER_API_URL: process.env.NEXT_PUBLIC_SERVER_API_URL,
-                                NEXT_PUBLIC_SERVER_DEV_URL: process.env.NEXT_PUBLIC_SERVER_DEV_URL,
-                            },
-                            null,
-                            2
-                        )}
-                    </pre>
-                </section>
-
-                <section className="border p-4 rounded">
                     <h2 className="font-semibold mb-2">디자인 시스템</h2>
                     <div className="flex flex-col gap-3">
                         <div className="flex flex-wrap gap-2">
@@ -303,21 +423,25 @@ export default function DevPage() {
  * 함수 요약
  * ========================================
  *
- * [API 테스트 - Server Action 사용]
- * - handleHealthCheck: 백엔드 헬스체크 (GET /health)
- * - handleHealthInfo: 서버 정보 조회 (GET /health/info)
- * - handleHealthTime: 서버 시간 조회 (GET /health/time)
+ * [API 테스트 - 브라우저 직접 호출]
+ * 흐름: 브라우저 → Spring Boot (직접)
+ * - handleHealthCheck: 헬스체크 (GET http://localhost:9000/health)
+ * - handleHealthInfo: 서버 정보 조회 (GET http://localhost:9000/health/info)
+ * - handleHealthTime: 서버 시간 조회 (GET http://localhost:9000/health/time)
+ *
+ * [API 테스트 - Next.js API Route 경유]
+ * 흐름: 브라우저 → Next.js API Route → Spring Boot
+ * - handleProxyHealthCheck: 헬스체크 (GET /api/dev/health → GET /health)
+ * - handleProxyHealthInfo: 서버 정보 조회 (GET /api/dev/health/info → GET /health/info)
+ * - handleProxyHealthTime: 서버 시간 조회 (GET /api/dev/health/time → GET /health/time)
  *
  * [테스트 로그인 - BFF 패턴 + HttpOnly Cookie]
+ * 흐름: 브라우저 → Next.js API Route → Spring Boot
  * - handleDevLogin: 테스트 계정 로그인 (POST /api/dev/login → GET /dev/login/{accountId})
  *   → 토큰은 HttpOnly Cookie에 저장, 클라이언트는 memberId만 반환받음
  *   → accessToken: 1시간, refreshToken: 7일 만료
  *
  * - handleGetMember: 로그인된 회원 정보 조회 (GET /api/dev/member → GET /dev/member)
  *   → Cookie에서 accessToken 자동 전송, Authorization 헤더 불필요
- *
- * [흐름]
- * 브라우저 → Next.js API Route → Spring 백엔드
- * (브라우저가 직접 백엔드 호출하지 않음)
  */
 

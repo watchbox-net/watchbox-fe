@@ -17,6 +17,11 @@ export default function DevPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    // Next.js 서버 헬스체크 상태
+    const [nextHealthResult, setNextHealthResult] = useState<any>(null);
+    const [nextHealthLoading, setNextHealthLoading] = useState(false);
+    const [nextHealthError, setNextHealthError] = useState<string | null>(null);
+
     // API Route 경유 헬스체크 상태
     const [proxyResult, setProxyResult] = useState<any>(null);
     const [proxyLoading, setProxyLoading] = useState(false);
@@ -113,6 +118,30 @@ export default function DevPage() {
             setError(err.message ?? 'Server Time 조회 실패');
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    // Next.js 서버 헬스체크 (브라우저 → Next.js /api/health)
+    const handleNextHealthCheck = async () => {
+        setNextHealthLoading(true);
+        setNextHealthError(null);
+        setNextHealthResult(null);
+
+        try {
+            const startTime = Date.now();
+            const response = await fetch('/api/health');
+            const responseTime = Date.now() - startTime;
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error('Next.js 헬스체크 실패');
+            }
+
+            setNextHealthResult({ ...data, clientResponseTime: `${responseTime}ms` });
+        } catch (err: any) {
+            setNextHealthError(err.message ?? 'Next.js 헬스체크 실패');
+        } finally {
+            setNextHealthLoading(false);
         }
     };
 
@@ -268,6 +297,34 @@ export default function DevPage() {
                             >
                                 로그인
                             </Link>
+                        </div>
+                    )}
+                </section>
+
+                <section className="border p-4 rounded">
+                    <h2 className="font-semibold mb-2">Next.js 서버 헬스체크</h2>
+                    <p className="text-xs text-gray-500 mb-3">브라우저 → Next.js /api/health</p>
+                    <button
+                        onClick={handleNextHealthCheck}
+                        disabled={nextHealthLoading}
+                        className="bg-cyan-600 text-white px-4 py-2 rounded hover:bg-cyan-700 disabled:bg-gray-400"
+                    >
+                        {nextHealthLoading ? '테스트 중...' : 'Next.js 헬스체크'}
+                    </button>
+
+                    {nextHealthResult && (
+                        <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded">
+                            <h3 className="font-semibold text-green-800 mb-2">✅ Next.js 서버 정상</h3>
+                            <pre className="text-sm overflow-auto">
+                                {JSON.stringify(nextHealthResult, null, 2)}
+                            </pre>
+                        </div>
+                    )}
+
+                    {nextHealthError && (
+                        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded">
+                            <h3 className="font-semibold text-red-800 mb-2">❌ Next.js 서버 응답 없음</h3>
+                            <p className="text-sm text-red-600">{nextHealthError}</p>
                         </div>
                     )}
                 </section>
@@ -450,6 +507,10 @@ export default function DevPage() {
  * ========================================
  * 함수 요약
  * ========================================
+ *
+ * [Next.js 서버 헬스체크]
+ * 흐름: 브라우저 → Next.js API Route (/api/health)
+ * - handleNextHealthCheck: Next.js 서버 자체 상태 체크
  *
  * [API 테스트 - 브라우저 직접 호출]
  * 흐름: 브라우저 → Spring Boot (직접)

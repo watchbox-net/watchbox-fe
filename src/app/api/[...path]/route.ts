@@ -20,10 +20,10 @@ async function proxyRequest(request: NextRequest, { params }: { params: Promise<
     'Content-Type': 'application/json',
   };
 
-  // Authorization 헤더 전달
-  const authorization = request.headers.get('Authorization');
-  if (authorization) {
-    headers['Authorization'] = authorization;
+  // HttpOnly Cookie에서 accessToken을 꺼내 Authorization 헤더로 변환 (BFF 패턴)
+  const accessToken = request.cookies.get('accessToken')?.value;
+  if (accessToken) {
+    headers['Authorization'] = `Bearer ${accessToken}`;
   }
 
   // 요청 body 처리 (GET, HEAD는 body 없음)

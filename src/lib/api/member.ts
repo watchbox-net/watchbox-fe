@@ -1,5 +1,4 @@
 import { privateApi } from './client';
-import { tokenManager } from './auth';
 import type {
   MemberSearchPageResponse,
   InvitationSentResponse,
@@ -7,17 +6,10 @@ import type {
 } from '@/types/member';
 import type { ApiResponse } from '@/types/api';
 
-function authHeaders() {
-  const token = tokenManager.getAccessToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
 /** 공유 박스에 회원 초대 */
 export async function inviteToBox(boxId: number, memberId: number): Promise<InvitationSentResponse> {
   const { data } = await privateApi.post<ApiResponse<InvitationSentResponse>>(
     `/boxes/shared/invitations/${boxId}/${memberId}`,
-    null,
-    { headers: authHeaders() },
   );
   return data.data;
 }
@@ -26,7 +18,6 @@ export async function inviteToBox(boxId: number, memberId: number): Promise<Invi
 export async function fetchSentInvitations(): Promise<InvitationSentResponse[]> {
   const { data } = await privateApi.get<ApiResponse<InvitationSentResponse[]>>(
     '/boxes/shared/invitations/sent',
-    { headers: authHeaders() },
   );
   return data.data;
 }
@@ -35,7 +26,6 @@ export async function fetchSentInvitations(): Promise<InvitationSentResponse[]> 
 export async function fetchReceivedInvitations(): Promise<InvitationReceivedResponse[]> {
   const { data } = await privateApi.get<ApiResponse<InvitationReceivedResponse[]>>(
     '/boxes/shared/invitations/received',
-    { headers: authHeaders() },
   );
   return data.data;
 }
@@ -44,8 +34,6 @@ export async function fetchReceivedInvitations(): Promise<InvitationReceivedResp
 export async function acceptInvitation(requestId: number): Promise<void> {
   await privateApi.patch(
     `/boxes/shared/invitations/${requestId}/accept`,
-    null,
-    { headers: authHeaders() },
   );
 }
 
@@ -53,8 +41,6 @@ export async function acceptInvitation(requestId: number): Promise<void> {
 export async function rejectInvitation(requestId: number): Promise<void> {
   await privateApi.patch(
     `/boxes/shared/invitations/${requestId}/reject`,
-    null,
-    { headers: authHeaders() },
   );
 }
 
@@ -62,7 +48,6 @@ export async function rejectInvitation(requestId: number): Promise<void> {
 export async function cancelInvitation(requestId: number): Promise<void> {
   await privateApi.delete(
     `/boxes/shared/invitations/${requestId}/cancel`,
-    { headers: authHeaders() },
   );
 }
 
@@ -70,10 +55,7 @@ export async function cancelInvitation(requestId: number): Promise<void> {
 export async function searchMembers(keyword: string, boxId: number): Promise<MemberSearchPageResponse> {
   const { data } = await privateApi.get<ApiResponse<MemberSearchPageResponse>>(
     '/members/search',
-    {
-      params: { keyword, boxId },
-      headers: authHeaders(),
-    },
+    { params: { keyword, boxId } },
   );
   return data.data;
 }

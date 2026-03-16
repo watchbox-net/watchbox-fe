@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/lib/hooks/useAuth';
 
 const TEST_ACCOUNTS = [-1, -2, -3, -4, -5];
 
@@ -10,6 +11,8 @@ interface LoginResponse {
 }
 
 export default function DevPage() {
+    const { isAuthenticated, member, isLoading: authCheckLoading, logout } = useAuth();
+
     const [healthCheckResult, setHealthCheckResult] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -197,13 +200,7 @@ export default function DevPage() {
                 throw new Error(result.message || '로그인 실패');
             }
 
-            // localStorage에도 토큰 저장 (privateApi 인증 헤더용)
-            if (result.data.accessToken) {
-                localStorage.setItem('accessToken', result.data.accessToken);
-            }
-            if (result.data.refreshToken) {
-                localStorage.setItem('refreshToken', result.data.refreshToken);
-            }
+            // 토큰은 HttpOnly Cookie로 관리 (BFF 프록시에서 자동 처리)
             setLoginData(result.data);
         } catch (err: any) {
             setAuthError(err.message ?? '로그인 실패');
@@ -244,6 +241,37 @@ export default function DevPage() {
         <div className="p-6">
             <h1 className="text-2xl font-bold mb-4">🛠️ 개발자 페이지</h1>
             <div className="space-y-4">
+                <section className="border p-4 rounded">
+                    <h2 className="font-semibold mb-2">인증 상태</h2>
+                    {authCheckLoading ? (
+                        <p className="text-sm text-gray-500">확인 중...</p>
+                    ) : isAuthenticated ? (
+                        <div className="flex items-center gap-3">
+                            <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
+                            <span className="text-sm text-green-700">
+                                로그인됨: {member?.nickname ?? member?.email ?? `memberId ${member?.memberId}`}
+                            </span>
+                            <button
+                                onClick={logout}
+                                className="ml-auto bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 cursor-pointer"
+                            >
+                                로그아웃
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-3">
+                            <span className="inline-block w-2 h-2 rounded-full bg-gray-400" />
+                            <span className="text-sm text-gray-500">비로그인</span>
+                            <Link
+                                href="/login"
+                                className="ml-auto bg-amber-500 text-white px-3 py-1 rounded text-sm hover:bg-amber-600"
+                            >
+                                로그인
+                            </Link>
+                        </div>
+                    )}
+                </section>
+
                 <section className="border p-4 rounded">
                     <h2 className="font-semibold mb-2">API 테스트 (직접 호출)</h2>
                     <p className="text-xs text-gray-500 mb-3">브라우저 → Spring Boot 직접 호출</p>

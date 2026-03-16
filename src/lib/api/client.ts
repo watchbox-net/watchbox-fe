@@ -1,10 +1,4 @@
-import axios, {
-    AxiosInstance,
-    AxiosError,
-    InternalAxiosRequestConfig,
-} from 'axios';
-
-const SERVER_URL = process.env.BACKEND_URL;
+import axios, { AxiosInstance, AxiosError } from 'axios';
 
 // 공통 인스턴스 (로그인 불필요) - Next.js BFF 프록시 경유
 export const publicApi: AxiosInstance = axios.create({
@@ -16,6 +10,7 @@ export const publicApi: AxiosInstance = axios.create({
 });
 
 // 개인별 인스턴스 (로그인 필요) - Next.js BFF 프록시 경유
+// 토큰은 HttpOnly Cookie로 자동 전송 → BFF 프록시에서 Authorization 헤더로 변환
 export const privateApi: AxiosInstance = axios.create({
     baseURL: '/api',
     timeout: 10000,
@@ -24,92 +19,18 @@ export const privateApi: AxiosInstance = axios.create({
     },
 });
 
-// 토큰 갱신 중복 방지
-let isRefreshing = false;
-let refreshSubscribers: ((token: string) => void)[] = [];
-
-const onRefreshed = (token: string) => {
-    refreshSubscribers.forEach((callback) => callback(token));
-    refreshSubscribers = [];
-};
-
-const addRefreshSubscriber = (callback: (token: string) => void) => {
-    refreshSubscribers.push(callback);
-};
-
-// 인터셉터 설정 함수 (auth.ts에서 호출)
-export const setupInterceptors = (
-    getAccessToken: () => string | null,
-    getRefreshToken: () => string | null,
-    setTokens: (accessToken: string, refreshToken: string) => void,
-    onRefreshFail: () => void
-) => {
-    // 요청 인터셉터 - 토큰 자동 첨부
-    privateApi.interceptors.request.use(
-        (config: InternalAxiosRequestConfig) => {
-            const token = getAccessToken();
-            if (token && config.headers) {
-                config.headers.Authorization = `Bearer ${token}`;
+// 응답 인터셉터 - 401 에러 시 로그인 페이지로 이동
+privateApi.interceptors.response.use(
+    (response) => response,
+    (error: AxiosError) => {
+        if (error.response?.status === 401) {
+            if (typeof window !== 'undefined') {
+                window.location.href = '/login';
             }
-            return config;
-        },
-        (error: AxiosError) => Promise.reject(error)
-    );
-
-    // 응답 인터셉터 - 401 에러 시 토큰 갱신
-    privateApi.interceptors.response.use(
-        (response) => response,
-        async (error: AxiosError) => {
-            const originalRequest = error.config as InternalAxiosRequestConfig & {
-                _retry?: boolean;
-            };
-
-            if (error.response?.status === 401 && !originalRequest._retry) {
-                if (isRefreshing) {
-                    return new Promise((resolve) => {
-                        addRefreshSubscriber((token: string) => {
-                            if (originalRequest.headers) {
-                                originalRequest.headers.Authorization = `Bearer ${token}`;
-                            }
-                            resolve(privateApi(originalRequest));
-                        });
-                    });
-                }
-
-                originalRequest._retry = true;
-                isRefreshing = true;
-
-                try {
-                    const refreshToken = getRefreshToken();
-
-                    if (!refreshToken) {
-                        throw new Error('No refresh token');
-                    }
-
-                    const { data } = await publicApi.post('/auth/refresh', {
-                        refreshToken,
-                    });
-
-                    setTokens(data.accessToken, data.refreshToken);
-                    onRefreshed(data.accessToken);
-
-                    if (originalRequest.headers) {
-                        originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
-                    }
-                    return privateApi(originalRequest);
-                } catch (refreshError) {
-                    refreshSubscribers = [];
-                    onRefreshFail();
-                    return Promise.reject(refreshError);
-                } finally {
-                    isRefreshing = false;
-                }
-            }
-
-            return Promise.reject(error);
         }
-    );
-};
+        return Promise.reject(error);
+    },
+);
 
 // 공통 에러 핸들링
 const handleApiError = (error: AxiosError) => {
@@ -141,6 +62,3 @@ const handleApiError = (error: AxiosError) => {
 };
 
 publicApi.interceptors.response.use((response) => response, handleApiError);
-
-// 헬스체크
-export const healthCheck = () => axios.get(`${SERVER_URL}/health`);

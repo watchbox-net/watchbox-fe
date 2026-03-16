@@ -1,64 +1,11 @@
-// lib/api/auth.ts - 토큰 관리 + 인증 API
-import { publicApi, privateApi, setupInterceptors } from './client';
+// lib/api/auth.ts - 인증 API
+// 토큰은 HttpOnly Cookie로 관리 (BFF 패턴)
+// localStorage 기반 tokenManager는 더 이상 사용하지 않음
 
-// 토큰 관리
-export const tokenManager = {
-    getAccessToken: () => {
-        if (typeof window === 'undefined') return null;
-        return localStorage.getItem('accessToken');
-    },
+import { privateApi } from './client';
 
-    getRefreshToken: () => {
-        if (typeof window === 'undefined') return null;
-        return localStorage.getItem('refreshToken');
-    },
-
-    setTokens: (accessToken: string, refreshToken: string) => {
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
-    },
-
-    clearTokens: () => {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-    },
-};
-
-// 인터셉터 초기화
-setupInterceptors(
-    tokenManager.getAccessToken,
-    tokenManager.getRefreshToken,
-    tokenManager.setTokens,
-    () => {
-        tokenManager.clearTokens();
-        if (typeof window !== 'undefined') {
-            window.location.href = '/login';
-        }
-    }
-);
-
-// ToDo : 인증 API
 export const authApi = {
-    // login: (email: string, password: string) =>
-    //     publicApi.post('/auth/login', { email, password }),
-    //
-    // signup: (data: { email: string; password: string; nickname: string }) =>
-    //     publicApi.post('/auth/signup', data),
+    logout: () => privateApi.post('/auth/logout'),
 
-    logout: () => {
-        tokenManager.clearTokens();
-        return privateApi.post('/auth/logout');
-    },
-
-    refresh: () =>
-        publicApi.post('/auth/refresh', {
-            refreshToken: tokenManager.getRefreshToken(),
-        }),
-
-    // 소셜 로그인
-    kakaoLogin: (code: string) =>
-        publicApi.post('/auth/kakao', { code }),
-
-    googleLogin: (code: string) =>
-        publicApi.post('/auth/google', { code }),
+    // 소셜 로그인은 브라우저에서 Spring Boot로 직접 이동 (login 페이지에서 처리)
 };

@@ -1,0 +1,52 @@
+name: Frontend CI/CD Dev
+
+on:
+  workflow_dispatch:
+
+env:
+  APP_NAME: watchbox-fe
+  DOCKER_IMAGE: watchbox-fe:latest
+
+jobs:
+  build-and-deploy:
+    runs-on: [self-hosted, dev, frontend]
+    environment: development
+
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_SERVER_URL=${{ secrets.NEXT_PUBLIC_SERVER_URL }} \
+            -f Dockerfile \
+            -t ${{ env.DOCKER_IMAGE }} .
+
+      - name: Create .env file for Docker
+        run: |
+          cat <<'EOF' > watchbox-dev-fe.env
+          BACKEND_URL=${{ secrets.BACKEND_URL }}
+          BACKEND_DEV_URL=${{ secrets.BACKEND_DEV_URL }}
+          BACKEND_API_URL=${{ secrets.BACKEND_API_URL }}
+          EOF
+
+      - name: Run docker container
+        run: |
+          docker stop ${{ env.APP_NAME }} || true
+          docker rm -f ${{ env.APP_NAME }} || true
+          docker run -d \
+            --name ${{ env.APP_NAME }} \
+            --env-file ./watchbox-dev-fe.env \
+            --network watchbox-net \
+            -p 3000:3000 \
+            ${{ env.DOCKER_IMAGE }}
+          docker image prune -f

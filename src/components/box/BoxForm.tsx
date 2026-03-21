@@ -106,19 +106,23 @@ export default function BoxForm({
               value={boxType}
               onChange={(e) => setBoxType(e.target.value as BoxType)}
               disabled={boxTypeDisabled}
-              className="w-full h-[48px] bg-wb-dark-03 border-[0.5px] border-wb-dark-05 rounded-[8px] px-[15px] pr-[40px] text-[15px] font-medium text-wb-white outline-none appearance-none cursor-pointer disabled:opacity-60"
+              className={`w-full h-[48px] border-[0.5px] rounded-[8px] px-[15px] pr-[40px] text-[15px] font-medium outline-none appearance-none ${
+                boxTypeDisabled
+                  ? 'bg-wb-dark-03 border-wb-dark-05 text-wb-grey-01 cursor-not-allowed'
+                  : 'bg-wb-dark-03 border-wb-dark-05 text-wb-white cursor-pointer'
+              }`}
             >
               <option value="MY">마이 박스</option>
               <option value="SHARED">공유 박스</option>
             </select>
-            <ChevronDownOutline className="absolute right-[15px] top-1/2 -translate-y-1/2 size-[22px] text-wb-grey-04 pointer-events-none" />
+            {!boxTypeDisabled && (
+              <ChevronDownOutline className="absolute right-[15px] top-1/2 -translate-y-1/2 size-[22px] text-wb-grey-04 pointer-events-none" />
+            )}
           </div>
         </div>
 
-        <div className="flex-1" />
-
         {/* 제출 버튼 */}
-        <div className="mb-6">
+        <div className="mt-3">
           <Button
             size="wide"
             variant={!name.trim() || submitting ? 'off' : 'save'}

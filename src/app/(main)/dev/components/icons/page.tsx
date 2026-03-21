@@ -7,6 +7,7 @@ import BoxIcon from '@/components/icons/BoxIcon';
 import DeleteIcon from '@/components/icons/DeleteIcon';
 import AddedStatusIcon from '@/components/icons/AddedStatusIcon';
 import ProfileIcon from '@/components/icons/ProfileIcon';
+import GoogleCircleLogo from '@/components/icons/GoogleCircleLogo';
 
 import type { WatchStatus, WatchStatusSize } from '@/components/icons/WatchStatusIcon';
 import type { LikeIconSize } from '@/components/icons/LikeIcon';
@@ -226,6 +227,10 @@ export default function IconComponentsPage() {
 
         <div className="bg-wb-dark-02 rounded-lg p-6 flex items-center gap-8 mb-4">
           <div className="flex flex-col items-center gap-2">
+            <ProfileIcon variant="edit" />
+            <span className="text-xs text-wb-grey-02">edit (96px)</span>
+          </div>
+          <div className="flex flex-col items-center gap-2">
             <ProfileIcon variant="mypage" />
             <span className="text-xs text-wb-grey-02">mypage (72px)</span>
           </div>
@@ -237,8 +242,31 @@ export default function IconComponentsPage() {
 
         <div className="bg-neutral-100 rounded-lg p-4 text-sm text-neutral-700 space-y-1">
           <p className="font-semibold text-black mb-2">디자인 스펙</p>
+          <p>edit — UserCircleSolid, 96px, text-wb-grey-03 (#B1B1B1)</p>
           <p>mypage — UserCircleSolid, 72px, text-wb-grey-03 (#B1B1B1)</p>
           <p>list — UserCircleSolid, 28px, text-wb-grey-03 (#B1B1B1)</p>
+        </div>
+      </section>
+
+      {/* ── Google Circle Logo ─────────────────────── */}
+      <section>
+        <h2 className="text-xl font-bold text-black mb-4">Google Circle Logo</h2>
+
+        <div className="bg-wb-dark-02 rounded-lg p-6 flex items-center gap-8 mb-4">
+          <div className="flex flex-col items-center gap-2">
+            <GoogleCircleLogo variant="dark" />
+            <span className="text-xs text-wb-grey-02">dark</span>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <GoogleCircleLogo variant="light" />
+            <span className="text-xs text-wb-grey-02">light</span>
+          </div>
+        </div>
+
+        <div className="bg-neutral-100 rounded-lg p-4 text-sm text-neutral-700 space-y-1">
+          <p className="font-semibold text-black mb-2">디자인 스펙</p>
+          <p>dark — web_dark_rd_na@2x.png, 18px</p>
+          <p>light — web_light_rd_na@2x.png, 18px</p>
         </div>
       </section>
     </div>

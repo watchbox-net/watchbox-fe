@@ -4,7 +4,7 @@ import Button from './Button';
 import { ExclamationCircleSolid } from '@/components/icons';
 
 // ─── Types ──────────────────────────────────────────────────
-export type ModalVariant = 'confirm' | 'invite' | 'login' | 'body-only' | 'delete' | 'error';
+export type ModalVariant = 'confirm' | 'invite' | 'login' | 'body-only' | 'delete' | 'error' | 'preparing';
 
 interface ModalProps {
   visible: boolean;
@@ -26,6 +26,7 @@ const CONFIRM_DEFAULTS: Record<ModalVariant, { label: string; variant: 'accept' 
   'body-only': { label: '이동', variant: 'accept' },
   delete:      { label: '삭제', variant: 'alert' },
   error:       { label: '확인', variant: 'accept' },
+  preparing:   { label: '확인', variant: 'accept' },
 };
 
 // ─── Component ──────────────────────────────────────────────
@@ -77,9 +78,11 @@ export default function Modal({
 
           {/* Buttons */}
           <div className="flex items-center justify-end gap-[10px]">
-            <Button size="modal" variant="cancel" onClick={onCancel}>
-              {cancelLabel}
-            </Button>
+            {variant !== 'preparing' && (
+              <Button size="modal" variant="cancel" onClick={onCancel}>
+                {cancelLabel}
+              </Button>
+            )}
             <Button size="modal" variant={confirm.variant} onClick={onConfirm}>
               {confirmLabel ?? confirm.label}
             </Button>

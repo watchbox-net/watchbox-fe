@@ -135,6 +135,7 @@ export { default as BoxIcon } from './BoxIcon';
 export { default as DeleteIcon } from './DeleteIcon';
 export { default as AddedStatusIcon } from './AddedStatusIcon';
 export { default as ProfileIcon } from './ProfileIcon';
+export { default as GoogleCircleLogo } from './GoogleCircleLogo';
 
 export type { WatchStatus, WatchStatusSize } from './WatchStatusIcon';
 export type { LikeIconSize } from './LikeIcon';
@@ -142,3 +143,4 @@ export type { BoxIconVariant, BoxIconSize } from './BoxIcon';
 export type { DeleteIconVariant } from './DeleteIcon';
 export type { AddedStatusVariant } from './AddedStatusIcon';
 export type { ProfileIconVariant } from './ProfileIcon';
+export type { GoogleCircleLogoVariant } from './GoogleCircleLogo';

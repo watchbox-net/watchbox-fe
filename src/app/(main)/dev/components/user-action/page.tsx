@@ -15,6 +15,7 @@ const MODAL_DEMOS: { variant: ModalVariant; title: string; body: string; confirm
   { variant: 'body-only', title: '',                    body: '{너구리 1}님에게 {박스명} 공유 박스로\n초대하겠습니까?' },
   { variant: 'delete',    title: '박스 삭제',           body: '이 박스를 삭제하시겠습니까?' },
   { variant: 'error',     title: '오류가 발생했어요',    body: '잠시 후에 다시 시도해주세요', confirmLabel: '확인' },
+  { variant: 'preparing', title: '아직 준비중이에요',    body: '' },
 ];
 
 export default function UserActionComponentsPage() {

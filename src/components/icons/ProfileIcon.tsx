@@ -3,7 +3,7 @@
 import { UserCircleIcon } from '@heroicons/react/24/solid';
 
 // ─── Types ──────────────────────────────────────────────────
-export type ProfileIconVariant = 'mypage' | 'list';
+export type ProfileIconVariant = 'edit' | 'mypage' | 'list';
 
 interface ProfileIconProps {
   variant?: ProfileIconVariant;
@@ -12,6 +12,7 @@ interface ProfileIconProps {
 
 // ─── Variant config ─────────────────────────────────────────
 const VARIANT_STYLES: Record<ProfileIconVariant, string> = {
+  edit:   'size-[96px] text-wb-grey-03',
   mypage: 'size-[72px] text-wb-grey-03',
   list:   'size-[28px] text-wb-grey-03',
 };

@@ -5,6 +5,7 @@ import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
 import TabNav from '@/components/common/TabNav';
+import MainContent from '@/components/common/MainContent';
 import { searchMulti, searchMovies, searchTv, searchPerson } from '@/lib/api/search';
 import type { ContentItem, ContentPageResponse } from '@/types/content';
 import { getImageUrl, getDisplayTitle, getSubText } from '@/lib/utils/content';
@@ -94,7 +95,7 @@ export default function SearchPage() {
       />
 
       {/* 검색 결과 */}
-      <main className="flex-1 overflow-y-auto pb-24">
+      <MainContent>
         {loading && (
           <p className="text-center text-neutral-500 py-8">검색 중...</p>
         )}
@@ -138,7 +139,7 @@ export default function SearchPage() {
             </ul>
           </div>
         )}
-      </main>
+      </MainContent>
 
       <BottomMenu />
     </MobileFrame>

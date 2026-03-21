@@ -6,6 +6,7 @@ import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
 import TabNav from '@/components/common/TabNav';
 import { PlusOutline } from '@/components/icons';
+import MainContent from '@/components/common/MainContent';
 import { fetchWatchStatusList } from '@/lib/api/record';
 import type { ContentItem, WatchStatus } from '@/types/content';
 import { getImageUrl, getDisplayTitle, getSubText } from '@/lib/utils/content';
@@ -62,7 +63,7 @@ export default function RecordPage() {
       />
 
       {/* 리스트 */}
-      <main className="flex-1 overflow-y-auto pb-24">
+      <MainContent>
         {loading && (
           <p className="text-center text-neutral-500 py-8">불러오는 중...</p>
         )}
@@ -119,7 +120,7 @@ export default function RecordPage() {
             ))}
           </ul>
         )}
-      </main>
+      </MainContent>
 
       <BottomMenu />
     </MobileFrame>

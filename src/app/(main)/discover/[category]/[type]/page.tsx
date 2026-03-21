@@ -2,6 +2,7 @@ import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
 import DiscoverTabs from './DiscoverTabs';
+import MainContent from '@/components/common/MainContent';
 import { fetchPopularMovieList } from '@/api/movie';
 import { fetchPopularTvList } from '@/api/tv';
 import { notFound } from 'next/navigation';
@@ -49,7 +50,7 @@ export default async function DiscoverCategoryPage({ params }: PageProps) {
       <MobileFrame>
         <Header variant="back" title={title} />
         <DiscoverTabs category={category} type={type} />
-        <main className="flex-1 overflow-y-auto pb-24">
+        <MainContent>
           <ul>
             {contentItems.map((item) => (
               <li
@@ -78,7 +79,7 @@ export default async function DiscoverCategoryPage({ params }: PageProps) {
               </li>
             ))}
           </ul>
-        </main>
+        </MainContent>
         <BottomMenu />
       </MobileFrame>
     );
@@ -88,9 +89,9 @@ export default async function DiscoverCategoryPage({ params }: PageProps) {
       <MobileFrame>
         <Header variant="back" title={title} />
         <DiscoverTabs category={category} type={type} />
-        <main className="p-4">
+        <MainContent className="p-4">
           <p className="text-neutral-500">오류가 발생했습니다.</p>
-        </main>
+        </MainContent>
         <BottomMenu />
       </MobileFrame>
     );

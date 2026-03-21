@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Header from '@/components/common/Header';
 import { ChevronDownOutline } from '@/components/icons';
 import Button from '@/components/common/Button';
+import MainContent from '@/components/common/MainContent';
 import type { BoxType } from '@/types/box';
 
 interface BoxFormProps {
@@ -58,7 +59,7 @@ export default function BoxForm({
     <>
       <Header variant="back" title={title} onBack={() => router.back()} />
 
-      <main className="flex-1 px-[12px] flex flex-col">
+      <MainContent className="px-[12px] flex flex-col">
         {/* 이름 */}
         <div className="mb-5">
           <label className="block text-[14px] font-medium text-wb-grey-03 mb-[5px]">
@@ -132,7 +133,7 @@ export default function BoxForm({
             {submitting ? buttonLoadingText : buttonText}
           </Button>
         </div>
-      </main>
+      </MainContent>
     </>
   );
 }

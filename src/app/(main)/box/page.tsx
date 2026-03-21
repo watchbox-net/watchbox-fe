@@ -6,7 +6,9 @@ import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
 import BottomSheet from '@/components/common/BottomSheet';
+import MainContent from '@/components/common/MainContent';
 import { PlusOutline } from '@/components/icons';
+import ListTitle from '@/components/list/ListTitle';
 import { fetchMyBoxList, fetchSharedBoxList } from '@/lib/api/box';
 import type { MyBoxResponse, SharedBoxResponse, BoxType } from '@/types/box';
 
@@ -75,7 +77,7 @@ export default function BoxPage() {
         onSearch={() => {/* TODO: 박스 검색 */}}
       />
 
-      <main className="flex-1 overflow-y-auto pb-24 px-4">
+      <MainContent>
         {loading && (
           <p className="text-center text-neutral-500 py-8">불러오는 중...</p>
         )}
@@ -90,9 +92,12 @@ export default function BoxPage() {
           <>
             {/* 마이 박스 */}
             <section className="mb-8">
-              <h2 className="text-base font-bold mb-3 text-wb-white">
-                마이 박스 ({myBoxes.length})
-              </h2>
+              <ListTitle
+                title={`마이 박스 (${myBoxes.length})`}
+                variant="kebab"
+                onAction={() => {/* TODO: 마이 박스 섹션 메뉴 */}}
+                className="mb-3"
+              />
               {myBoxes.length > 0 && (
                 <ul className="space-y-3">
                   {myBoxes.map((box) => (
@@ -132,9 +137,12 @@ export default function BoxPage() {
 
             {/* 공유 박스 */}
             <section>
-              <h2 className="text-base font-bold mb-3 text-wb-white">
-                공유 박스 ({sharedBoxes.length})
-              </h2>
+              <ListTitle
+                title={`공유 박스 (${sharedBoxes.length})`}
+                variant="kebab"
+                onAction={() => {/* TODO: 공유 박스 섹션 메뉴 */}}
+                className="mb-3"
+              />
               {sharedBoxes.length > 0 && (
                 <ul className="space-y-3">
                   {sharedBoxes.map((box) => (
@@ -176,7 +184,7 @@ export default function BoxPage() {
             </section>
           </>
         )}
-      </main>
+      </MainContent>
 
       {/* 바텀시트 */}
       <BottomSheet

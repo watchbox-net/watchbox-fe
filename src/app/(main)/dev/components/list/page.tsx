@@ -33,7 +33,7 @@ export default function ListComponentsPage() {
         {/* 스펙 */}
         <div className="bg-neutral-100 rounded-lg p-4 text-sm text-neutral-700 space-y-1 mt-4">
           <p className="font-semibold text-black mb-2">디자인 스펙</p>
-          <p>레이아웃 — flex, justify-between, pl:17px, pr:12px</p>
+          <p>레이아웃 — flex, justify-between, 패딩 없음 (부모에서 제어)</p>
           <p>제목 — 20px Bold, lh:1, text-white</p>
           <p>아이콘 — heroicons solid 26px, text-white</p>
           <p>variant: none(제목만), arrow(ChevronRight), kebab(EllipsisVertical)</p>

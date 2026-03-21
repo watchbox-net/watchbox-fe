@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
 import Toast from '@/components/common/Toast';
+import MainContent from '@/components/common/MainContent';
 import {
   fetchReceivedInvitations,
   fetchSentInvitations,
@@ -92,7 +93,7 @@ export default function BoxInvitationsPage() {
         <div className="w-6" />
       </div>
 
-      <main className="flex-1 overflow-y-auto pb-24 px-4">
+      <MainContent className="px-4">
         {loading && (
           <p className="text-center text-neutral-500 py-8">불러오는 중...</p>
         )}
@@ -194,7 +195,7 @@ export default function BoxInvitationsPage() {
             </section>
           </>
         )}
-      </main>
+      </MainContent>
 
       <BottomMenu />
       <Toast message={toast} visible={!!toast} onClose={() => setToast('')} />

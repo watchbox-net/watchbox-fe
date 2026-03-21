@@ -22,7 +22,7 @@ export default function ListTitle({
 }: ListTitleProps) {
   return (
     <div
-      className={`flex items-center justify-between pl-[17px] pr-[12px] w-full ${className ?? ''}`}
+      className={`flex items-center justify-between w-full pl-[16px] pr-[12px] ${className ?? ''}`}
     >
       <p className="text-[20px] font-bold leading-none text-white">{title}</p>
 

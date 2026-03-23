@@ -22,8 +22,8 @@ export type ContentItemField =
   | 'BOX_CONTENT_ID'
   | 'WATCH_RECORD_ID';
 
-/** 시청 상태 (null = DROP/미등록) */
-export type WatchStatus = 'COMPLETED' | 'WATCHING' | 'PLANNED' | 'PAUSED';
+/** 시청 상태 */
+export type WatchStatus = 'COMPLETED' | 'WATCHING' | 'PLANNED' | 'PAUSED' | 'NONE';
 
 // ============================================================
 // 응답 메타 정보
@@ -47,8 +47,8 @@ export type ContentSummary = MovieSummary | TvSummary | PersonSummary;
 // 사용자 상호작용
 // ============================================================
 
-/** 사용자의 콘텐츠 상호작용 */
-export interface MemberInteraction {
+/** 사용자의 콘텐츠 기록 (API 응답: memberRecord) */
+export interface MemberRecord {
   liked: boolean | null;
   watchStatus: WatchStatus | null;
 }
@@ -67,7 +67,7 @@ export interface PublisherSummary {
 /** 콘텐츠 아이템 (목록의 한 행) - 제네릭으로 Summary 타입 확정 가능 */
 export interface ContentItem<T extends ContentSummary = ContentSummary> {
   contentSummary: T;
-  memberInteraction: MemberInteraction | null;
+  memberRecord: MemberRecord | null;
   publisherSummaryList: PublisherSummary[] | null;
   boxContentId: number | null;
   contentRecordId: number | null;

@@ -6,10 +6,11 @@ import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
 import ListTitle from '@/components/list/ListTitle';
+import ContentListItem from '@/components/list/ContentListItem';
 import { PlusOutline } from '@/components/icons';
 import MainContent from '@/components/common/MainContent';
 import { fetchMyBoxContents, fetchSharedBoxContents } from '@/lib/api/box';
-import { getImageUrl, getDisplayTitle, getSubText } from '@/lib/utils/content';
+import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
 import type { ContentItem } from '@/types/content';
 import type { BoxType } from '@/types/box';
 
@@ -52,55 +53,36 @@ export default function BoxContentsPage() {
     return { movies, tvs, persons };
   }, [items]);
 
-  const renderItem = (item: ContentItem) => {
+  const renderItem = (item: ContentItem, idx: number, arr: ContentItem[]) => {
     const summary = item.contentSummary;
     const imageUrl = getImageUrl(summary);
     const title = getDisplayTitle(summary);
-    const sub = getSubText(summary);
-    const liked = item.memberInteraction?.liked === true;
-    const publishers = item.publisherSummaryList;
+    const year = 'year' in summary ? summary.year : null;
+    const genres = 'genreList' in summary ? summary.genreList : null;
+    const watchStatus = item.memberRecord?.watchStatus ?? null;
+    const isLast = idx === arr.length - 1;
+
+    const boxMode = isShared
+      ? {
+          mode: 'shared' as const,
+          publishers: item.publisherSummaryList?.map((p) => p.nickname) ?? [],
+        }
+      : {
+          mode: 'my' as const,
+          liked: item.memberRecord?.liked === true,
+        };
 
     return (
-      <li
+      <ContentListItem
         key={item.boxContentId ?? summary.contentId}
-        className="flex items-center gap-3 py-2 border-b border-neutral-800"
-      >
-        {/* 포스터 */}
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={title}
-            className="w-16 h-22 rounded object-cover shrink-0"
-          />
-        ) : (
-          <div className="w-16 h-22 rounded bg-neutral-800 shrink-0" />
-        )}
-
-        {/* 텍스트 정보 */}
-        <div className="flex-1 min-w-0">
-          <p className="text-sm text-wb-white truncate">{title}</p>
-          <p className="text-xs text-neutral-400 truncate mt-0.5">{sub}</p>
-
-          {/* 마이 박스: 좋아요 표시 */}
-          {!isShared && liked && (
-            <p className="text-xs text-red-500 mt-1">👍 좋아요 누른 컨텐츠</p>
-          )}
-
-          {/* 공유 박스: 게시자 표시 */}
-          {isShared && publishers && publishers.length > 0 && (
-            <p className="text-xs text-yellow-500 mt-1">
-              게시자: {publishers.map((p) => p.nickname).join(', ')}
-            </p>
-          )}
-        </div>
-
-        {/* 시청 상태 */}
-        {item.memberInteraction?.watchStatus && (
-          <span className="text-xs text-neutral-400 shrink-0">
-            {item.memberInteraction.watchStatus}
-          </span>
-        )}
-      </li>
+        posterSrc={imageUrl}
+        title={title}
+        year={year}
+        genres={genres}
+        watchStatus={watchStatus}
+        boxMode={boxMode}
+        showDivider={!isLast}
+      />
     );
   };
 
@@ -134,31 +116,25 @@ export default function BoxContentsPage() {
           <>
             {/* 영화 */}
             {grouped.movies.length > 0 && (
-              <section className="mb-6">
-                <ListTitle title={`영화 (${grouped.movies.length})`} variant="none" className="mb-3" />
-                <ul className="space-y-3">
-                  {grouped.movies.map(renderItem)}
-                </ul>
+              <section className="mb-4">
+                <ListTitle title={`영화 (${grouped.movies.length})`} variant="none" className="mb-1" />
+                {grouped.movies.map(renderItem)}
               </section>
             )}
 
             {/* 시리즈 */}
             {grouped.tvs.length > 0 && (
-              <section className="mb-6">
-                <ListTitle title={`시리즈 (${grouped.tvs.length})`} variant="none" className="mb-3" />
-                <ul className="space-y-3">
-                  {grouped.tvs.map(renderItem)}
-                </ul>
+              <section className="mb-4">
+                <ListTitle title={`시리즈 (${grouped.tvs.length})`} variant="none" className="mb-1" />
+                {grouped.tvs.map(renderItem)}
               </section>
             )}
 
             {/* 인물 */}
             {grouped.persons.length > 0 && (
-              <section className="mb-6">
-                <ListTitle title={`인물 (${grouped.persons.length})`} variant="none" className="mb-3" />
-                <ul className="space-y-3">
-                  {grouped.persons.map(renderItem)}
-                </ul>
+              <section className="mb-4">
+                <ListTitle title={`인물 (${grouped.persons.length})`} variant="none" className="mb-1" />
+                {grouped.persons.map(renderItem)}
               </section>
             )}
           </>

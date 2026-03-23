@@ -105,15 +105,15 @@ export default function RecordPage() {
                   <p className="text-xs text-neutral-500 truncate">
                     {getSubText(item.contentSummary)}
                   </p>
-                  {item.memberInteraction?.liked && (
+                  {item.memberRecord?.liked && (
                     <p className="text-xs text-red-400 mt-0.5">
                       좋아요 누른 컨텐츠
                     </p>
                   )}
                 </div>
-                {item.memberInteraction?.watchStatus && (
+                {item.memberRecord?.watchStatus && (
                   <span className="text-xs text-neutral-400 shrink-0 whitespace-nowrap">
-                    {WATCH_STATUS_LABEL[item.memberInteraction.watchStatus]}
+                    {WATCH_STATUS_LABEL[item.memberRecord.watchStatus]}
                   </span>
                 )}
               </li>

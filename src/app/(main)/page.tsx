@@ -1,34 +1,80 @@
-import BottomMenu from "@/components/common/BottomMenu";
-import Header from "@/components/common/Header";
-import MobileFrame from "@/components/common/MobileFrame";
-import Link from "next/link";
+import BottomMenu from '@/components/common/BottomMenu';
+import Header from '@/components/common/Header';
+import MobileFrame from '@/components/common/MobileFrame';
+import MainContent from '@/components/common/MainContent';
+import ListTitle from '@/components/list/ListTitle';
+import ContentCard from '@/components/content/ContentCard';
+import { fetchPopularMovieList } from '@/api/movie';
+import { fetchPopularTvList } from '@/api/tv';
+import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
+import type { ContentItem } from '@/types/content';
+import type { MovieSummary } from '@/types/movie';
+import type { TvSummary } from '@/types/tv';
+import Link from 'next/link';
 
-const DISCOVER_LINKS = [
-    { href: '/discover/popular/movie', label: '인기 영화' },
-    { href: '/discover/popular/tv', label: '인기 시리즈' },
-    { href: '/discover/top-rated/movie', label: '높은 평가 영화' },
-    { href: '/discover/top-rated/tv', label: '높은 평가 시리즈' },
-];
+async function loadSections() {
+  const [movieRes, tvRes] = await Promise.allSettled([
+    fetchPopularMovieList(),
+    fetchPopularTvList(),
+  ]);
 
-export default function HomePage(){
-    return (
-        <MobileFrame>
-            <Header variant="center" />
-            <main className="p-4">
-                <h1 className="text-xl font-bold mb-4 text-wb-white">홈화면</h1>
-                <div className="flex flex-col gap-2">
-                    {DISCOVER_LINKS.map((link) => (
-                        <Link
-                            key={link.href}
-                            href={link.href}
-                            className="p-3 bg-wb-dark-04 text-wb-white rounded hover:bg-wb-dark-05"
-                        >
-                            {link.label}
-                        </Link>
-                    ))}
-                </div>
-            </main>
-            <BottomMenu />
-        </MobileFrame>
-    );
+  const movies = movieRes.status === 'fulfilled' ? movieRes.value.contentItemList : [];
+  const tvShows = tvRes.status === 'fulfilled' ? tvRes.value.contentItemList : [];
+
+  return { movies, tvShows };
+}
+
+function CardScroll<T extends MovieSummary | TvSummary>({
+  items,
+}: {
+  items: ContentItem<T>[];
+}) {
+  return (
+    <div className="flex gap-[15px] overflow-x-auto pl-[16px] pr-[16px] pb-2 scrollbar-hide">
+      {items.map((item) => (
+        <ContentCard
+          key={item.contentSummary.contentId}
+          posterSrc={getImageUrl(item.contentSummary)}
+          title={getDisplayTitle(item.contentSummary)}
+          rating={item.contentSummary.voteAverage}
+        />
+      ))}
+    </div>
+  );
+}
+
+export default async function HomePage() {
+  const { movies, tvShows } = await loadSections();
+
+  return (
+    <MobileFrame>
+      <Header variant="center" />
+      <MainContent>
+        {/* 인기 영화 */}
+        <section className="mb-6">
+          <Link href="/discover/popular/movie">
+            <ListTitle title="인기 영화" variant="arrow" className="py-[12px]" />
+          </Link>
+          {movies.length > 0 ? (
+            <CardScroll items={movies} />
+          ) : (
+            <p className="text-sm text-wb-grey-02 px-[16px]">불러올 수 없습니다</p>
+          )}
+        </section>
+
+        {/* 인기 시리즈 */}
+        <section className="mb-6">
+          <Link href="/discover/popular/tv">
+            <ListTitle title="인기 시리즈" variant="arrow" className="py-[12px]" />
+          </Link>
+          {tvShows.length > 0 ? (
+            <CardScroll items={tvShows} />
+          ) : (
+            <p className="text-sm text-wb-grey-02 px-[16px]">불러올 수 없습니다</p>
+          )}
+        </section>
+      </MainContent>
+      <BottomMenu />
+    </MobileFrame>
+  );
 }

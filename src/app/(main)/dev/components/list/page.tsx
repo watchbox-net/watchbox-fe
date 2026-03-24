@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import ListTitle from '@/components/list/ListTitle';
 import ContentListItem from '@/components/list/ContentListItem';
+import ContentCard from '@/components/content/ContentCard';
 
 export default function ListComponentsPage() {
   return (
@@ -118,6 +119,31 @@ export default function ListComponentsPage() {
           <p>멤버정보 — 10px, my: 좋아요(wb-red), shared: 게시자(wb-primary)</p>
           <p>아이콘 — WatchStatusIcon medium (24px)</p>
           <p>구분선 — 0.5px, bg-wb-dark-05</p>
+        </div>
+      </section>
+
+      {/* ── ContentCard ────────────────────────── */}
+      <section>
+        <h2 className="text-xl font-bold text-black mb-4">Content Card</h2>
+
+        <div className="bg-wb-dark-01 rounded-lg p-6">
+          <p className="text-xs font-semibold text-neutral-500 mb-3">카드 스크롤 예시</p>
+          <div className="flex gap-[15px] overflow-x-auto pb-2">
+            <ContentCard title="더 립" rating={7.1} />
+            <ContentCard title="주토피아 2" rating={7.6} />
+            <ContentCard title="아바타: 불과 재" rating={7.3} />
+            <ContentCard title="스폰지밥 무비: 네모바지를 찾아서" rating={6.5} />
+            <ContentCard title="프레데터: 죽음의 땅" rating={7.8} />
+          </div>
+        </div>
+
+        <div className="bg-neutral-100 rounded-lg p-4 text-sm text-neutral-700 space-y-1 mt-4">
+          <p className="font-semibold text-black mb-2">디자인 스펙</p>
+          <p>크기 — 140×270 (Poster large 140×199 + 하단 71px)</p>
+          <p>하단 배경 — bg-wb-dark-02, rounded-b-[10px]</p>
+          <p>제목 — 14px Medium, text-white, text-center, truncate</p>
+          <p>평점 — 14px Medium, text-wb-green, tracking-[1.4px]</p>
+          <p>아이콘 — BoxIcon small(20px) + WatchStatusIcon small(20px), gap-[8px]</p>
         </div>
       </section>
     </div>

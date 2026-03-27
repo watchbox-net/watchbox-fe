@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
 import MobileFrame from '@/components/common/MobileFrame';

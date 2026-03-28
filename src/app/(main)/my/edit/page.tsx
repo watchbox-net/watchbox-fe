@@ -128,10 +128,10 @@ export default function ProfileEditPage() {
                 type="button"
                 onClick={handleSave}
                 disabled={!isValid || saving}
-                className={`w-full h-[48px] rounded-[8px] text-[15px] font-bold text-white leading-[24px] shadow-sm ${
+                className={`w-full h-[48px] rounded-[8px] text-[15px] font-bold leading-[24px] shadow-sm ${
                   isValid && !saving
-                    ? 'bg-wb-green'
-                    : 'bg-wb-green/40'
+                    ? 'bg-wb-green text-white'
+                    : 'bg-wb-dark-05 text-wb-grey-01'
                 }`}
               >
                 {saving ? '저장 중...' : '저장'}

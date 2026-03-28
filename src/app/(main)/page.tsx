@@ -34,12 +34,16 @@ function CardScroll<T extends MovieSummary | TvSummary>({
   return (
     <div className="flex gap-[15px] overflow-x-auto pl-[16px] pr-[16px] pb-2 scrollbar-hide">
       {items.map((item) => (
-        <ContentCard
+        <Link
           key={item.contentSummary.contentId}
-          posterSrc={getImageUrl(item.contentSummary)}
-          title={getDisplayTitle(item.contentSummary)}
-          rating={item.contentSummary.voteAverage}
-        />
+          href={`/content/${item.contentSummary.mediaType}/${item.contentSummary.contentId}`}
+        >
+          <ContentCard
+            posterSrc={getImageUrl(item.contentSummary)}
+            title={getDisplayTitle(item.contentSummary)}
+            rating={item.contentSummary.voteAverage}
+          />
+        </Link>
       ))}
     </div>
   );

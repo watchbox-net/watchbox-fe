@@ -41,11 +41,13 @@ export default function RecordPage() {
     setToast({ visible: true, message });
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!isAuthenticated) { setLoading(false); return; }
     fetchWatchStatusList()
       .then((res) => setAllItems(res.contentItemList))
       .catch(() => setError(true))
       .finally(() => setLoading(false));
-  }, []);
+  }, [authLoading, isAuthenticated]);
 
   // 외부 클릭 시 메뉴 닫기
   useEffect(() => {
@@ -171,17 +173,29 @@ export default function RecordPage() {
         {loading && (
           <p className="text-center text-neutral-500 py-8">불러오는 중...</p>
         )}
-        {!loading && error && (
+        {!loading && !isAuthenticated && (
+          <div className="flex flex-col items-center gap-[16px] py-[60px]">
+            <p className="text-[16px] text-wb-grey-02">로그인이 필요합니다.</p>
+            <button
+              type="button"
+              onClick={() => router.push('/login')}
+              className="h-[40px] px-[24px] bg-wb-green rounded-[8px] text-[14px] font-bold text-white"
+            >
+              로그인
+            </button>
+          </div>
+        )}
+        {!loading && isAuthenticated && error && (
           <p className="text-center text-neutral-500 py-8">
-            로그인이 필요하거나 오류가 발생했습니다.
+            오류가 발생했습니다.
           </p>
         )}
-        {!loading && !error && filteredItems.length === 0 && (
+        {!loading && isAuthenticated && !error && filteredItems.length === 0 && (
           <p className="text-center text-neutral-500 py-8">
             시청 기록이 없습니다.
           </p>
         )}
-        {!loading && !error && filteredItems.length > 0 && (
+        {!loading && isAuthenticated && !error && filteredItems.length > 0 && (
           <div>{filteredItems.map(renderItem)}</div>
         )}
       </MainContent>

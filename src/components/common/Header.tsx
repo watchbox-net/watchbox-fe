@@ -105,9 +105,15 @@ export default function Header({
           )}
 
           {(variant === 'icon1' || variant === 'icon1-back') && (
-            <button type="button" onClick={onRightIconClick ?? onSearch} className="ml-auto">
-              {rightIcon ?? <MagnifyingGlassOutline className="size-6 text-wb-grey-04" />}
-            </button>
+            rightIcon ? (
+              <div className="ml-auto" onClick={onRightIconClick}>
+                {rightIcon}
+              </div>
+            ) : (
+              <button type="button" onClick={onRightIconClick ?? onSearch} className="ml-auto">
+                <MagnifyingGlassOutline className="size-6 text-wb-grey-04" />
+              </button>
+            )
           )}
 
           {variant === 'edit' && (

@@ -38,6 +38,8 @@ interface ContentListItemProps {
   showDivider?: boolean;
   /** 클릭 시 실행 (상세 페이지 이동 등) */
   onClick?: () => void;
+  /** 시청 상태 아이콘 클릭 시 실행 (stopPropagation 처리됨) */
+  onStatusClick?: (e: React.MouseEvent) => void;
   className?: string;
 }
 
@@ -61,6 +63,7 @@ export default function ContentListItem({
   boxMode,
   showDivider = true,
   onClick,
+  onStatusClick,
   className,
 }: ContentListItemProps) {
   // 연도 · 장르1, 장르2
@@ -100,7 +103,10 @@ export default function ContentListItem({
         </div>
 
         {/* 오른쪽: 시청 상태 아이콘 */}
-        <div className="shrink-0 ml-[10px]">
+        <div
+          className={`shrink-0 ml-[10px] ${onStatusClick ? 'cursor-pointer' : ''}`}
+          onClick={onStatusClick ? (e) => { e.stopPropagation(); onStatusClick(e); } : undefined}
+        >
           <WatchStatusIcon status={toIconStatus(watchStatus)} size="medium" />
         </div>
       </div>

@@ -1,16 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
 import TabNav from '@/components/common/TabNav';
+import ContentListItem from '@/components/list/ContentListItem';
+import WatchStatusMenu from '@/components/common/WatchStatusMenu';
 import { PlusOutline } from '@/components/icons';
 import MainContent from '@/components/common/MainContent';
-import { fetchWatchStatusList } from '@/lib/api/record';
+import { fetchWatchStatusList, upsertWatchStatus, deleteWatchRecord } from '@/lib/api/record';
 import type { ContentItem, WatchStatus } from '@/types/content';
-import { getImageUrl, getDisplayTitle, getSubText } from '@/lib/utils/content';
+import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
 
 const TABS = [
   { key: 'all', label: '전체' },
@@ -18,21 +20,14 @@ const TABS = [
   { key: 'tv', label: '시리즈' },
 ] as const;
 
-type TabKey = (typeof TABS)[number]['key'];
-
-const WATCH_STATUS_LABEL: Record<WatchStatus, string> = {
-  COMPLETED: 'COMPLETED',
-  WATCHING: 'WATCHING',
-  PLANNED: 'PLANNED',
-  PAUSED: 'PAUSED',
-};
-
 export default function RecordPage() {
   const router = useRouter();
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [allItems, setAllItems] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchWatchStatusList()
@@ -41,14 +36,96 @@ export default function RecordPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  // 외부 클릭 시 메뉴 닫기
+  useEffect(() => {
+    const handleMouseDown = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpenMenuId(null);
+      }
+    };
+    if (openMenuId !== null) {
+      document.addEventListener('mousedown', handleMouseDown);
+    }
+    return () => document.removeEventListener('mousedown', handleMouseDown);
+  }, [openMenuId]);
+
   const activeTab = TABS[activeTabIndex].key;
   const filteredItems =
     activeTab === 'all'
       ? allItems
       : allItems.filter(
-          (item) =>
-            item.contentSummary.mediaType === activeTab.toUpperCase(),
+          (item) => item.contentSummary.mediaType === activeTab.toUpperCase(),
         );
+
+  const handleStatusSelect = async (
+    item: ContentItem,
+    status: Exclude<WatchStatus, 'NONE'>,
+  ) => {
+    setOpenMenuId(null);
+    const summary = item.contentSummary;
+    if (summary.mediaType !== 'MOVIE' && summary.mediaType !== 'TV') return;
+    try {
+      await upsertWatchStatus({
+        contentId: summary.contentId,
+        watchMediaType: summary.mediaType,
+        watchStatus: status,
+      });
+      setAllItems((prev) =>
+        prev.map((i) =>
+          (i.contentRecordId ?? i.contentSummary.contentId) ===
+          (item.contentRecordId ?? summary.contentId)
+            ? { ...i, memberRecord: { ...i.memberRecord, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
+            : i,
+        ),
+      );
+    } catch {/* 에러 무시 */}
+  };
+
+  const handleDelete = async (item: ContentItem) => {
+    setOpenMenuId(null);
+    if (!item.contentRecordId) return;
+    try {
+      await deleteWatchRecord(item.contentRecordId);
+      setAllItems((prev) =>
+        prev.filter((i) => i.contentRecordId !== item.contentRecordId),
+      );
+    } catch {/* 에러 무시 */}
+  };
+
+  const renderItem = (item: ContentItem, idx: number, arr: ContentItem[]) => {
+    const summary = item.contentSummary;
+    const year = 'year' in summary ? summary.year : null;
+    const genres = 'genreList' in summary ? summary.genreList : null;
+    const itemId = item.contentRecordId ?? summary.contentId;
+    const isMenuOpen = openMenuId === itemId;
+
+    return (
+      <div key={itemId} className="relative">
+        <ContentListItem
+          posterSrc={getImageUrl(summary)}
+          title={getDisplayTitle(summary)}
+          year={year}
+          genres={genres}
+          watchStatus={item.memberRecord?.watchStatus ?? null}
+          boxMode={{ mode: 'my', liked: item.memberRecord?.liked === true }}
+          showDivider={idx < arr.length - 1}
+          onClick={() => router.push(`/content/${summary.mediaType}/${summary.contentId}`)}
+          onStatusClick={() => setOpenMenuId(isMenuOpen ? null : itemId)}
+        />
+        {isMenuOpen && (
+          <div
+            ref={menuRef}
+            className="absolute right-[5px] top-[50%] translate-y-[-50%] z-50"
+          >
+            <WatchStatusMenu
+              onSelect={(status) => handleStatusSelect(item, status)}
+              onDelete={() => handleDelete(item)}
+            />
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <MobileFrame>
@@ -64,64 +141,22 @@ export default function RecordPage() {
         onChange={setActiveTabIndex}
       />
 
-      {/* 리스트 */}
       <MainContent>
         {loading && (
           <p className="text-center text-neutral-500 py-8">불러오는 중...</p>
         )}
-
         {!loading && error && (
           <p className="text-center text-neutral-500 py-8">
             로그인이 필요하거나 오류가 발생했습니다.
           </p>
         )}
-
         {!loading && !error && filteredItems.length === 0 && (
           <p className="text-center text-neutral-500 py-8">
             시청 기록이 없습니다.
           </p>
         )}
-
         {!loading && !error && filteredItems.length > 0 && (
-          <ul>
-            {filteredItems.map((item) => (
-              <li
-                key={item.contentRecordId ?? item.contentSummary.contentId}
-                className="flex items-center gap-3 px-4 py-3 border-b border-neutral-800 cursor-pointer"
-                onClick={() => router.push(`/content/${item.contentSummary.mediaType}/${item.contentSummary.contentId}`)}
-              >
-                {getImageUrl(item.contentSummary) ? (
-                  <img
-                    src={getImageUrl(item.contentSummary)!}
-                    alt={getDisplayTitle(item.contentSummary)}
-                    className="w-16 h-22 rounded object-cover shrink-0 bg-neutral-800"
-                  />
-                ) : (
-                  <div className="w-16 h-22 rounded bg-neutral-800 shrink-0 flex items-center justify-center text-neutral-600 text-xs">
-                    No img
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-wb-white truncate">
-                    {getDisplayTitle(item.contentSummary)}
-                  </p>
-                  <p className="text-xs text-neutral-500 truncate">
-                    {getSubText(item.contentSummary)}
-                  </p>
-                  {item.memberRecord?.liked && (
-                    <p className="text-xs text-red-400 mt-0.5">
-                      좋아요 누른 컨텐츠
-                    </p>
-                  )}
-                </div>
-                {item.memberRecord?.watchStatus && (
-                  <span className="text-xs text-neutral-400 shrink-0 whitespace-nowrap">
-                    {WATCH_STATUS_LABEL[item.memberRecord.watchStatus]}
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
+          <div>{filteredItems.map(renderItem)}</div>
         )}
       </MainContent>
 

@@ -87,7 +87,7 @@ function toIconStatus(status: string | null | undefined) {
 function InfoRow({ label, value }: { label: string; value: string | null | undefined }) {
   if (!value) return null;
   return (
-    <div className="flex gap-[20px] py-[10px]">
+    <div className="flex gap-[20px] py-[7px]">
       <span className="w-[51px] shrink-0 text-[14px] text-wb-grey-02">{label}</span>
       <span className="text-[14px] text-wb-grey-04">{value}</span>
     </div>

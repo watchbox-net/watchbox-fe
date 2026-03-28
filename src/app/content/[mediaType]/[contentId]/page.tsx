@@ -1,25 +1,37 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
 import TabNav from '@/components/common/TabNav';
+import Toast from '@/components/common/Toast';
+import WatchStatusMenu from '@/components/common/WatchStatusMenu';
 import LikeIcon from '@/components/icons/LikeIcon';
 import BoxIcon from '@/components/icons/BoxIcon';
 import WatchStatusIcon from '@/components/icons/WatchStatusIcon';
 import { ChevronLeftOutline } from '@/components/icons';
 import { fetchContentDetail } from '@/lib/api/content';
+import { upsertWatchStatus, deleteWatchRecord, addLike, deleteLike } from '@/lib/api/record';
 import type {
   ContentDetailResponse,
   ContentDetailMediaType,
+  DetailMemberRecord,
   MovieInfo,
   TvInfo,
 } from '@/types/content-detail';
+import type { WatchStatus } from '@/types/content';
 
 // ─── TMDB 이미지 베이스 URL ──────────────────────────────────
 const TMDB_POSTER   = 'https://image.tmdb.org/t/p/w342';
 const TMDB_BACKDROP = 'https://image.tmdb.org/t/p/w780';
+
+const STATUS_LABEL: Record<Exclude<WatchStatus, 'NONE'>, string> = {
+  COMPLETED: '시청 완료',
+  WATCHING:  '시청중',
+  PLANNED:   '시청 예정',
+  PAUSED:    '시청 중단',
+};
 
 // ─── mediaType별 표시 정보 추출 ─────────────────────────────
 function extractInfo(detail: ContentDetailResponse) {
@@ -84,23 +96,91 @@ function InfoRow({ label, value }: { label: string; value: string | null | undef
 
 // ─── 메인 페이지 ─────────────────────────────────────────────
 export default function ContentDetailPage() {
-  const router   = useRouter();
-  const params   = useParams();
-  const mediaType  = (params.mediaType  as string).toUpperCase() as ContentDetailMediaType;
-  const contentId  = Number(params.contentId);
+  const router    = useRouter();
+  const params    = useParams();
+  const mediaType = (params.mediaType as string).toUpperCase() as ContentDetailMediaType;
+  const contentId = Number(params.contentId);
 
-  const [detail,   setDetail]   = useState<ContentDetailResponse | null>(null);
-  const [loading,  setLoading]  = useState(true);
-  const [error,    setError]    = useState(false);
-  const [expanded, setExpanded] = useState(false);
-  const [activeTab, setActiveTab] = useState(0); // 0: 작품 정보, 1: 캐스팅
+  const [detail,      setDetail]      = useState<ContentDetailResponse | null>(null);
+  const [loading,     setLoading]     = useState(true);
+  const [error,       setError]       = useState(false);
+  const [expanded,    setExpanded]    = useState(false);
+  const [activeTab,   setActiveTab]   = useState(0);
+
+  // 로컬 상호작용 상태
+  const [liked,         setLiked]         = useState(false);
+  const [recordId,      setRecordId]      = useState<number | null>(null);
+  const [watchStatus,   setWatchStatus]   = useState<WatchStatus | null>(null);
+
+  // 시청 상태 메뉴
+  const [statusMenuOpen, setStatusMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // 토스트
+  const [toast, setToast] = useState({ visible: false, message: '' });
+  const showToast = (msg: string) => setToast({ visible: true, message: msg });
 
   useEffect(() => {
     fetchContentDetail(mediaType, contentId)
-      .then(setDetail)
+      .then((res) => {
+        setDetail(res);
+        const mr: DetailMemberRecord | null = res.memberRecord;
+        setLiked(mr?.liked === true);
+        setRecordId(mr?.recordId ?? null);
+        setWatchStatus(mr?.watchStatus ?? null);
+      })
       .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, [mediaType, contentId]);
+
+  // 외부 클릭 시 메뉴 닫기
+  useEffect(() => {
+    const handleMouseDown = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setStatusMenuOpen(false);
+      }
+    };
+    if (statusMenuOpen) document.addEventListener('mousedown', handleMouseDown);
+    return () => document.removeEventListener('mousedown', handleMouseDown);
+  }, [statusMenuOpen]);
+
+  // ── 좋아요 토글 ─────────────────────────────────────────────
+  const handleLike = async () => {
+    if (mediaType !== 'MOVIE' && mediaType !== 'TV') return;
+    try {
+      if (liked) {
+        await addLike({ contentId, mediaType, liked: false });
+        setLiked(false);
+        showToast('좋아요를 취소했습니다.');
+      } else {
+        await addLike({ contentId, mediaType, liked: true });
+        setLiked(true);
+        showToast('좋아요를 등록했습니다.');
+      }
+    } catch {/* 에러 무시 */}
+  };
+
+  // ── 시청 상태 변경 ──────────────────────────────────────────
+  const handleStatusSelect = async (status: Exclude<WatchStatus, 'NONE'>) => {
+    setStatusMenuOpen(false);
+    if (mediaType !== 'MOVIE' && mediaType !== 'TV') return;
+    try {
+      await upsertWatchStatus({ contentId, watchMediaType: mediaType, watchStatus: status });
+      setWatchStatus(status);
+      showToast(`${STATUS_LABEL[status]}로 변경되었습니다.`);
+    } catch {/* 에러 무시 */}
+  };
+
+  // ── 시청 기록 삭제 ──────────────────────────────────────────
+  const handleStatusDelete = async () => {
+    setStatusMenuOpen(false);
+    if (!recordId) return;
+    try {
+      await deleteWatchRecord(recordId);
+      setWatchStatus(null);
+      showToast('시청 기록에서 삭제되었습니다.');
+    } catch {/* 에러 무시 */}
+  };
 
   if (loading) {
     return (
@@ -125,12 +205,9 @@ export default function ContentDetailPage() {
   }
 
   const info = extractInfo(detail);
-  const { memberRecord } = detail;
-
   const posterUrl   = info.posterPath   ? `${TMDB_POSTER}${info.posterPath}`     : null;
   const backdropUrl = info.backdropPath ? `${TMDB_BACKDROP}${info.backdropPath}` : null;
 
-  // 메타 한 줄: 연도 · 장르 · 러닝타임
   const metaParts = [
     info.year,
     info.genreList?.join(', '),
@@ -146,17 +223,11 @@ export default function ContentDetailPage() {
         {/* ── 백드롭 + 뒤로가기 ─────────────────────────── */}
         <div className="relative h-[230px] bg-wb-dark-03 shrink-0">
           {backdropUrl ? (
-            <img
-              src={backdropUrl}
-              alt=""
-              className="w-full h-full object-cover"
-            />
+            <img src={backdropUrl} alt="" className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full bg-wb-dark-03" />
           )}
-          {/* 어두운 그라디언트 오버레이 */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/20" />
-          {/* 뒤로가기 버튼 */}
           <button
             type="button"
             onClick={() => router.back()}
@@ -168,7 +239,6 @@ export default function ContentDetailPage() {
 
         {/* ── 포스터 + 제목 블록 ────────────────────────── */}
         <div className="flex gap-[14px] px-[17px] mt-[16px]">
-          {/* 포스터 */}
           <div className="w-[115px] h-[163px] rounded-[10px] overflow-hidden shrink-0 bg-wb-dark-03">
             {posterUrl ? (
               <img src={posterUrl} alt={info.titleKo} className="w-full h-full object-cover" />
@@ -176,8 +246,6 @@ export default function ContentDetailPage() {
               <div className="w-full h-full bg-wb-dark-05" />
             )}
           </div>
-
-          {/* 제목 정보 */}
           <div className="flex flex-col justify-center gap-[4px] min-w-0 pt-[4px]">
             <h1 className="text-[24px] font-semibold leading-[1.3] text-white break-keep">
               {info.titleKo}
@@ -186,9 +254,7 @@ export default function ContentDetailPage() {
               <p className="text-[11px] text-wb-grey-03 truncate">{info.titleOriginal}</p>
             )}
             {metaParts.length > 0 && (
-              <p className="text-[12px] text-wb-grey-03 mt-[2px]">
-                {metaParts.join(' · ')}
-              </p>
+              <p className="text-[12px] text-wb-grey-03 mt-[2px]">{metaParts.join(' · ')}</p>
             )}
           </div>
         </div>
@@ -196,11 +262,7 @@ export default function ContentDetailPage() {
         {/* ── 줄거리 ───────────────────────────────────── */}
         {info.overview && (
           <div className="px-[16px] mt-[20px]">
-            <p
-              className={`text-[13px] font-medium leading-[22px] text-wb-grey-03 ${
-                !expanded ? 'line-clamp-3' : ''
-              }`}
-            >
+            <p className={`text-[13px] font-medium leading-[22px] text-wb-grey-03 ${!expanded ? 'line-clamp-3' : ''}`}>
               {info.overview}
             </p>
             {needsExpansion && (
@@ -217,17 +279,18 @@ export default function ContentDetailPage() {
 
         {/* ── 액션 아이콘 3개 ──────────────────────────── */}
         <div className="flex items-start justify-around px-[20px] py-[24px]">
+
           {/* 좋아요 */}
           <button
             type="button"
             className="flex flex-col items-center gap-[8px] cursor-pointer"
-            onClick={() => {/* TODO: 좋아요 토글 */}}
+            onClick={handleLike}
           >
-            <LikeIcon size="xl" active={memberRecord?.liked ?? false} />
+            <LikeIcon size="xl" active={liked} />
             <span className="text-[11px] text-wb-grey-04">좋아요</span>
           </button>
 
-          {/* 박스에 추가 (이벤트 없음) */}
+          {/* 박스에 추가 */}
           <button
             type="button"
             className="flex flex-col items-center gap-[8px] cursor-pointer"
@@ -237,17 +300,26 @@ export default function ContentDetailPage() {
           </button>
 
           {/* 시청 상태 */}
-          <button
-            type="button"
-            className="flex flex-col items-center gap-[8px] cursor-pointer"
-            onClick={() => {/* TODO: 시청 상태 변경 */}}
-          >
-            <WatchStatusIcon
-              size="xl"
-              status={toIconStatus(memberRecord?.watchStatus)}
-            />
+          <div className="relative flex flex-col items-center gap-[8px]">
+            <button
+              type="button"
+              className="cursor-pointer"
+              onClick={() => setStatusMenuOpen((v) => !v)}
+            >
+              <WatchStatusIcon size="xl" status={toIconStatus(watchStatus)} />
+            </button>
             <span className="text-[11px] text-wb-grey-04">시청 상태</span>
-          </button>
+
+            {/* 시청 상태 메뉴 - 아이콘 아래로 */}
+            {statusMenuOpen && (
+              <div ref={menuRef} className="absolute top-full mt-1 center z-50">
+                <WatchStatusMenu
+                  onSelect={handleStatusSelect}
+                  onDelete={handleStatusDelete}
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* ── 탭 ───────────────────────────────────────── */}
@@ -265,8 +337,6 @@ export default function ContentDetailPage() {
             ))}
           </div>
         )}
-
-        {/* 캐스팅 탭은 미구현 */}
         {activeTab === 1 && (
           <div className="px-[16px] pt-[20px]">
             <p className="text-[14px] text-wb-grey-02 text-center py-8">준비 중입니다.</p>
@@ -276,6 +346,12 @@ export default function ContentDetailPage() {
       </div>
 
       <BottomMenu />
+
+      <Toast
+        message={toast.message}
+        visible={toast.visible}
+        onClose={() => setToast((t) => ({ ...t, visible: false }))}
+      />
     </MobileFrame>
   );
 }

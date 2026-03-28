@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
@@ -8,9 +9,12 @@ import Header from '@/components/common/Header';
 import TabNav from '@/components/common/TabNav';
 import ContentListItem from '@/components/list/ContentListItem';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
+import Modal from '@/components/common/Modal';
+import Toast from '@/components/common/Toast';
 import { PlusOutline } from '@/components/icons';
 import MainContent from '@/components/common/MainContent';
 import { fetchWatchStatusList, upsertWatchStatus, deleteWatchRecord } from '@/lib/api/record';
+import { useAuth } from '@/lib/hooks/useAuth';
 import type { ContentItem, WatchStatus } from '@/types/content';
 import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
 
@@ -26,8 +30,15 @@ export default function RecordPage() {
   const [allItems, setAllItems] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const [menuDir, setMenuDir] = useState<'down' | 'up'>('down');
+  const [loginModalVisible, setLoginModalVisible] = useState(false);
+  const [toast, setToast] = useState({ visible: false, message: '' });
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const showToast = (message: string) =>
+    setToast({ visible: true, message });
 
   useEffect(() => {
     fetchWatchStatusList()
@@ -78,6 +89,13 @@ export default function RecordPage() {
             : i,
         ),
       );
+      const STATUS_LABEL: Record<Exclude<WatchStatus, 'NONE'>, string> = {
+        COMPLETED: '시청 완료',
+        WATCHING:  '시청중',
+        PLANNED:   '시청 예정',
+        PAUSED:    '시청 중단',
+      };
+      showToast(`${STATUS_LABEL[status]}로 변경되었습니다.`);
     } catch {/* 에러 무시 */}
   };
 
@@ -89,6 +107,7 @@ export default function RecordPage() {
       setAllItems((prev) =>
         prev.filter((i) => i.contentRecordId !== item.contentRecordId),
       );
+      showToast('시청 기록에서 삭제되었습니다.');
     } catch {/* 에러 무시 */}
   };
 
@@ -99,31 +118,38 @@ export default function RecordPage() {
     const itemId = item.contentRecordId ?? summary.contentId;
     const isMenuOpen = openMenuId === itemId;
 
-    return (
-      <div key={itemId} className="relative">
-        <ContentListItem
-          posterSrc={getImageUrl(summary)}
-          title={getDisplayTitle(summary)}
-          year={year}
-          genres={genres}
-          watchStatus={item.memberRecord?.watchStatus ?? null}
-          boxMode={{ mode: 'my', liked: item.memberRecord?.liked === true }}
-          showDivider={idx < arr.length - 1}
-          onClick={() => router.push(`/content/${summary.mediaType}/${summary.contentId}`)}
-          onStatusClick={() => setOpenMenuId(isMenuOpen ? null : itemId)}
+    const menu: ReactNode = isMenuOpen ? (
+      <div
+        ref={menuRef}
+        className={`absolute right-0 z-50 ${menuDir === 'down' ? 'top-full mt-1' : 'bottom-full mb-1'}`}
+      >
+        <WatchStatusMenu
+          onSelect={(status) => handleStatusSelect(item, status)}
+          onDelete={() => handleDelete(item)}
         />
-        {isMenuOpen && (
-          <div
-            ref={menuRef}
-            className="absolute right-[5px] top-[50%] translate-y-[-50%] z-50"
-          >
-            <WatchStatusMenu
-              onSelect={(status) => handleStatusSelect(item, status)}
-              onDelete={() => handleDelete(item)}
-            />
-          </div>
-        )}
       </div>
+    ) : null;
+
+    return (
+      <ContentListItem
+        key={itemId}
+        posterSrc={getImageUrl(summary)}
+        title={getDisplayTitle(summary)}
+        year={year}
+        genres={genres}
+        watchStatus={item.memberRecord?.watchStatus ?? null}
+        boxMode={{ mode: 'my', liked: item.memberRecord?.liked === true }}
+        showDivider={idx < arr.length - 1}
+        onClick={() => router.push(`/content/${summary.mediaType}/${summary.contentId}`)}
+        onStatusClick={(e) => {
+          if (!authLoading && !isAuthenticated) { setLoginModalVisible(true); return; }
+          if (isMenuOpen) { setOpenMenuId(null); return; }
+          const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+          setMenuDir(window.innerHeight - rect.bottom < 220 ? 'up' : 'down');
+          setOpenMenuId(itemId);
+        }}
+        statusMenuSlot={menu}
+      />
     );
   };
 
@@ -161,6 +187,21 @@ export default function RecordPage() {
       </MainContent>
 
       <BottomMenu />
+      <Modal
+        visible={loginModalVisible}
+        variant="login"
+        title="로그인이 필요합니다"
+        body="시청 상태를 변경하려면\n로그인이 필요합니다."
+        confirmLabel="로그인"
+        cancelLabel="취소"
+        onCancel={() => setLoginModalVisible(false)}
+        onConfirm={() => { setLoginModalVisible(false); router.push('/login'); }}
+      />
+      <Toast
+        message={toast.message}
+        visible={toast.visible}
+        onClose={() => setToast((t) => ({ ...t, visible: false }))}
+      />
     </MobileFrame>
   );
 }

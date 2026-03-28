@@ -1,4 +1,4 @@
-import type { MemberRecord } from './content';
+import type { WatchStatus } from './content';
 
 // ─── MediaType ─────────────────────────────────────────────
 export type ContentDetailMediaType = 'MOVIE' | 'TV';
@@ -51,9 +51,16 @@ export interface TvInfo {
 
 export type ContentInfo = MovieInfo | TvInfo;
 
+// ─── 상세 페이지 사용자 기록 (recordId 포함) ────────────────
+export interface DetailMemberRecord {
+  recordId: number | null;
+  liked: boolean | null;
+  watchStatus: WatchStatus | null;
+}
+
 // ─── API 응답 ───────────────────────────────────────────────
 export interface ContentDetailResponse {
   mediaType: ContentDetailMediaType;
   contentInfo: ContentInfo;
-  memberRecord: MemberRecord | null;
+  memberRecord: DetailMemberRecord | null;
 }

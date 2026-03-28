@@ -31,3 +31,21 @@ export async function upsertWatchStatus(params: {
 export async function deleteWatchRecord(recordId: number): Promise<void> {
   await privateApi.delete(`/records/status/${recordId}`);
 }
+
+/** 좋아요 등록 (로그인 필요) */
+export async function addLike(params: {
+  contentId: number;
+  mediaType: 'MOVIE' | 'TV';
+  liked: boolean;
+}): Promise<{ recordId: number }> {
+  const { data } = await privateApi.post<ApiResponse<{ recordId: number }>>(
+    '/records/likes',
+    params,
+  );
+  return data.data;
+}
+
+/** 좋아요 삭제 (로그인 필요) */
+export async function deleteLike(recordId: number): Promise<void> {
+  await privateApi.delete(`/records/likes/${recordId}`);
+}

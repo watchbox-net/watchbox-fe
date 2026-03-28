@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       // secure: process..env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60, // 1시간
+      maxAge: 60 * 60 * 20, // 20시간 (백엔드 ACCESS_TOKEN_DURATION과 동일)
     });
 
     // refreshToken 쿠키

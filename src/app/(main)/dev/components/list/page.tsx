@@ -1,11 +1,18 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import ListTitle from '@/components/list/ListTitle';
 import ContentListItem from '@/components/list/ContentListItem';
 import ContentCard from '@/components/content/ContentCard';
+import MemberInviteListItem from '@/components/list/MemberInviteListItem';
 
 export default function ListComponentsPage() {
+  // MemberInviteListItem - search 상태 관리 (1번 인덱스는 초기에 checked)
+  const [addedIds, setAddedIds] = useState<Set<number>>(new Set([1]));
+  const toggle = (id: number) =>
+    setAddedIds((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
+
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-10">
       <div className="flex items-center gap-3">
@@ -119,6 +126,96 @@ export default function ListComponentsPage() {
           <p>멤버정보 — 10px, my: 좋아요(wb-red), shared: 게시자(wb-primary)</p>
           <p>아이콘 — WatchStatusIcon medium (24px)</p>
           <p>구분선 — 0.5px, bg-wb-dark-05</p>
+        </div>
+      </section>
+
+      {/* ── MemberInviteListItem ────────────────── */}
+      <section>
+        <h2 className="text-xl font-bold text-black mb-4">Member Invite List Item</h2>
+
+        {/* search */}
+        <div className="mb-6">
+          <p className="text-sm font-semibold text-neutral-600 mb-2">Searched Member List</p>
+          <div className="bg-wb-dark-02 rounded-lg px-[16px]">
+            {['너구리 1', '너구리 2', '너구리 3', '너구리 4', '너구리 5'].map((name, i) => (
+              <MemberInviteListItem
+                key={i}
+                variant="search"
+                name={name}
+                added={addedIds.has(i)}
+                onAdd={() => toggle(i)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* invitation */}
+        <div className="mb-6">
+          <p className="text-sm font-semibold text-neutral-600 mb-2">Member Invitation List</p>
+          <div className="bg-wb-dark-02 rounded-lg px-[16px] space-y-[15px] py-[12px]">
+            <MemberInviteListItem
+              variant="invitation"
+              boxName="너구리와 해달의 공유 박스"
+              boxMembers="멤버: 너구리, 해달"
+              inviterName="너구리"
+              onAccept={() => alert('수락')}
+              onReject={() => alert('거절')}
+            />
+            <MemberInviteListItem
+              variant="invitation"
+              boxName="오리와 해달의 공유 박스"
+              boxMembers="멤버: 오리, 해달"
+              inviterName="오리"
+              onAccept={() => alert('수락')}
+              onReject={() => alert('거절')}
+            />
+          </div>
+        </div>
+
+        {/* status */}
+        <div className="mb-6">
+          <p className="text-sm font-semibold text-neutral-600 mb-2">Invitation Status List</p>
+          <div className="bg-wb-dark-02 rounded-lg px-[16px]">
+            <MemberInviteListItem
+              variant="status"
+              userName="사용자A"
+              boxName="공유 박스A"
+              status="pending"
+              onAction={() => alert('취소')}
+              className=""
+            />
+            <MemberInviteListItem
+              variant="status"
+              userName="사용자B"
+              boxName="공유 박스A"
+              status="pending"
+              onAction={() => alert('취소')}
+              className=""
+            />
+            <MemberInviteListItem
+              variant="status"
+              userName="사용자C"
+              boxName="공유 박스A"
+              status="rejected"
+              onAction={() => alert('삭제')}
+              className=""
+            />
+            <MemberInviteListItem
+              variant="status"
+              userName="사용자A"
+              boxName="공유 박스B"
+              status="pending"
+              onAction={() => alert('취소')}
+            />
+          </div>
+        </div>
+
+        <div className="bg-neutral-100 rounded-lg p-4 text-sm text-neutral-700 space-y-1">
+          <p className="font-semibold text-black mb-2">디자인 스펙</p>
+          <p>search — ProfileIcon list(28px) + 이름 18px Regular wb-white-02 + AddedStatusIcon(add/checked)</p>
+          <p>invitation — 박스 썸네일(148×81) + 박스명 16px Medium + 멤버 12px wb-primary / ProfileIcon + 초대자 14px wb-grey-02 + 수락(green)/거절(dark) 버튼 55×28</p>
+          <p>status — ProfileIcon + 메시지 14px white + 상태 11px wb-grey-02 / 취소(dark) or 삭제(red) 버튼 55×28</p>
+          <p>버튼 — h-28px w-55px, rounded-8px, 13px Medium, shadow-xs</p>
         </div>
       </section>
 

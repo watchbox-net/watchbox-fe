@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
@@ -27,6 +28,7 @@ const searchByTab = {
 } as const;
 
 export default function SearchPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabKey>('multi');
   const [query, setQuery] = useState('');
   const [items, setItems] = useState<ContentItem[]>([]);
@@ -113,7 +115,8 @@ export default function SearchPage() {
               {items.map((item) => (
                 <li
                   key={`${item.contentSummary.mediaType}-${item.contentSummary.contentId}`}
-                  className="flex items-center gap-3 px-4 py-3 border-b border-neutral-800"
+                  className="flex items-center gap-3 px-4 py-3 border-b border-neutral-800 cursor-pointer"
+                  onClick={() => router.push(`/content/${item.contentSummary.mediaType}/${item.contentSummary.contentId}`)}
                 >
                   {getImageUrl(item.contentSummary) ? (
                     <img

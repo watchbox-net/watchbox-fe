@@ -34,7 +34,7 @@ export default function ContentCard({
       <Poster src={posterSrc} alt={title} size="large" />
 
       {/* 하단 정보 영역 */}
-      <div className="bg-wb-dark-02 rounded-b-[10px] -mt-[1px] px-[7px] pb-[11px]">
+      <div className="bg-wb-dark-03 rounded-b-[10px] -mt-[1px] px-[7px] pb-[11px]">
         {/* 제목 */}
         <p className="text-[14px] font-medium text-white text-center truncate pt-[8px] pb-[6px]">
           {title}

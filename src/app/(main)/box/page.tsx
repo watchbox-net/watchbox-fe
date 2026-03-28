@@ -1,16 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
-import BottomSheet from '@/components/common/BottomSheet';
 import MainContent from '@/components/common/MainContent';
-import { PlusOutline } from '@/components/icons';
+import ContextMenu from '@/components/common/ContextMenu';
+import { PlusOutline, EllipsisVerticalOutline } from '@/components/icons';
 import ListTitle from '@/components/list/ListTitle';
 import { fetchMyBoxList, fetchSharedBoxList } from '@/lib/api/box';
 import type { MyBoxResponse, SharedBoxResponse, BoxType } from '@/types/box';
+
+type MenuTarget = { boxId: number; boxType: BoxType };
 
 export default function BoxPage() {
   const router = useRouter();
@@ -19,9 +21,9 @@ export default function BoxPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  // 바텀시트 상태
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const [selectedBox, setSelectedBox] = useState<{ boxId: number; boxType: BoxType } | null>(null);
+  // 컨텍스트 메뉴 상태
+  const [openMenu, setOpenMenu] = useState<MenuTarget | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     Promise.all([fetchMyBoxList(), fetchSharedBoxList()])
@@ -33,37 +35,51 @@ export default function BoxPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const openMenu = (boxId: number, boxType: BoxType) => {
-    setSelectedBox({ boxId, boxType });
-    setSheetOpen(true);
+  // 외부 클릭 시 메뉴 닫기
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpenMenu(null);
+      }
+    };
+    if (openMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [openMenu]);
+
+  const toggleMenu = (boxId: number, boxType: BoxType) => {
+    setOpenMenu((prev) =>
+      prev?.boxId === boxId ? null : { boxId, boxType }
+    );
   };
 
   const goToContents = (boxId: number, boxType: BoxType, name: string) => {
     router.push(`/box/${boxId}/contents?type=${boxType}&name=${encodeURIComponent(name)}`);
   };
 
-  const sheetItems = [
-    // 초대: 공유 박스에서만 표시
-    ...(selectedBox?.boxType === 'SHARED'
-      ? [
-          {
-            icon: '✓',
-            label: '초대',
-            onClick: () => {
-              if (selectedBox) {
-                router.push(`/box/invite/${selectedBox.boxId}`);
-              }
-            },
+  const buildMenuItems = (boxId: number, boxType: BoxType) => [
+    ...(boxType === 'SHARED'
+      ? [{
+          type: 'invite' as const,
+          onClick: () => {
+            setOpenMenu(null);
+            router.push(`/box/invite/${boxId}`);
           },
-        ]
+        }]
       : []),
     {
-      icon: '✎',
-      label: '수정',
+      type: 'edit' as const,
       onClick: () => {
-        if (selectedBox) {
-          router.push(`/box/edit/${selectedBox.boxId}?type=${selectedBox.boxType}`);
-        }
+        setOpenMenu(null);
+        router.push(`/box/edit/${boxId}?type=${boxType}`);
+      },
+    },
+    {
+      type: 'delete' as const,
+      onClick: () => {
+        setOpenMenu(null);
+        // TODO: 삭제 확인 모달
       },
     },
   ];
@@ -94,12 +110,12 @@ export default function BoxPage() {
             <section className="mb-8">
               <ListTitle
                 title={`마이 박스 (${myBoxes.length})`}
-                variant="kebab"
+                variant="none"
                 onAction={() => {/* TODO: 마이 박스 섹션 메뉴 */}}
                 className="mb-3"
               />
               {myBoxes.length > 0 && (
-                <ul className="space-y-3">
+                <ul>
                   {myBoxes.map((box) => (
                     <li
                       key={box.boxId}
@@ -111,17 +127,24 @@ export default function BoxPage() {
                       >
                         <div className="w-24 h-16 rounded bg-neutral-800 shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-wb-white truncate">
-                            {box.name}
-                          </p>
+                          <p className="text-sm text-wb-white truncate">{box.name}</p>
                         </div>
                       </div>
-                      <button
-                        onClick={() => openMenu(box.boxId, 'MY')}
-                        className="text-neutral-400 text-xl px-1 cursor-pointer shrink-0"
-                      >
-                        ⋮
-                      </button>
+
+                      {/* 케밥 버튼 + 컨텍스트 메뉴 */}
+                      <div className="relative shrink-0" ref={openMenu?.boxId === box.boxId ? menuRef : undefined}>
+                        <button
+                          onClick={() => toggleMenu(box.boxId, 'MY')}
+                          className="p-1 text-neutral-400 cursor-pointer"
+                        >
+                          <EllipsisVerticalOutline className="size-5" />
+                        </button>
+                        {openMenu?.boxId === box.boxId && (
+                          <div className="absolute right-[5px] top-full z-50 mt-1">
+                            <ContextMenu items={buildMenuItems(box.boxId, 'MY')} />
+                          </div>
+                        )}
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -139,12 +162,12 @@ export default function BoxPage() {
             <section>
               <ListTitle
                 title={`공유 박스 (${sharedBoxes.length})`}
-                variant="kebab"
+                variant="none"
                 onAction={() => {/* TODO: 공유 박스 섹션 메뉴 */}}
                 className="mb-3"
               />
               {sharedBoxes.length > 0 && (
-                <ul className="space-y-3">
+                <ul>
                   {sharedBoxes.map((box) => (
                     <li
                       key={box.boxId}
@@ -156,20 +179,27 @@ export default function BoxPage() {
                       >
                         <div className="w-24 h-16 rounded bg-neutral-800 shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-wb-white truncate">
-                            {box.name}
-                          </p>
+                          <p className="text-sm text-wb-white truncate">{box.name}</p>
                           <p className="text-xs text-neutral-500 truncate">
                             {box.members.map((m) => m.boxMemberName).join(', ')}
                           </p>
                         </div>
                       </div>
-                      <button
-                        onClick={() => openMenu(box.boxId, 'SHARED')}
-                        className="text-neutral-400 text-xl px-1 cursor-pointer shrink-0"
-                      >
-                        ⋮
-                      </button>
+
+                      {/* 케밥 버튼 + 컨텍스트 메뉴 */}
+                      <div className="relative shrink-0" ref={openMenu?.boxId === box.boxId ? menuRef : undefined}>
+                        <button
+                          onClick={() => toggleMenu(box.boxId, 'SHARED')}
+                          className="p-1 text-neutral-400 cursor-pointer"
+                        >
+                          <EllipsisVerticalOutline className="size-5" />
+                        </button>
+                        {openMenu?.boxId === box.boxId && (
+                          <div className="absolute right-[5px] top-full z-50 mt-1">
+                            <ContextMenu items={buildMenuItems(box.boxId, 'SHARED')} />
+                          </div>
+                        )}
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -185,13 +215,6 @@ export default function BoxPage() {
           </>
         )}
       </MainContent>
-
-      {/* 바텀시트 */}
-      <BottomSheet
-        visible={sheetOpen}
-        onClose={() => setSheetOpen(false)}
-        items={sheetItems}
-      />
 
       <BottomMenu />
     </MobileFrame>

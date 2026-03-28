@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
@@ -55,27 +56,32 @@ export default async function DiscoverCategoryPage({ params }: PageProps) {
             {contentItems.map((item) => (
               <li
                 key={item.contentSummary.contentId}
-                className="flex items-center gap-3 px-4 py-3 border-b border-neutral-800"
+                className="border-b border-neutral-800"
               >
-                {getImageUrl(item.contentSummary) ? (
-                  <img
-                    src={getImageUrl(item.contentSummary)!}
-                    alt={getDisplayTitle(item.contentSummary)}
-                    className="w-16 h-22 rounded object-cover shrink-0 bg-neutral-800"
-                  />
-                ) : (
-                  <div className="w-16 h-22 rounded bg-neutral-800 shrink-0 flex items-center justify-center text-neutral-600 text-xs">
-                    No img
+                <Link
+                  href={`/content/${item.contentSummary.mediaType}/${item.contentSummary.contentId}`}
+                  className="flex items-center gap-3 px-4 py-3"
+                >
+                  {getImageUrl(item.contentSummary) ? (
+                    <img
+                      src={getImageUrl(item.contentSummary)!}
+                      alt={getDisplayTitle(item.contentSummary)}
+                      className="w-16 h-22 rounded object-cover shrink-0 bg-neutral-800"
+                    />
+                  ) : (
+                    <div className="w-16 h-22 rounded bg-neutral-800 shrink-0 flex items-center justify-center text-neutral-600 text-xs">
+                      No img
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-wb-white truncate">
+                      {getDisplayTitle(item.contentSummary)}
+                    </p>
+                    <p className="text-xs text-neutral-500 truncate">
+                      {getSubText(item.contentSummary)}
+                    </p>
                   </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-wb-white truncate">
-                    {getDisplayTitle(item.contentSummary)}
-                  </p>
-                  <p className="text-xs text-neutral-500 truncate">
-                    {getSubText(item.contentSummary)}
-                  </p>
-                </div>
+                </Link>
               </li>
             ))}
           </ul>

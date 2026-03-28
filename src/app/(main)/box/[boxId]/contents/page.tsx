@@ -82,6 +82,7 @@ export default function BoxContentsPage() {
         watchStatus={watchStatus}
         boxMode={boxMode}
         showDivider={!isLast}
+        onClick={() => router.push(`/content/${summary.mediaType}/${summary.contentId}`)}
       />
     );
   };

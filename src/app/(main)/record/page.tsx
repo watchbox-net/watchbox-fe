@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
@@ -27,6 +28,7 @@ const WATCH_STATUS_LABEL: Record<WatchStatus, string> = {
 };
 
 export default function RecordPage() {
+  const router = useRouter();
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [allItems, setAllItems] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,7 +87,8 @@ export default function RecordPage() {
             {filteredItems.map((item) => (
               <li
                 key={item.contentRecordId ?? item.contentSummary.contentId}
-                className="flex items-center gap-3 px-4 py-3 border-b border-neutral-800"
+                className="flex items-center gap-3 px-4 py-3 border-b border-neutral-800 cursor-pointer"
+                onClick={() => router.push(`/content/${item.contentSummary.mediaType}/${item.contentSummary.contentId}`)}
               >
                 {getImageUrl(item.contentSummary) ? (
                   <img

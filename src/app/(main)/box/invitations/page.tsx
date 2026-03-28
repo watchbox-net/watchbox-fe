@@ -6,6 +6,9 @@ import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
 import Toast from '@/components/common/Toast';
 import MainContent from '@/components/common/MainContent';
+import Header from '@/components/common/Header';
+import ListTitle from '@/components/list/ListTitle';
+import MemberInviteListItem from '@/components/list/MemberInviteListItem';
 import {
   fetchReceivedInvitations,
   fetchSentInvitations,
@@ -35,11 +38,7 @@ export default function BoxInvitationsPage() {
   const handleAccept = async (requestId: number) => {
     try {
       await acceptInvitation(requestId);
-      setReceived((prev) =>
-        prev.map((inv) =>
-          inv.requestId === requestId ? { ...inv, status: 'ACCEPTED' as const } : inv,
-        ),
-      );
+      setReceived((prev) => prev.filter((inv) => inv.requestId !== requestId));
       setToast('초대를 수락했습니다.');
     } catch {
       setToast('수락에 실패했습니다.');
@@ -49,11 +48,7 @@ export default function BoxInvitationsPage() {
   const handleReject = async (requestId: number) => {
     try {
       await rejectInvitation(requestId);
-      setReceived((prev) =>
-        prev.map((inv) =>
-          inv.requestId === requestId ? { ...inv, status: 'REJECTED' as const } : inv,
-        ),
-      );
+      setReceived((prev) => prev.filter((inv) => inv.requestId !== requestId));
       setToast('초대를 거절했습니다.');
     } catch {
       setToast('거절에 실패했습니다.');
@@ -70,125 +65,73 @@ export default function BoxInvitationsPage() {
     }
   };
 
-  const statusLabel = (status: string) => {
-    switch (status) {
-      case 'PENDING': return '대기중';
-      case 'ACCEPTED': return '수락됨';
-      case 'REJECTED': return '거절됨';
-      default: return status;
-    }
-  };
+  // 받은 초대 중 PENDING만 표시
+  const pendingReceived = received.filter((inv) => inv.status === 'PENDING');
 
   return (
     <MobileFrame>
-      {/* 헤더 */}
-      <div className="flex items-center py-4 px-4 relative">
-        <button
-          onClick={() => router.back()}
-          className="text-wb-white text-xl cursor-pointer"
-        >
-          ‹
-        </button>
-        <h1 className="text-lg font-bold flex-1 text-center">박스 초대 요청</h1>
-        <div className="w-6" />
-      </div>
+      <Header variant="back" title="박스 초대 요청" onBack={() => router.back()} />
 
-      <MainContent className="px-4">
+      <MainContent>
         {loading && (
-          <p className="text-center text-neutral-500 py-8">불러오는 중...</p>
+          <p className="text-center text-wb-grey-02 py-8">불러오는 중...</p>
         )}
 
         {!loading && (
           <>
-            {/* 받은 초대 요청 */}
-            <section className="mb-8">
-              <h2 className="text-base font-bold text-wb-white mb-4">받은 초대 요청</h2>
-              {received.length === 0 ? (
-                <p className="text-sm text-neutral-500">받은 초대가 없습니다.</p>
-              ) : (
-                <ul className="space-y-4">
-                  {received.map((inv) => (
-                    <li
-                      key={inv.requestId}
-                      className="bg-neutral-900 rounded-lg p-4"
-                    >
-                      <p className="text-sm text-white font-semibold mb-1">
-                        {inv.sharedBoxTitle}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full bg-neutral-700 flex items-center justify-center">
-                            <span className="text-neutral-400 text-xs">👤</span>
-                          </div>
-                          <span className="text-sm text-neutral-300">
-                            초대자: {inv.sender}
-                          </span>
-                        </div>
+            {/* ── 받은 초대 요청 ── */}
+            <section className="mt-[35px] mb-[40px]">
+              <ListTitle
+                title="받은 초대 요청"
+                variant="none"
+                className="pl-[16px] pr-[12px] mb-[25px]"
+              />
 
-                        {inv.status === 'PENDING' ? (
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleAccept(inv.requestId)}
-                              className="px-4 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold cursor-pointer"
-                            >
-                              수락
-                            </button>
-                            <button
-                              onClick={() => handleReject(inv.requestId)}
-                              className="px-4 py-1.5 rounded-lg bg-neutral-700 text-white text-xs font-semibold cursor-pointer"
-                            >
-                              거절
-                            </button>
-                          </div>
-                        ) : (
-                          <span className="text-xs text-neutral-500">
-                            {statusLabel(inv.status)}
-                          </span>
-                        )}
-                      </div>
-                    </li>
+              {pendingReceived.length === 0 ? (
+                <p className="pl-[16px] text-sm text-wb-grey-02">받은 초대가 없습니다.</p>
+              ) : (
+                <ul className="px-[16px] space-y-[15px]">
+                  {pendingReceived.map((inv) => (
+                    <MemberInviteListItem
+                      key={inv.requestId}
+                      variant="invitation"
+                      boxName={inv.sharedBoxTitle}
+                      boxMembers=""
+                      inviterName={inv.sender}
+                      onAccept={() => handleAccept(inv.requestId)}
+                      onReject={() => handleReject(inv.requestId)}
+                    />
                   ))}
                 </ul>
               )}
             </section>
 
-            {/* 보낸 초대 요청 */}
+            {/* ── 보낸 초대 요청 ── */}
             <section>
-              <h2 className="text-base font-bold text-wb-white mb-4">보낸 초대 요청</h2>
-              {sent.length === 0 ? (
-                <p className="text-sm text-neutral-500">보낸 초대가 없습니다.</p>
-              ) : (
-                <ul className="space-y-4">
-                  {sent.map((inv) => (
-                    <li
-                      key={inv.requestId}
-                      className="bg-neutral-900 rounded-lg p-4"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full bg-neutral-700 flex items-center justify-center">
-                            <span className="text-neutral-400 text-xs">👤</span>
-                          </div>
-                          <div>
-                            <span className="text-sm text-white">
-                              {inv.receiver} 님에게 {inv.sharedBoxTitle} 참가 요청
-                            </span>
-                            <p className="text-xs text-neutral-500 mt-0.5">
-                              상태: {statusLabel(inv.status)}
-                            </p>
-                          </div>
-                        </div>
+              <ListTitle
+                title="보낸 초대 요청"
+                variant="none"
+                className="pl-[16px] pr-[12px] mb-[25px]"
+              />
 
-                        {inv.status === 'PENDING' && (
-                          <button
-                            onClick={() => handleCancel(inv.requestId)}
-                            className="px-4 py-1.5 rounded-lg bg-neutral-700 text-white text-xs font-semibold cursor-pointer shrink-0"
-                          >
-                            취소
-                          </button>
-                        )}
-                      </div>
-                    </li>
+              {sent.length === 0 ? (
+                <p className="pl-[16px] text-sm text-wb-grey-02">보낸 초대가 없습니다.</p>
+              ) : (
+                <ul className="px-[16px]">
+                  {sent.map((inv) => (
+                    <MemberInviteListItem
+                      key={inv.requestId}
+                      variant="status"
+                      userName={inv.receiver}
+                      boxName={inv.sharedBoxTitle}
+                      status={inv.status === 'REJECTED' ? 'rejected' : 'pending'}
+                      onAction={
+                        inv.status === 'PENDING'
+                          ? () => handleCancel(inv.requestId)
+                          : () => {} // TODO: 거절 삭제 기능
+                      }
+                      className="py-[10px]"
+                    />
                   ))}
                 </ul>
               )}

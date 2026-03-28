@@ -36,6 +36,8 @@ interface ContentListItemProps {
   boxMode?: BoxMode;
   /** 하단 구분선 표시 */
   showDivider?: boolean;
+  /** 클릭 시 실행 (상세 페이지 이동 등) */
+  onClick?: () => void;
   className?: string;
 }
 
@@ -58,6 +60,7 @@ export default function ContentListItem({
   watchStatus,
   boxMode,
   showDivider = true,
+  onClick,
   className,
 }: ContentListItemProps) {
   // 연도 · 장르1, 장르2
@@ -74,7 +77,10 @@ export default function ContentListItem({
 
   return (
     <div className={`px-[16px] ${className ?? ''}`}>
-      <div className="flex items-center justify-between py-[11px]">
+      <div
+        className={`flex items-center justify-between py-[11px] ${onClick ? 'cursor-pointer' : ''}`}
+        onClick={onClick}
+      >
         {/* 왼쪽: 포스터 + 텍스트 */}
         <div className="flex items-center gap-[17px] min-w-0">
           <Poster src={posterSrc} alt={title} size="small" />

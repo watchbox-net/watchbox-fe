@@ -4,7 +4,23 @@ import type {
   InvitationSentResponse,
   InvitationReceivedResponse,
 } from '@/types/member';
+import type { MyPageResponse, ProfileResponse } from '@/types/mypage';
 import type { ApiResponse } from '@/types/api';
+
+/** 마이페이지 조회 (로그인 필요) */
+export async function fetchMyPage(): Promise<MyPageResponse> {
+  const { data } = await privateApi.get<ApiResponse<MyPageResponse>>('/members/mypage');
+  return data.data;
+}
+
+/** 프로필 수정 (닉네임 변경, 로그인 필요) */
+export async function updateProfile(nickname: string): Promise<ProfileResponse> {
+  const { data } = await privateApi.patch<ApiResponse<ProfileResponse>>(
+    '/members/profile',
+    { nickname },
+  );
+  return data.data;
+}
 
 /** 공유 박스에 회원 초대 */
 export async function inviteToBox(boxId: number, memberId: number): Promise<InvitationSentResponse> {

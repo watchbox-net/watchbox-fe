@@ -101,6 +101,7 @@ export {
   HomeIcon as HomeSolid,
   MagnifyingGlassIcon as MagnifyingGlassSolid,
   PauseCircleIcon as PauseCircleSolid,
+  PencilIcon as PencilSolid,
   PencilSquareIcon as PencilSquareSolid,
   PhotoIcon as PhotoSolid,
   PlayCircleIcon as PlayCircleSolid,

@@ -6,6 +6,7 @@ import MobileFrame from '@/components/common/MobileFrame';
 import Header from '@/components/common/Header';
 import BottomMenu from '@/components/common/BottomMenu';
 import MainContent from '@/components/common/MainContent';
+import Button from '@/components/common/Button';
 import Toast from '@/components/common/Toast';
 import { ProfileIcon, PencilOutline } from '@/components/icons';
 import { fetchMyPage, updateProfile } from '@/lib/api/member';
@@ -124,18 +125,14 @@ export default function ProfileEditPage() {
 
             {/* ── 저장 버튼 ─────────────────────────────── */}
             <div className="px-[14px] mt-[16px]">
-              <button
-                type="button"
+              <Button
+                size="wide"
+                variant={isValid && !saving ? 'save' : 'off'}
                 onClick={handleSave}
                 disabled={!isValid || saving}
-                className={`w-full h-[48px] rounded-[8px] text-[15px] font-bold leading-[24px] shadow-sm ${
-                  isValid && !saving
-                    ? 'bg-wb-green text-white'
-                    : 'bg-wb-dark-05 text-wb-grey-01'
-                }`}
               >
                 {saving ? '저장 중...' : '저장'}
-              </button>
+              </Button>
             </div>
           </>
         )}

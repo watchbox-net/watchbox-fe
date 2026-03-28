@@ -84,12 +84,12 @@ export default function ContentListItem({
 
   return (
     <div className={`px-[16px] ${className ?? ''}`}>
-      <div
-        className={`flex items-center justify-between py-[11px] ${onClick ? 'cursor-pointer' : ''}`}
-        onClick={onClick}
-      >
-        {/* 왼쪽: 포스터 + 텍스트 */}
-        <div className="flex items-center gap-[17px] min-w-0">
+      <div className="flex items-center justify-between py-[11px]">
+        {/* 왼쪽: 포스터 + 텍스트 (클릭 시 상세 이동) */}
+        <div
+          className={`flex items-center gap-[17px] min-w-0 ${onClick ? 'cursor-pointer' : ''}`}
+          onClick={onClick}
+        >
           <Poster src={posterSrc} alt={title} size="small" />
 
           <div className="flex flex-col gap-[5px] min-w-0">
@@ -110,7 +110,7 @@ export default function ContentListItem({
         <div className="relative shrink-0 ml-[10px]">
           <div
             className={onStatusClick ? 'cursor-pointer' : ''}
-            onClick={onStatusClick ? (e) => { e.stopPropagation(); onStatusClick(e); } : undefined}
+            onClick={onStatusClick}
           >
             <WatchStatusIcon status={toIconStatus(watchStatus)} size="medium" />
           </div>

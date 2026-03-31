@@ -6,6 +6,7 @@ import ListTitle from '@/components/list/ListTitle';
 import ContentListItem from '@/components/list/ContentListItem';
 import ContentCard from '@/components/content/ContentCard';
 import MemberInviteListItem from '@/components/list/MemberInviteListItem';
+import TriplePosterBox from '@/components/content/TriplePosterBox';
 
 export default function ListComponentsPage() {
   // MemberInviteListItem - search 상태 관리 (1번 인덱스는 초기에 checked)
@@ -90,7 +91,7 @@ export default function ListComponentsPage() {
 
         {/* 공유 박스 예시 */}
         <div className="mb-6">
-          <p className="text-sm font-semibold text-neutral-600 mb-2">공유 박스 (게시자 표시)</p>
+          <p className="text-sm font-semibold text-neutral-600 mb-2">공유 박스 (공유 멤버 표시)</p>
           <div className="bg-wb-dark-02 rounded-lg">
             <ContentListItem
               title="더 립"
@@ -123,7 +124,7 @@ export default function ListComponentsPage() {
           <p>포스터 — Poster small (60×90, rounded-[5px])</p>
           <p>제목 — 16px Medium, text-white, truncate</p>
           <p>정보 — 12px Regular, text-wb-grey-02, &ldquo;연도 · 장르&rdquo;</p>
-          <p>멤버정보 — 10px, my: 좋아요(wb-red), shared: 게시자(wb-primary)</p>
+          <p>멤버정보 — 10px, my: 좋아요(wb-red), shared: 공유 멤버(wb-primary)</p>
           <p>아이콘 — WatchStatusIcon medium (24px)</p>
           <p>구분선 — 0.5px, bg-wb-dark-05</p>
         </div>
@@ -216,6 +217,53 @@ export default function ListComponentsPage() {
           <p>invitation — 박스 썸네일(148×81) + 박스명 16px Medium + 멤버 12px wb-primary / ProfileIcon + 초대자 14px wb-grey-02 + 수락(green)/거절(dark) 버튼 55×28</p>
           <p>status — ProfileIcon + 메시지 14px white + 상태 11px wb-grey-02 / 취소(dark) or 삭제(red) 버튼 55×28</p>
           <p>버튼 — h-28px w-55px, rounded-8px, 13px Medium, shadow-xs</p>
+        </div>
+      </section>
+
+      {/* ── TriplePosterBox ──────────────────────── */}
+      <section>
+        <h2 className="text-xl font-bold text-black mb-4">TriplePosterBox</h2>
+
+        <div className="bg-wb-dark-02 rounded-lg p-6 flex gap-[30px] items-start flex-wrap">
+          <div>
+            <p className="text-xs font-semibold text-neutral-500 mb-2">포스터 3개 (ABC)</p>
+            <TriplePosterBox
+              posters={[
+                'https://image.tmdb.org/t/p/w185/eKZ07Ted7VHxQjbuZrRBFOamcKJ.jpg',
+                'https://image.tmdb.org/t/p/w185/zmK5G0JdkL637VbaVPYFeEQ52qi.jpg',
+                'https://image.tmdb.org/t/p/w185/uitqZVbhvlQV5iLOdbk3itGoNNd.jpg',
+              ]}
+            />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-neutral-500 mb-2">포스터 2개 (ABA)</p>
+            <TriplePosterBox
+              posters={[
+                'https://image.tmdb.org/t/p/w185/eKZ07Ted7VHxQjbuZrRBFOamcKJ.jpg',
+                'https://image.tmdb.org/t/p/w185/zmK5G0JdkL637VbaVPYFeEQ52qi.jpg',
+              ]}
+            />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-neutral-500 mb-2">포스터 1개 (AAA)</p>
+            <TriplePosterBox
+              posters={[
+                'https://image.tmdb.org/t/p/w185/eKZ07Ted7VHxQjbuZrRBFOamcKJ.jpg',
+              ]}
+            />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-neutral-500 mb-2">비어있음</p>
+            <TriplePosterBox />
+          </div>
+        </div>
+
+        <div className="bg-neutral-100 rounded-lg p-4 text-sm text-neutral-700 space-y-1 mt-4">
+          <p className="font-semibold text-black mb-2">디자인 스펙</p>
+          <p>전체 — w-[155px], flex-col, gap-[2.5px]</p>
+          <p>뚜껑 (hat) — 155×16, rounded-t-[5px], stroke dark01 1px inside, 중앙 슬롯</p>
+          <p>포스터 — 3×(46×65), border dark01 1px outside, rounded-b-[5px]</p>
+          <p>비어있음 — bg-wb-grey-01 (#525252)</p>
         </div>
       </section>
 

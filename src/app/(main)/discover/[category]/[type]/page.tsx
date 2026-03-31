@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
@@ -63,9 +64,11 @@ export default async function DiscoverCategoryPage({ params }: PageProps) {
                   className="flex items-center gap-3 px-4 py-3"
                 >
                   {getImageUrl(item.contentSummary) ? (
-                    <img
+                    <Image
                       src={getImageUrl(item.contentSummary)!}
                       alt={getDisplayTitle(item.contentSummary)}
+                      width={64}
+                      height={88}
                       className="w-16 h-22 rounded object-cover shrink-0 bg-neutral-800"
                     />
                   ) : (

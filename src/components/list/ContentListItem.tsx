@@ -14,7 +14,7 @@ interface MyBoxMode {
   liked: boolean;
 }
 
-/** 공유 박스 → 게시자 표시 */
+/** 공유 박스 → 공유 멤버 표시 */
 interface SharedBoxMode {
   mode: 'shared';
   publishers: string[];

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import ProfileIcon from '@/components/icons/ProfileIcon';
 import AddedStatusIcon from '@/components/icons/AddedStatusIcon';
 
@@ -108,7 +109,7 @@ export default function MemberInviteListItem(props: MemberInviteListItemProps) {
           {/* 박스 썸네일 (148×81) */}
           <div className="w-[148px] h-[81px] rounded-[5px] bg-wb-dark-05 shrink-0 overflow-hidden">
             {boxThumbnailSrc ? (
-              <img src={boxThumbnailSrc} alt={boxName} className="w-full h-full object-cover" />
+              <Image src={boxThumbnailSrc} alt={boxName} width={148} height={81} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full bg-wb-dark-05" />
             )}

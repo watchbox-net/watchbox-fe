@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+
 // ─── Types ──────────────────────────────────────────────────
 export type PosterSize = 'large' | 'medium' | 'small';
 
@@ -33,9 +35,11 @@ export default function Poster({
       style={{ width, height }}
     >
       {src ? (
-        <img
+        <Image
           src={src}
           alt={alt}
+          width={width}
+          height={height}
           className={`w-full h-full object-cover ${radius}`}
         />
       ) : (

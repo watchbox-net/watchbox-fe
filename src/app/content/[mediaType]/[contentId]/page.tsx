@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
@@ -223,7 +224,7 @@ export default function ContentDetailPage() {
         {/* ── 백드롭 + 뒤로가기 ─────────────────────────── */}
         <div className="relative h-[230px] bg-wb-dark-03 shrink-0">
           {backdropUrl ? (
-            <img src={backdropUrl} alt="" className="w-full h-full object-cover" />
+            <Image src={backdropUrl} alt="" fill className="object-cover" />
           ) : (
             <div className="w-full h-full bg-wb-dark-03" />
           )}
@@ -241,7 +242,7 @@ export default function ContentDetailPage() {
         <div className="flex gap-[14px] px-[17px] mt-[16px]">
           <div className="w-[115px] h-[163px] rounded-[10px] overflow-hidden shrink-0 bg-wb-dark-03">
             {posterUrl ? (
-              <img src={posterUrl} alt={info.titleKo} className="w-full h-full object-cover" />
+              <Image src={posterUrl} alt={info.titleKo} width={115} height={163} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full bg-wb-dark-05" />
             )}

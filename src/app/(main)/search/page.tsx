@@ -7,6 +7,7 @@ import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
 import TabNav from '@/components/common/TabNav';
 import MainContent from '@/components/common/MainContent';
+import Image from 'next/image';
 import { searchMulti, searchMovies, searchTv, searchPerson } from '@/lib/api/search';
 import type { ContentItem, ContentPageResponse } from '@/types/content';
 import { getImageUrl, getDisplayTitle, getSubText } from '@/lib/utils/content';
@@ -119,9 +120,11 @@ export default function SearchPage() {
                   onClick={() => router.push(`/content/${item.contentSummary.mediaType}/${item.contentSummary.contentId}`)}
                 >
                   {getImageUrl(item.contentSummary) ? (
-                    <img
+                    <Image
                       src={getImageUrl(item.contentSummary)!}
                       alt={getDisplayTitle(item.contentSummary)}
+                      width={64}
+                      height={88}
                       className="w-16 h-22 rounded object-cover shrink-0 bg-neutral-800"
                     />
                   ) : (

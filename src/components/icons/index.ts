@@ -90,6 +90,7 @@ export {
   CheckCircleIcon as CheckCircleSolid,
   Cog6ToothIcon as Cog6ToothSolid,
   Cog8ToothIcon as Cog8ToothSolid,
+  EllipsisVerticalIcon as EllipsisVerticalSolid,
   ExclamationCircleIcon as ExclamationCircleSolid,
   ExclamationTriangleIcon as ExclamationTriangleSolid,
   EyeIcon as EyeSolid,

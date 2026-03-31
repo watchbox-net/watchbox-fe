@@ -7,13 +7,31 @@ import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
 import MainContent from '@/components/common/MainContent';
 import ContextMenu from '@/components/common/ContextMenu';
-import { PlusOutline, EllipsisVerticalOutline } from '@/components/icons';
+import TriplePosterBox from '@/components/content/TriplePosterBox';
+import { PlusOutline, EllipsisVerticalSolid } from '@/components/icons';
 import ListTitle from '@/components/list/ListTitle';
 import { fetchMyBoxList, fetchSharedBoxList } from '@/lib/api/box';
 import { useAuth } from '@/lib/hooks/useAuth';
 import type { MyBoxResponse, SharedBoxResponse, BoxType } from '@/types/box';
 
 type MenuTarget = { boxId: number; boxType: BoxType };
+
+// 백엔드에서 박스 포스터 이미지를 아직 안 보내므로 임시 샘플
+const SAMPLE_POSTERS = [
+  [
+    'https://image.tmdb.org/t/p/w185/eKZ07Ted7VHxQjbuZrRBFOamcKJ.jpg',
+    'https://image.tmdb.org/t/p/w185/zmK5G0JdkL637VbaVPYFeEQ52qi.jpg',
+    'https://image.tmdb.org/t/p/w185/uitqZVbhvlQV5iLOdbk3itGoNNd.jpg',
+  ],
+  [
+    'https://image.tmdb.org/t/p/w185/zmK5G0JdkL637VbaVPYFeEQ52qi.jpg',
+    'https://image.tmdb.org/t/p/w185/uitqZVbhvlQV5iLOdbk3itGoNNd.jpg',
+  ],
+  [
+    'https://image.tmdb.org/t/p/w185/uitqZVbhvlQV5iLOdbk3itGoNNd.jpg',
+  ],
+  [],
+];
 
 export default function BoxPage() {
   const router = useRouter();
@@ -133,18 +151,19 @@ export default function BoxPage() {
               />
               {myBoxes.length > 0 && (
                 <ul>
-                  {myBoxes.map((box) => (
+                  {myBoxes.map((box, idx) => (
                     <li
                       key={box.boxId}
-                      className="flex items-center gap-3 py-2 border-b border-neutral-800"
+                      className="flex items-start pl-[16px] pr-[12px] py-[10px]"
                     >
                       <div
-                        className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"
+                        className="flex gap-[10px] items-start flex-1 min-w-0 cursor-pointer"
                         onClick={() => goToContents(box.boxId, 'MY', box.name)}
                       >
-                        <div className="w-24 h-16 rounded bg-neutral-800 shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-wb-white truncate">{box.name}</p>
+                        <TriplePosterBox posters={SAMPLE_POSTERS[idx % SAMPLE_POSTERS.length]} />
+                        <div className="flex flex-col gap-[3px] min-w-0 flex-1">
+                          <p className="text-[16px] font-medium text-white leading-[24px] tracking-[0.15px] line-clamp-2">{box.name}</p>
+                          <p className="text-[12px] text-wb-grey-03 leading-[20px] tracking-[0.25px]">마지막 업데이트: 2026-03-25</p>
                         </div>
                       </div>
 
@@ -152,9 +171,9 @@ export default function BoxPage() {
                       <div className="relative shrink-0" ref={openMenu?.boxId === box.boxId ? menuRef : undefined}>
                         <button
                           onClick={() => toggleMenu(box.boxId, 'MY')}
-                          className="p-1 text-neutral-400 cursor-pointer"
+                          className="p-1 text-white cursor-pointer"
                         >
-                          <EllipsisVerticalOutline className="size-5" />
+                          <EllipsisVerticalSolid className="size-[24px]" />
                         </button>
                         {openMenu?.boxId === box.boxId && (
                           <div className="absolute right-[5px] top-full z-50 mt-1">
@@ -168,7 +187,7 @@ export default function BoxPage() {
               )}
               <button
                 onClick={() => router.push('/box/create')}
-                className="flex items-center justify-center gap-2 w-full py-4 cursor-pointer"
+                className="flex items-center justify-center gap-2 w-full py-4 cursor-pointer rounded-[8px] hover:bg-wb-dark-05 transition-colors"
               >
                 <PlusOutline className="size-5 text-wb-grey-02" />
                 <span className="text-sm text-wb-grey-02">새 박스 만들기</span>
@@ -185,19 +204,19 @@ export default function BoxPage() {
               />
               {sharedBoxes.length > 0 && (
                 <ul>
-                  {sharedBoxes.map((box) => (
+                  {sharedBoxes.map((box, idx) => (
                     <li
                       key={box.boxId}
-                      className="flex items-center gap-3 py-2 border-b border-neutral-800"
+                      className="flex items-start pl-[16px] pr-[12px] py-[10px]"
                     >
                       <div
-                        className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"
+                        className="flex gap-[10px] items-start flex-1 min-w-0 cursor-pointer"
                         onClick={() => goToContents(box.boxId, 'SHARED', box.name)}
                       >
-                        <div className="w-24 h-16 rounded bg-neutral-800 shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-wb-white truncate">{box.name}</p>
-                          <p className="text-xs text-neutral-500 truncate">
+                        <TriplePosterBox posters={SAMPLE_POSTERS[(idx + 2) % SAMPLE_POSTERS.length]} />
+                        <div className="flex flex-col gap-[3px] min-w-0 flex-1">
+                          <p className="text-[16px] font-medium text-white leading-[24px] tracking-[0.15px] line-clamp-2">{box.name}</p>
+                          <p className="text-[12px] text-wb-primary leading-[20px] tracking-[0.25px] truncate">
                             {box.members.map((m) => m.boxMemberName).join(', ')}
                           </p>
                         </div>
@@ -207,9 +226,9 @@ export default function BoxPage() {
                       <div className="relative shrink-0" ref={openMenu?.boxId === box.boxId ? menuRef : undefined}>
                         <button
                           onClick={() => toggleMenu(box.boxId, 'SHARED')}
-                          className="p-1 text-neutral-400 cursor-pointer"
+                          className="p-1 text-white cursor-pointer"
                         >
-                          <EllipsisVerticalOutline className="size-5" />
+                          <EllipsisVerticalSolid className="size-[24px]" />
                         </button>
                         {openMenu?.boxId === box.boxId && (
                           <div className="absolute right-[5px] top-full z-50 mt-1">
@@ -223,7 +242,7 @@ export default function BoxPage() {
               )}
               <button
                 onClick={() => router.push('/box/create')}
-                className="flex items-center justify-center gap-2 w-full py-4 cursor-pointer"
+                className="flex items-center justify-center gap-2 w-full py-4 cursor-pointer rounded-[8px] hover:bg-wb-dark-05 transition-colors"
               >
                 <PlusOutline className="size-5 text-wb-grey-02" />
                 <span className="text-sm text-wb-grey-02">새 박스 만들기</span>

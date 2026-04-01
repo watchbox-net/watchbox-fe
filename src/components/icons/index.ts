@@ -138,6 +138,7 @@ export { default as DeleteIcon } from './DeleteIcon';
 export { default as AddedStatusIcon } from './AddedStatusIcon';
 export { default as ProfileIcon } from './ProfileIcon';
 export { default as GoogleCircleLogo } from './GoogleCircleLogo';
+export { default as LogoWide } from './LogoWide';
 
 export type { WatchStatus, WatchStatusSize } from './WatchStatusIcon';
 export type { LikeIconSize } from './LikeIcon';

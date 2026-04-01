@@ -483,6 +483,7 @@ export default function DevPage() {
                                 <Link href="/dev/components/user-action" className="bg-purple-100 text-purple-800 px-3 py-1 rounded">User Action</Link>
                                 <Link href="/dev/components/icons" className="bg-purple-100 text-purple-800 px-3 py-1 rounded">Icons</Link>
                                 <Link href="/dev/components/list" className="bg-purple-100 text-purple-800 px-3 py-1 rounded">List</Link>
+                                <Link href="/dev/components/logo" className="bg-purple-100 text-purple-800 px-3 py-1 rounded">Logo</Link>
                             </div>
                         </div>
                     </div>

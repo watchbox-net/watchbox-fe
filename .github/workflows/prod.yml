@@ -1,0 +1,38 @@
+name: Frontend CI/CD Prod
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  DOCKER_IMAGE: watchbox-fe:latest
+
+jobs:
+  build-and-deploy:
+    runs-on: [self-hosted, prod, frontend]
+
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_SERVER_URL=https://api.watch-box.net \
+            -f Dockerfile \
+            -t ${{ env.DOCKER_IMAGE }} .
+
+      - name: Deploy with Docker Compose
+        working-directory: /home/ubuntu/app
+        run: |
+          docker compose up -d --no-deps watchbox-fe
+          docker image prune -f

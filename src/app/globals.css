@@ -1,26 +1,240 @@
 @import "tailwindcss";
+@import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
 
+/* ─── WatchBox Design Tokens (Figma Color Styles) ─────────────── */
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Dark Theme / Dark */
+  --wb-dark-01: #101010;
+  --wb-dark-02: #181818;
+  --wb-dark-03: #202020;
+  --wb-dark-04: #2a2a2a;
+  --wb-dark-05: #353535;
+
+  /* Dark Theme / Grey */
+  --wb-grey-01: #525252;
+  --wb-grey-02: #a3a3a3;
+  --wb-grey-03: #b1b1b1;
+  --wb-grey-04: #d9d9d9;
+
+  /* Light Theme */
+  --wb-black: #000000;
+  --wb-white-01: #ffffff;
+  --wb-white-02: #d9d9d9;
+
+  /* Brand */
+  --wb-primary: #f59e0b;
+  --wb-green:   #10b981;
+  --wb-blue:    #3b82f6;
+  --wb-orange:  #f97316;
+  --wb-purple:  #a855f7;
+  --wb-red:     #de4e4e;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  /* Dark surfaces */
+  --color-wb-dark-01: var(--wb-dark-01);
+  --color-wb-dark-02: var(--wb-dark-02);
+  --color-wb-dark-03: var(--wb-dark-03);
+  --color-wb-dark-04: var(--wb-dark-04);
+  --color-wb-dark-05: var(--wb-dark-05);
+
+  /* Grey scale */
+  --color-wb-grey-01: var(--wb-grey-01);
+  --color-wb-grey-02: var(--wb-grey-02);
+  --color-wb-grey-03: var(--wb-grey-03);
+  --color-wb-grey-04: var(--wb-grey-04);
+
+  /* Light Theme */
+  --color-wb-black: var(--wb-black);
+  --color-wb-white-01: var(--wb-white-01);
+  --color-wb-white-02: var(--wb-white-02);
+  /* 기존 wb-white 호환 alias */
+  --color-wb-white: var(--wb-white-01);
+
+  /* Brand */
+  --color-wb-primary: var(--wb-primary);
+  --color-wb-green:   var(--wb-green);
+  --color-wb-blue:    var(--wb-blue);
+  --color-wb-orange:  var(--wb-orange);
+  --color-wb-purple:  var(--wb-purple);
+  --color-wb-red:     var(--wb-red);
+
+  /*--font-sans: var(--font-geist-sans);*/
+  /*--font-mono: var(--font-geist-mono);*/
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+button, [role="button"] {
+  cursor: pointer;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: rgb(250, 250, 250);
+  color: black;
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo",
+    "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", sans-serif;
+}
+
+/* ─── WatchBox Text Styles (Figma Text Styles) ────────────────── */
+/*
+ * 폰트: Pretendard Variable
+ * 네이밍: @utility wb-{category}-{name}
+ * 사용: className="wb-header-title"
+ *
+ * 확인된 속성 (Figma MCP):
+ *   Header/title       — 16px Bold(700)    lh:Auto
+ *   Header/edit        — 14px Medium(500)  lh:1
+ *   Category/title     — 20px Bold(700)    lh:1
+ *   List/Content/title — 16px Medium(500)  lh:normal
+ *   List/Content/info  — 12px Regular(400) lh:normal
+ *   List/Box/title     — 16px Medium(500)  lh:24px
+ *   List/Box/info      — 12px Regular(400) lh:20px
+ *   List/Card/title    — 14px Medium(500)  lh:normal
+ *   Menu/tab           — 16px Medium(500)  lh:1
+ *   Menu/bottom-sheet  — 14px Medium(500)  lh:24px
+ *   Menu/bottom-bar    — 11px Regular(400) lh:normal  ls:-0.55px
+ *   Modal/header       — 20px SemiBold(600) lh:1
+ *   Modal/body         — 16px Medium(500)  lh:1
+ *   Button/small       — 13px Medium(500)  lh:16px
+ *   Button/medium      — 16px Medium(500)  lh:24px
+ *   Input/tag          — 14px Medium(500)  lh:1
+ *   Input/body         — 15px Medium(500)  lh:1
+ *   Input/footer       — 10px Medium(500)  lh:1
+ */
+
+/* ── Header ─────────────────────────────── */
+@utility wb-header-title {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+}
+@utility wb-header-edit {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* ── Category ───────────────────────────── */
+@utility wb-category-title {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* ── List / Content ─────────────────────── */
+@utility wb-content-title {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: normal;
+}
+@utility wb-content-info {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: normal;
+}
+
+/* ── List / Box ─────────────────────────── */
+@utility wb-box-title {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+@utility wb-box-info {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 20px;
+}
+@utility wb-box-inviter {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+/* ── List / Card ────────────────────────── */
+@utility wb-card-title {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: normal;
+}
+
+/* ── List / Searched User ───────────────── */
+@utility wb-user-name {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 28px;
+}
+
+/* ── Menu ───────────────────────────────── */
+@utility wb-menu-tab {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+}
+@utility wb-menu-bottomsheet {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 24px;
+}
+@utility wb-menu-bottombar {
+  font-size: 11px;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: -0.55px;
+}
+
+/* ── Modal ──────────────────────────────── */
+@utility wb-modal-header {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1;
+}
+@utility wb-modal-body {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* ── Button ─────────────────────────────── */
+@utility wb-button-small {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 16px;
+}
+@utility wb-button-medium {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+/* ── Input ──────────────────────────────── */
+@utility wb-input-tag {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+}
+@utility wb-input-body {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+}
+@utility wb-input-footer {
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* ─── Scrollbar hide ──────────────────────────────────────── */
+@utility scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }

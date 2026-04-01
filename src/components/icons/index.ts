@@ -1,0 +1,148 @@
+/**
+ * WatchBox 아이콘 인덱스
+ * Figma Style Guides / Icon Buttons 기반 heroicons re-export
+ *
+ * 사용법:
+ *   import { OutlineIcons, SolidIcons } from '@/components/icons';
+ *   <OutlineIcons.HeartIcon className="w-6 h-6" />
+ *   <SolidIcons.HeartIcon className="w-6 h-6" />
+ */
+
+// ─── Outline (24x24 stroke) ─────────────────────────────────
+export {
+  ArchiveBoxIcon as ArchiveBoxOutline,
+  AdjustmentsHorizontalIcon as AdjustmentsHorizontalOutline,
+  ArrowDownIcon as ArrowDownOutline,
+  ArrowDownCircleIcon as ArrowDownCircleOutline,
+  ArrowLeftIcon as ArrowLeftOutline,
+  ArrowLeftCircleIcon as ArrowLeftCircleOutline,
+  ArrowRightIcon as ArrowRightOutline,
+  ArrowRightCircleIcon as ArrowRightCircleOutline,
+  ArrowUpIcon as ArrowUpOutline,
+  ArrowUpCircleIcon as ArrowUpCircleOutline,
+  Bars3Icon as Bars3Outline,
+  Bars4Icon as Bars4Outline,
+  BellIcon as BellOutline,
+  BellAlertIcon as BellAlertOutline,
+  BellSlashIcon as BellSlashOutline,
+  CheckIcon as CheckOutline,
+  CheckCircleIcon as CheckCircleOutline,
+  ChevronDownIcon as ChevronDownOutline,
+  ChevronLeftIcon as ChevronLeftOutline,
+  ChevronRightIcon as ChevronRightOutline,
+  ChevronUpIcon as ChevronUpOutline,
+  Cog6ToothIcon as Cog6ToothOutline,
+  Cog8ToothIcon as Cog8ToothOutline,
+  EllipsisHorizontalIcon as EllipsisHorizontalOutline,
+  EllipsisVerticalIcon as EllipsisVerticalOutline,
+  ExclamationCircleIcon as ExclamationCircleOutline,
+  ExclamationTriangleIcon as ExclamationTriangleOutline,
+  EyeIcon as EyeOutline,
+  EyeSlashIcon as EyeSlashOutline,
+  FilmIcon as FilmOutline,
+  HandThumbDownIcon as HandThumbDownOutline,
+  HandThumbUpIcon as HandThumbUpOutline,
+  HeartIcon as HeartOutline,
+  HomeIcon as HomeOutline,
+  MagnifyingGlassIcon as MagnifyingGlassOutline,
+  PauseIcon as PauseOutline,
+  PauseCircleIcon as PauseCircleOutline,
+  PencilIcon as PencilOutline,
+  PencilSquareIcon as PencilSquareOutline,
+  PhotoIcon as PhotoOutline,
+  PlayIcon as PlayOutline,
+  PlayCircleIcon as PlayCircleOutline,
+  // PlusIcon → 아래에서 strokeWidth=2 래핑
+  PlusCircleIcon as PlusCircleOutline,
+  QuestionMarkCircleIcon as QuestionMarkCircleOutline,
+  RectangleStackIcon as RectangleStackOutline,
+  Squares2X2Icon as Squares2X2Outline,
+  StopIcon as StopOutline,
+  StopCircleIcon as StopCircleOutline,
+  TrashIcon as TrashOutline,
+  UserIcon as UserOutline,
+  UserCircleIcon as UserCircleOutline,
+  UserGroupIcon as UserGroupOutline,
+  UserMinusIcon as UserMinusOutline,
+  UserPlusIcon as UserPlusOutline,
+  UsersIcon as UsersOutline,
+  VideoCameraIcon as VideoCameraOutline,
+  VideoCameraSlashIcon as VideoCameraSlashOutline,
+  XCircleIcon as XCircleOutline,
+  // XMarkIcon → 아래에서 strokeWidth=2 래핑
+} from '@heroicons/react/24/outline';
+
+import React from 'react';
+import { PlusIcon as _PlusIcon, XMarkIcon as _XMarkIcon } from '@heroicons/react/24/outline';
+
+// Plus, XMark 기본 strokeWidth=2
+export const PlusOutline = ((props: React.ComponentProps<typeof _PlusIcon>) =>
+  React.createElement(_PlusIcon, { strokeWidth: 2, ...props })) as typeof _PlusIcon;
+export const XMarkOutline = ((props: React.ComponentProps<typeof _XMarkIcon>) =>
+  React.createElement(_XMarkIcon, { strokeWidth: 2, ...props })) as typeof _XMarkIcon;
+
+// ─── Solid (24x24 fill) ─────────────────────────────────────
+export {
+  ArchiveBoxIcon as ArchiveBoxSolid,
+  BellIcon as BellSolid,
+  BellAlertIcon as BellAlertSolid,
+  BellSlashIcon as BellSlashSolid,
+  CheckCircleIcon as CheckCircleSolid,
+  Cog6ToothIcon as Cog6ToothSolid,
+  Cog8ToothIcon as Cog8ToothSolid,
+  EllipsisVerticalIcon as EllipsisVerticalSolid,
+  ExclamationCircleIcon as ExclamationCircleSolid,
+  ExclamationTriangleIcon as ExclamationTriangleSolid,
+  EyeIcon as EyeSolid,
+  EyeSlashIcon as EyeSlashSolid,
+  FilmIcon as FilmSolid,
+  HandThumbDownIcon as HandThumbDownSolid,
+  HandThumbUpIcon as HandThumbUpSolid,
+  HeartIcon as HeartSolid,
+  HomeIcon as HomeSolid,
+  MagnifyingGlassIcon as MagnifyingGlassSolid,
+  PauseCircleIcon as PauseCircleSolid,
+  PencilIcon as PencilSolid,
+  PencilSquareIcon as PencilSquareSolid,
+  PhotoIcon as PhotoSolid,
+  PlayCircleIcon as PlayCircleSolid,
+  PlusCircleIcon as PlusCircleSolid,
+  QuestionMarkCircleIcon as QuestionMarkCircleSolid,
+  RectangleStackIcon as RectangleStackSolid,
+  Squares2X2Icon as Squares2X2Solid,
+  StopCircleIcon as StopCircleSolid,
+  TrashIcon as TrashSolid,
+  UserIcon as UserSolid,
+  UserCircleIcon as UserCircleSolid,
+  UserGroupIcon as UserGroupSolid,
+  UserMinusIcon as UserMinusSolid,
+  UserPlusIcon as UserPlusSolid,
+  UsersIcon as UsersSolid,
+  VideoCameraIcon as VideoCameraSolid,
+  VideoCameraSlashIcon as VideoCameraSlashSolid,
+  XCircleIcon as XCircleSolid,
+} from '@heroicons/react/24/solid';
+
+// ─── Namespace re-export (편의용) ────────────────────────────
+import * as _Outline from '@heroicons/react/24/outline';
+import * as _Solid from '@heroicons/react/24/solid';
+
+export const OutlineIcons = _Outline;
+export const SolidIcons = _Solid;
+
+// ─── Custom Icon Components (Figma Design) ──────────────────
+export { default as WatchStatusIcon } from './WatchStatusIcon';
+export { default as LikeIcon } from './LikeIcon';
+export { default as BoxIcon } from './BoxIcon';
+export { default as DeleteIcon } from './DeleteIcon';
+export { default as AddedStatusIcon } from './AddedStatusIcon';
+export { default as ProfileIcon } from './ProfileIcon';
+export { default as GoogleCircleLogo } from './GoogleCircleLogo';
+
+export type { WatchStatus, WatchStatusSize } from './WatchStatusIcon';
+export type { LikeIconSize } from './LikeIcon';
+export type { BoxIconVariant, BoxIconSize } from './BoxIcon';
+export type { DeleteIconVariant } from './DeleteIcon';
+export type { AddedStatusVariant } from './AddedStatusIcon';
+export type { ProfileIconVariant } from './ProfileIcon';
+export type { GoogleCircleLogoVariant } from './GoogleCircleLogo';

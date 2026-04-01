@@ -1,0 +1,13 @@
+export default function MobileFrame({
+    children
+}: {
+    children: React.ReactNode
+}) {
+    return (
+        // <div className="mx-auto max-w-[393px] min-h-screen bg-neutral-950 text-white shadow-[rgba(100,100,111,0.2)_0px_7px_29px_0px] flex flex-col">
+        <div className="relative mx-auto max-w-[393px] min-h-screen bg-wb-dark-02 shadow-[rgba(100,100,111,0.2)_0px_7px_29px_0px] overflow-hidden flex flex-col">
+
+            {children}
+        </div>
+    );
+}

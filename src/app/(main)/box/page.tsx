@@ -217,7 +217,7 @@ export default function BoxPage() {
                         <div className="flex flex-col gap-[3px] min-w-0 flex-1">
                           <p className="text-[16px] font-medium text-white leading-[24px] tracking-[0.15px] line-clamp-2">{box.name}</p>
                           <p className="text-[12px] text-wb-primary leading-[20px] tracking-[0.25px] truncate">
-                            {box.members.map((m) => m.boxMemberName).join(', ')}
+                            {box.memberList.map((m) => m.boxMemberName).join(', ')}
                           </p>
                         </div>
                       </div>

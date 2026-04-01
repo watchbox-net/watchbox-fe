@@ -25,7 +25,7 @@ export interface SharedBoxResponse {
   name: string;
   description: string | null;
   boxType: BoxType;
-  members: BoxMemberResponse[];
+  memberList: BoxMemberResponse[];
 }
 
 /** 공개 타입 */

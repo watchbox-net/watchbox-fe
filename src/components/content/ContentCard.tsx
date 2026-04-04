@@ -3,11 +3,12 @@
 import Poster from '@/components/content/Poster';
 import BoxIcon from '@/components/icons/BoxIcon';
 import WatchStatusIcon from '@/components/icons/WatchStatusIcon';
+import { TMDB_POSTER } from '@/lib/utils/content';
 
 // ─── Types ──────────────────────────────────────────────────
 interface ContentCardProps {
-  /** 포스터 이미지 URL */
-  posterSrc?: string | null;
+  /** 포스터 상대 경로 (e.g. /abc123.jpg) */
+  posterPath?: string | null;
   /** 콘텐츠 제목 */
   title: string;
   /** 평점 (voteAverage) */
@@ -23,11 +24,13 @@ interface ContentCardProps {
  * 구조: Poster(large) + 하단 정보 영역(제목, 평점, 아이콘)
  */
 export default function ContentCard({
-  posterSrc,
+  posterPath,
   title,
   rating,
   className,
 }: ContentCardProps) {
+  const posterSrc = posterPath ? `${TMDB_POSTER.md}${posterPath}` : null;
+
   return (
     <div className={`w-[140px] shrink-0 ${className ?? ''}`}>
       {/* 포스터 */}

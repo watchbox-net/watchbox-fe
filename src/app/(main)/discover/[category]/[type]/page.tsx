@@ -19,10 +19,10 @@ interface PageProps {
 }
 
 const TITLE_MAP: Record<string, Record<string, string>> = {
-  popular: { movie: '인기 영화', tv: '인기 시리즈' },
-  'top-rated': { movie: '높은 평점의 영화', tv: '높은 평점의 시리즈' },
-  'now-showing': { movie: '현재 상영중인 영화', tv: '현재 방영중인 시리즈' },
-  trending: { movie: '이번주 화제 영화', tv: '이번주 화제 시리즈' },
+  'popular': { 'movie': '인기 영화', 'tv': '인기 시리즈' },
+  'top-rated': { 'movie': '높은 평점의 영화', 'tv': '높은 평점의 시리즈' },
+  'now-showing': { 'movie': '현재 상영중인 영화', 'tv': '현재 방영중인 시리즈' },
+  'trending': { 'movie': '이번주 화제 영화', 'tv': '이번주 화제 시리즈' },
 };
 
 export default async function DiscoverCategoryPage({ params }: PageProps) {

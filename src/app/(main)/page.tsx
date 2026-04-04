@@ -8,8 +8,8 @@ import ListTitle from '@/components/list/ListTitle';
 import ContentCard from '@/components/content/ContentCard';
 import { fetchPopularMovieList, fetchTopRatedMovieList, fetchNowShowingMovieList, fetchTrendingMovieList } from '@/api/movie';
 import { fetchPopularTvList, fetchTopRatedTvList, fetchNowShowingTvList, fetchTrendingTvList } from '@/api/tv';
-import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
-import type { ContentItem, ContentPageResponse } from '@/types/content';
+import { getDisplayTitle } from '@/lib/utils/content';
+import type { ContentItem, ContentPageResponse, ContentSummary } from '@/types/content';
 import type { MovieSummary } from '@/types/movie';
 import type { TvSummary } from '@/types/tv';
 import Link from 'next/link';
@@ -31,7 +31,7 @@ async function loadSections() {
     fetchTrendingTvList(),
   ]);
 
-  const get = <T,>(res: PromiseSettledResult<ContentPageResponse<T>>) =>
+  const get = <T extends ContentSummary,>(res: PromiseSettledResult<ContentPageResponse<T>>) =>
     res.status === 'fulfilled' ? res.value.contentItemList : [];
 
   return {
@@ -59,7 +59,7 @@ function CardScroll<T extends MovieSummary | TvSummary>({
           href={`/content/${item.contentSummary.mediaType}/${item.contentSummary.contentId}`}
         >
           <ContentCard
-            posterSrc={getImageUrl(item.contentSummary)}
+            posterPath={item.contentSummary.posterPath}
             title={getDisplayTitle(item.contentSummary)}
             rating={item.contentSummary.voteAverage}
           />

@@ -1,6 +1,5 @@
 import Image from 'next/image';
-
-const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w185';
+import { TMDB_POSTER } from '@/lib/utils/content';
 
 interface TriplePosterBoxProps {
   /** 포스터 경로 배열 (최대 3개) */
@@ -17,7 +16,7 @@ interface TriplePosterBoxProps {
 export default function TriplePosterBox({ posters = [], className }: TriplePosterBoxProps) {
   const valid = posters
     .filter((p): p is string => !!p)
-    .map((p) => (p.startsWith('http') ? p : `${TMDB_IMAGE_BASE}${p}`));
+    .map((p) => (p.startsWith('http') ? p : `${TMDB_POSTER.md}${p}`));
   // 0개: 전부 빈칸 / 1개: AAA / 2개: ABA / 3개: ABC
   const slots: (string | null)[] =
     valid.length === 0 ? [null, null, null]

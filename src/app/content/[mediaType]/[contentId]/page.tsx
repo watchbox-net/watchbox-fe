@@ -14,6 +14,7 @@ import WatchStatusIcon from '@/components/icons/WatchStatusIcon';
 import { ChevronLeftOutline } from '@/components/icons';
 import { fetchContentDetail } from '@/lib/api/content';
 import { upsertWatchStatus, deleteWatchRecord, addLike, deleteLike } from '@/lib/api/record';
+import { TMDB_POSTER, TMDB_BACKDROP } from '@/lib/utils/content';
 import type {
   ContentDetailResponse,
   ContentDetailMediaType,
@@ -22,10 +23,6 @@ import type {
   TvInfo,
 } from '@/types/content-detail';
 import type { WatchStatus } from '@/types/content';
-
-// ─── TMDB 이미지 베이스 URL ──────────────────────────────────
-const TMDB_POSTER   = 'https://image.tmdb.org/t/p/w342';
-const TMDB_BACKDROP = 'https://image.tmdb.org/t/p/w780';
 
 const STATUS_LABEL: Record<Exclude<WatchStatus, 'NONE'>, string> = {
   COMPLETED: '시청 완료',
@@ -206,8 +203,8 @@ export default function ContentDetailPage() {
   }
 
   const info = extractInfo(detail);
-  const posterUrl   = info.posterPath   ? `${TMDB_POSTER}${info.posterPath}`     : null;
-  const backdropUrl = info.backdropPath ? `${TMDB_BACKDROP}${info.backdropPath}` : null;
+  const posterUrl   = info.posterPath   ? `${TMDB_POSTER.md}${info.posterPath}`     : null;
+  const backdropUrl = info.backdropPath ? `${TMDB_BACKDROP.md}${info.backdropPath}` : null;
 
   const metaParts = [
     info.year,

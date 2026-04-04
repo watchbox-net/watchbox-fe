@@ -4,6 +4,15 @@ import Poster from '@/components/content/Poster';
 import BoxIcon from '@/components/icons/BoxIcon';
 import WatchStatusIcon from '@/components/icons/WatchStatusIcon';
 import { TMDB_POSTER } from '@/lib/utils/content';
+import type { WatchStatus } from '@/types/content';
+import type { WatchStatus as IconWatchStatus } from '@/components/icons/WatchStatusIcon';
+
+const WATCH_STATUS_MAP: Record<string, IconWatchStatus> = {
+  COMPLETED: 'completed',
+  WATCHING: 'watching',
+  PLANNED: 'planned',
+  PAUSED: 'paused',
+};
 
 // ─── Types ──────────────────────────────────────────────────
 interface ContentCardProps {
@@ -13,6 +22,8 @@ interface ContentCardProps {
   title: string;
   /** 평점 (voteAverage) */
   rating?: number | null;
+  /** 시청 상태 */
+  watchStatus?: WatchStatus | null;
   className?: string;
 }
 
@@ -27,9 +38,11 @@ export default function ContentCard({
   posterPath,
   title,
   rating,
+  watchStatus,
   className,
 }: ContentCardProps) {
   const posterSrc = posterPath ? `${TMDB_POSTER.md}${posterPath}` : null;
+  const iconStatus: IconWatchStatus = (watchStatus && WATCH_STATUS_MAP[watchStatus]) ?? 'none';
 
   return (
     <div className={`w-[140px] shrink-0 ${className ?? ''}`}>
@@ -50,7 +63,7 @@ export default function ContentCard({
           </span>
           <div className="flex items-center gap-[8px]">
             <BoxIcon variant="none" size="small" />
-            <WatchStatusIcon status="none" size="small" />
+            <WatchStatusIcon status={iconStatus} size="small" />
           </div>
         </div>
       </div>

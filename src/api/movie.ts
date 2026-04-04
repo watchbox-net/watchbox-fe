@@ -4,55 +4,33 @@ import type { MovieSummary } from '@/types/movie';
 
 const BACKEND_API_URL = process.env.BACKEND_API_URL;
 
-export async function fetchPopularMovieList(
-  page: number = 1,
-  region: string = 'KR',
+async function fetchMovies(
+  endpoint: string,
+  accessToken?: string,
 ): Promise<ContentPageResponse<MovieSummary>> {
+  const withRecord = !!accessToken;
+  const headers: Record<string, string> = {};
+  if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+
   const response = await fetch(
-    `${BACKEND_API_URL}/discover/popular/movies?page=${page}&region=${region}`,
+    `${BACKEND_API_URL}/discover/${endpoint}?page=1&withRecord=${withRecord}`,
+    { headers },
   );
   if (!response.ok) {
-    throw new Error('Failed to fetch popular movies');
+    throw new Error(`Failed to fetch ${endpoint}`);
   }
   const result: ApiResponse<ContentPageResponse<MovieSummary>> = await response.json();
   return result.data;
 }
 
-export async function fetchTopRatedMovieList(
-  page: number = 1,
-): Promise<ContentPageResponse<MovieSummary>> {
-  const response = await fetch(
-    `${BACKEND_API_URL}/discover/top-rated/movies?page=${page}`,
-  );
-  if (!response.ok) {
-    throw new Error('Failed to fetch top rated movies');
-  }
-  const result: ApiResponse<ContentPageResponse<MovieSummary>> = await response.json();
-  return result.data;
-}
+export const fetchPopularMovieList = (token?: string) =>
+  fetchMovies('popular/movies', token);
 
-export async function fetchNowShowingMovieList(
-  page: number = 1,
-): Promise<ContentPageResponse<MovieSummary>> {
-  const response = await fetch(
-    `${BACKEND_API_URL}/discover/now-showing/movies?page=${page}`,
-  );
-  if (!response.ok) {
-    throw new Error('Failed to fetch now showing movies');
-  }
-  const result: ApiResponse<ContentPageResponse<MovieSummary>> = await response.json();
-  return result.data;
-}
+export const fetchTopRatedMovieList = (token?: string) =>
+  fetchMovies('top-rated/movies', token);
 
-export async function fetchTrendingMovieList(
-  page: number = 1,
-): Promise<ContentPageResponse<MovieSummary>> {
-  const response = await fetch(
-    `${BACKEND_API_URL}/discover/trending/movies?page=${page}`,
-  );
-  if (!response.ok) {
-    throw new Error('Failed to fetch trending movies');
-  }
-  const result: ApiResponse<ContentPageResponse<MovieSummary>> = await response.json();
-  return result.data;
-}
+export const fetchNowShowingMovieList = (token?: string) =>
+  fetchMovies('now-showing/movies', token);
+
+export const fetchTrendingMovieList = (token?: string) =>
+  fetchMovies('trending/movies', token);

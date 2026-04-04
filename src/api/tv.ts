@@ -4,54 +4,33 @@ import type { TvSummary } from '@/types/tv';
 
 const BACKEND_API_URL = process.env.BACKEND_API_URL;
 
-export async function fetchPopularTvList(
-  page: number = 1,
+async function fetchTv(
+  endpoint: string,
+  accessToken?: string,
 ): Promise<ContentPageResponse<TvSummary>> {
+  const withRecord = !!accessToken;
+  const headers: Record<string, string> = {};
+  if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+
   const response = await fetch(
-    `${BACKEND_API_URL}/discover/popular/tv?page=${page}`,
+    `${BACKEND_API_URL}/discover/${endpoint}?page=1&withRecord=${withRecord}`,
+    { headers },
   );
   if (!response.ok) {
-    throw new Error('Failed to fetch popular tv');
+    throw new Error(`Failed to fetch ${endpoint}`);
   }
   const result: ApiResponse<ContentPageResponse<TvSummary>> = await response.json();
   return result.data;
 }
 
-export async function fetchTopRatedTvList(
-  page: number = 1,
-): Promise<ContentPageResponse<TvSummary>> {
-  const response = await fetch(
-    `${BACKEND_API_URL}/discover/top-rated/tv?page=${page}`,
-  );
-  if (!response.ok) {
-    throw new Error('Failed to fetch top rated tv');
-  }
-  const result: ApiResponse<ContentPageResponse<TvSummary>> = await response.json();
-  return result.data;
-}
+export const fetchPopularTvList = (token?: string) =>
+  fetchTv('popular/tv', token);
 
-export async function fetchNowShowingTvList(
-  page: number = 1,
-): Promise<ContentPageResponse<TvSummary>> {
-  const response = await fetch(
-    `${BACKEND_API_URL}/discover/now-showing/tv?page=${page}`,
-  );
-  if (!response.ok) {
-    throw new Error('Failed to fetch now showing tv');
-  }
-  const result: ApiResponse<ContentPageResponse<TvSummary>> = await response.json();
-  return result.data;
-}
+export const fetchTopRatedTvList = (token?: string) =>
+  fetchTv('top-rated/tv', token);
 
-export async function fetchTrendingTvList(
-  page: number = 1,
-): Promise<ContentPageResponse<TvSummary>> {
-  const response = await fetch(
-    `${BACKEND_API_URL}/discover/trending/tv?page=${page}`,
-  );
-  if (!response.ok) {
-    throw new Error('Failed to fetch trending tv');
-  }
-  const result: ApiResponse<ContentPageResponse<TvSummary>> = await response.json();
-  return result.data;
-}
+export const fetchNowShowingTvList = (token?: string) =>
+  fetchTv('now-showing/tv', token);
+
+export const fetchTrendingTvList = (token?: string) =>
+  fetchTv('trending/tv', token);

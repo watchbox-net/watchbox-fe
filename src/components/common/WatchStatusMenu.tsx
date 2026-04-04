@@ -6,7 +6,7 @@ import { XMarkOutline } from '@/components/icons';
 // ─── Types ──────────────────────────────────────────────────
 export interface WatchStatusMenuProps {
   onSelect: (status: 'COMPLETED' | 'WATCHING' | 'PLANNED' | 'PAUSED') => void;
-  onDelete: () => void;
+  onDelete?: () => void;
   className?: string;
 }
 
@@ -47,16 +47,18 @@ export default function WatchStatusMenu({
       ))}
 
       {/* 기록 삭제 */}
-      <button
-        type="button"
-        className="flex items-center h-[45px] w-full px-[16px] gap-[16px] cursor-pointer transition-colors hover:bg-wb-grey-01 rounded-b-[10px]"
-        onClick={onDelete}
-      >
-        <XMarkOutline className="size-[24px] text-wb-grey-03 shrink-0" />
-        <span className="text-[14px] font-medium text-wb-grey-03 whitespace-nowrap">
-          기록 삭제
-        </span>
-      </button>
+      {onDelete && (
+        <button
+          type="button"
+          className="flex items-center h-[45px] w-full px-[16px] gap-[16px] cursor-pointer transition-colors hover:bg-wb-grey-01 rounded-b-[10px]"
+          onClick={onDelete}
+        >
+          <XMarkOutline className="size-[24px] text-wb-grey-03 shrink-0" />
+          <span className="text-[14px] font-medium text-wb-grey-03 whitespace-nowrap">
+            기록 삭제
+          </span>
+        </button>
+      )}
     </div>
   );
 }

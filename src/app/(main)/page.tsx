@@ -9,26 +9,30 @@ import ContentCard from '@/components/content/ContentCard';
 import { fetchPopularMovieList, fetchTopRatedMovieList, fetchNowShowingMovieList, fetchTrendingMovieList } from '@/api/movie';
 import { fetchPopularTvList, fetchTopRatedTvList, fetchNowShowingTvList, fetchTrendingTvList } from '@/api/tv';
 import { getDisplayTitle } from '@/lib/utils/content';
-import type { ContentItem, ContentPageResponse, ContentSummary } from '@/types/content';
+import type { ContentItem, ContentPageResponse, ContentSummary, WatchStatus } from '@/types/content';
 import type { MovieSummary } from '@/types/movie';
 import type { TvSummary } from '@/types/tv';
 import Link from 'next/link';
+import { cookies } from 'next/headers';
 
 async function loadSections() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('accessToken')?.value;
+
   const [
     popularMovieRes, popularTvRes,
     topRatedMovieRes, topRatedTvRes,
     nowShowingMovieRes, nowShowingTvRes,
     trendingMovieRes, trendingTvRes,
   ] = await Promise.allSettled([
-    fetchPopularMovieList(),
-    fetchPopularTvList(),
-    fetchTopRatedMovieList(),
-    fetchTopRatedTvList(),
-    fetchNowShowingMovieList(),
-    fetchNowShowingTvList(),
-    fetchTrendingMovieList(),
-    fetchTrendingTvList(),
+    fetchPopularMovieList(token),
+    fetchPopularTvList(token),
+    fetchTopRatedMovieList(token),
+    fetchTopRatedTvList(token),
+    fetchNowShowingMovieList(token),
+    fetchNowShowingTvList(token),
+    fetchTrendingMovieList(token),
+    fetchTrendingTvList(token),
   ]);
 
   const get = <T extends ContentSummary,>(res: PromiseSettledResult<ContentPageResponse<T>>) =>
@@ -62,6 +66,7 @@ function CardScroll<T extends MovieSummary | TvSummary>({
             posterPath={item.contentSummary.posterPath}
             title={getDisplayTitle(item.contentSummary)}
             rating={item.contentSummary.voteAverage}
+            watchStatus={item.memberRecord?.watchStatus}
           />
         </Link>
       ))}

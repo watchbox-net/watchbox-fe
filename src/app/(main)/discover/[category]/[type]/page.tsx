@@ -1,15 +1,14 @@
-import Image from 'next/image';
-import Link from 'next/link';
+import { cookies } from 'next/headers';
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
 import DiscoverTabs from './DiscoverTabs';
+import DiscoverContentList from './DiscoverContentList';
 import MainContent from '@/components/common/MainContent';
 import { fetchPopularMovieList, fetchTopRatedMovieList, fetchNowShowingMovieList, fetchTrendingMovieList } from '@/api/movie';
 import { fetchPopularTvList, fetchTopRatedTvList, fetchNowShowingTvList, fetchTrendingTvList } from '@/api/tv';
 import { notFound } from 'next/navigation';
 import type { ContentItem } from '@/types/content';
-import { getImageUrl, getDisplayTitle, getSubText } from '@/lib/utils/content';
 
 interface PageProps {
   params: Promise<{
@@ -25,6 +24,15 @@ const TITLE_MAP: Record<string, Record<string, string>> = {
   'trending': { 'movie': '이번주 화제 영화', 'tv': '이번주 화제 시리즈' },
 };
 
+type Fetcher = (token?: string) => Promise<{ contentItemList: ContentItem[] }>;
+
+const FETCH_MAP: Record<string, Record<string, Fetcher>> = {
+  'popular': { 'movie': fetchPopularMovieList, 'tv': fetchPopularTvList },
+  'top-rated': { 'movie': fetchTopRatedMovieList, 'tv': fetchTopRatedTvList },
+  'now-showing': { 'movie': fetchNowShowingMovieList, 'tv': fetchNowShowingTvList },
+  'trending': { 'movie': fetchTrendingMovieList, 'tv': fetchTrendingTvList },
+};
+
 export default async function DiscoverCategoryPage({ params }: PageProps) {
   const { category, type } = await params;
 
@@ -34,15 +42,11 @@ export default async function DiscoverCategoryPage({ params }: PageProps) {
   }
 
   try {
-    const fetchMap: Record<string, Record<string, () => Promise<{ contentItemList: ContentItem[] }>>> = {
-      popular: { movie: fetchPopularMovieList, tv: fetchPopularTvList },
-      'top-rated': { movie: fetchTopRatedMovieList, tv: fetchTopRatedTvList },
-      'now-showing': { movie: fetchNowShowingMovieList, tv: fetchNowShowingTvList },
-      trending: { movie: fetchTrendingMovieList, tv: fetchTrendingTvList },
-    };
+    const cookieStore = await cookies();
+    const token = cookieStore.get('accessToken')?.value;
 
-    const fetcher = fetchMap[category]?.[type];
-    const response = fetcher ? await fetcher() : { contentItemList: [] };
+    const fetcher = FETCH_MAP[category]?.[type];
+    const response = fetcher ? await fetcher(token) : { contentItemList: [] };
     const contentItems: ContentItem[] = response.contentItemList;
 
     return (
@@ -50,41 +54,11 @@ export default async function DiscoverCategoryPage({ params }: PageProps) {
         <Header variant="back" title={title} />
         <DiscoverTabs category={category} type={type} />
         <MainContent>
-          <ul>
-            {contentItems.map((item) => (
-              <li
-                key={item.contentSummary.contentId}
-                className="border-b border-neutral-800"
-              >
-                <Link
-                  href={`/content/${item.contentSummary.mediaType}/${item.contentSummary.contentId}`}
-                  className="flex items-center gap-3 px-4 py-3"
-                >
-                  {getImageUrl(item.contentSummary) ? (
-                    <Image
-                      src={getImageUrl(item.contentSummary)!}
-                      alt={getDisplayTitle(item.contentSummary)}
-                      width={64}
-                      height={88}
-                      className="w-16 h-22 rounded object-cover shrink-0 bg-neutral-800"
-                    />
-                  ) : (
-                    <div className="w-16 h-22 rounded bg-neutral-800 shrink-0 flex items-center justify-center text-neutral-600 text-xs">
-                      No img
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-wb-white truncate">
-                      {getDisplayTitle(item.contentSummary)}
-                    </p>
-                    <p className="text-xs text-neutral-500 truncate">
-                      {getSubText(item.contentSummary)}
-                    </p>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          {contentItems.length > 0 ? (
+            <DiscoverContentList items={contentItems} />
+          ) : (
+            <p className="text-center text-neutral-500 py-8">컨텐츠가 없습니다.</p>
+          )}
         </MainContent>
         <BottomMenu />
       </MobileFrame>

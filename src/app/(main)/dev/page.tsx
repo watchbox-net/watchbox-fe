@@ -278,7 +278,7 @@ export default function DevPage() {
                         <div className="flex items-center gap-3">
                             <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
                             <span className="text-sm text-green-700">
-                                로그인됨: {member?.nickname ?? member?.email ?? `memberId ${member?.memberId}`}
+                                로그인됨: memberId {member?.memberId} / {member?.nickname} / {member?.email}
                             </span>
                             <button
                                 onClick={logout}

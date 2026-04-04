@@ -17,3 +17,42 @@ export async function fetchPopularMovieList(
   const result: ApiResponse<ContentPageResponse<MovieSummary>> = await response.json();
   return result.data;
 }
+
+export async function fetchTopRatedMovieList(
+  page: number = 1,
+): Promise<ContentPageResponse<MovieSummary>> {
+  const response = await fetch(
+    `${BACKEND_API_URL}/discover/top-rated/movies?page=${page}`,
+  );
+  if (!response.ok) {
+    throw new Error('Failed to fetch top rated movies');
+  }
+  const result: ApiResponse<ContentPageResponse<MovieSummary>> = await response.json();
+  return result.data;
+}
+
+export async function fetchNowShowingMovieList(
+  page: number = 1,
+): Promise<ContentPageResponse<MovieSummary>> {
+  const response = await fetch(
+    `${BACKEND_API_URL}/discover/now-showing/movies?page=${page}`,
+  );
+  if (!response.ok) {
+    throw new Error('Failed to fetch now showing movies');
+  }
+  const result: ApiResponse<ContentPageResponse<MovieSummary>> = await response.json();
+  return result.data;
+}
+
+export async function fetchTrendingMovieList(
+  page: number = 1,
+): Promise<ContentPageResponse<MovieSummary>> {
+  const response = await fetch(
+    `${BACKEND_API_URL}/discover/trending/movies?page=${page}`,
+  );
+  if (!response.ok) {
+    throw new Error('Failed to fetch trending movies');
+  }
+  const result: ApiResponse<ContentPageResponse<MovieSummary>> = await response.json();
+  return result.data;
+}

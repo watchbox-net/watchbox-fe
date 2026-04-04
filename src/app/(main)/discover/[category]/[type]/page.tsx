@@ -5,8 +5,8 @@ import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
 import DiscoverTabs from './DiscoverTabs';
 import MainContent from '@/components/common/MainContent';
-import { fetchPopularMovieList } from '@/api/movie';
-import { fetchPopularTvList } from '@/api/tv';
+import { fetchPopularMovieList, fetchTopRatedMovieList, fetchNowShowingMovieList, fetchTrendingMovieList } from '@/api/movie';
+import { fetchPopularTvList, fetchTopRatedTvList, fetchNowShowingTvList, fetchTrendingTvList } from '@/api/tv';
 import { notFound } from 'next/navigation';
 import type { ContentItem } from '@/types/content';
 import { getImageUrl, getDisplayTitle, getSubText } from '@/lib/utils/content';
@@ -18,35 +18,32 @@ interface PageProps {
   }>;
 }
 
-const CATEGORY_MAP: Record<string, string> = {
-  popular: '인기',
-  'top-rated': '높은 평가',
-};
-
-const TYPE_MAP: Record<string, string> = {
-  movie: '영화',
-  tv: '시리즈',
+const TITLE_MAP: Record<string, Record<string, string>> = {
+  popular: { movie: '인기 영화', tv: '인기 시리즈' },
+  'top-rated': { movie: '높은 평점의 영화', tv: '높은 평점의 시리즈' },
+  'now-showing': { movie: '현재 상영중인 영화', tv: '현재 방영중인 시리즈' },
+  trending: { movie: '이번주 화제 영화', tv: '이번주 화제 시리즈' },
 };
 
 export default async function DiscoverCategoryPage({ params }: PageProps) {
   const { category, type } = await params;
 
-  if (!CATEGORY_MAP[category] || !TYPE_MAP[type]) {
+  const title = TITLE_MAP[category]?.[type];
+  if (!title) {
     notFound();
   }
 
-  const title = `${CATEGORY_MAP[category]} 컨텐츠 리스트`;
-
   try {
-    let contentItems: ContentItem[] = [];
+    const fetchMap: Record<string, Record<string, () => Promise<{ contentItemList: ContentItem[] }>>> = {
+      popular: { movie: fetchPopularMovieList, tv: fetchPopularTvList },
+      'top-rated': { movie: fetchTopRatedMovieList, tv: fetchTopRatedTvList },
+      'now-showing': { movie: fetchNowShowingMovieList, tv: fetchNowShowingTvList },
+      trending: { movie: fetchTrendingMovieList, tv: fetchTrendingTvList },
+    };
 
-    if (type === 'movie') {
-      const response = await fetchPopularMovieList();
-      contentItems = response.contentItemList;
-    } else if (type === 'tv') {
-      const response = await fetchPopularTvList();
-      contentItems = response.contentItemList;
-    }
+    const fetcher = fetchMap[category]?.[type];
+    const response = fetcher ? await fetcher() : { contentItemList: [] };
+    const contentItems: ContentItem[] = response.contentItemList;
 
     return (
       <MobileFrame>

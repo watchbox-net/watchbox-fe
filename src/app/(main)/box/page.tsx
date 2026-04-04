@@ -16,23 +16,6 @@ import type { MyBoxResponse, SharedBoxResponse, BoxType } from '@/types/box';
 
 type MenuTarget = { boxId: number; boxType: BoxType };
 
-// 백엔드에서 박스 포스터 이미지를 아직 안 보내므로 임시 샘플
-const SAMPLE_POSTERS = [
-  [
-    'https://image.tmdb.org/t/p/w185/eKZ07Ted7VHxQjbuZrRBFOamcKJ.jpg',
-    'https://image.tmdb.org/t/p/w185/zmK5G0JdkL637VbaVPYFeEQ52qi.jpg',
-    'https://image.tmdb.org/t/p/w185/uitqZVbhvlQV5iLOdbk3itGoNNd.jpg',
-  ],
-  [
-    'https://image.tmdb.org/t/p/w185/zmK5G0JdkL637VbaVPYFeEQ52qi.jpg',
-    'https://image.tmdb.org/t/p/w185/uitqZVbhvlQV5iLOdbk3itGoNNd.jpg',
-  ],
-  [
-    'https://image.tmdb.org/t/p/w185/uitqZVbhvlQV5iLOdbk3itGoNNd.jpg',
-  ],
-  [],
-];
-
 export default function BoxPage() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -160,10 +143,12 @@ export default function BoxPage() {
                         className="flex gap-[10px] items-start flex-1 min-w-0 cursor-pointer"
                         onClick={() => goToContents(box.boxId, 'MY', box.name)}
                       >
-                        <TriplePosterBox posters={SAMPLE_POSTERS[idx % SAMPLE_POSTERS.length]} />
+                        <TriplePosterBox posters={box.previewPosterList} />
                         <div className="flex flex-col gap-[3px] min-w-0 flex-1">
                           <p className="text-[16px] font-medium text-white leading-[24px] tracking-[0.15px] line-clamp-2">{box.name}</p>
-                          <p className="text-[12px] text-wb-grey-03 leading-[20px] tracking-[0.25px]">마지막 업데이트: 2026-03-25</p>
+                          {box.lastContentAddedAt && (
+                            <p className="text-[12px] text-wb-grey-03 leading-[20px] tracking-[0.25px]">마지막 업데이트: {box.lastContentAddedAt.slice(0, 10)}</p>
+                          )}
                         </div>
                       </div>
 
@@ -213,7 +198,7 @@ export default function BoxPage() {
                         className="flex gap-[10px] items-start flex-1 min-w-0 cursor-pointer"
                         onClick={() => goToContents(box.boxId, 'SHARED', box.name)}
                       >
-                        <TriplePosterBox posters={SAMPLE_POSTERS[(idx + 2) % SAMPLE_POSTERS.length]} />
+                        <TriplePosterBox posters={box.previewPosterList} />
                         <div className="flex flex-col gap-[3px] min-w-0 flex-1">
                           <p className="text-[16px] font-medium text-white leading-[24px] tracking-[0.15px] line-clamp-2">{box.name}</p>
                           <p className="text-[12px] text-wb-primary leading-[20px] tracking-[0.25px] truncate">

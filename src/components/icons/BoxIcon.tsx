@@ -11,6 +11,7 @@ interface BoxIconProps {
   variant?: BoxIconVariant;
   size?: BoxIconSize;
   className?: string;
+  onClick?: (e: React.MouseEvent) => void;
 }
 
 // ─── Size → Tailwind class ──────────────────────────────────
@@ -34,14 +35,15 @@ export default function BoxIcon({
   variant = 'added',
   size = 'medium',
   className,
+  onClick,
 }: BoxIconProps) {
   const sizeClass = SIZE_CLASSES[size];
   const colorClass = VARIANT_COLORS[variant];
   const combined = `${sizeClass} ${colorClass} ${className ?? ''}`;
 
   if (variant === 'outline') {
-    return <ArchiveBoxOutline className={combined} />;
+    return <ArchiveBoxOutline className={combined} onClick={onClick} />;
   }
 
-  return <ArchiveBoxSolid className={combined} />;
+  return <ArchiveBoxSolid className={combined} onClick={onClick} />;
 }

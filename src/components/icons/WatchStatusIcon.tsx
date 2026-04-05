@@ -11,6 +11,7 @@ interface WatchStatusIconProps {
   status?: WatchStatus;
   size?: WatchStatusSize;
   className?: string;
+  onClick?: (e: React.MouseEvent) => void;
 }
 
 // ─── Size → Tailwind class ──────────────────────────────────
@@ -37,18 +38,19 @@ export default function WatchStatusIcon({
   status = 'completed',
   size = 'medium',
   className,
+  onClick,
 }: WatchStatusIconProps) {
   const sizeClass = SIZE_CLASSES[size];
   const colorClass = STATUS_COLORS[status];
   const combined = `${sizeClass} ${colorClass} ${className ?? ''}`;
 
   if (status === 'outline') {
-    return <EyeOutlineIcon className={combined} />;
+    return <EyeOutlineIcon className={combined} onClick={onClick} />;
   }
 
   if (status === 'paused') {
-    return <EyeSlashSolid className={combined} />;
+    return <EyeSlashSolid className={combined} onClick={onClick} />;
   }
 
-  return <EyeSolid className={combined} />;
+  return <EyeSolid className={combined} onClick={onClick} />;
 }

@@ -7,13 +7,15 @@ import MobileFrame from '@/components/common/MobileFrame';
 import BottomMenu from '@/components/common/BottomMenu';
 import TabNav from '@/components/common/TabNav';
 import Toast from '@/components/common/Toast';
+import Modal from '@/components/common/Modal';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
+import { useAuth } from '@/lib/hooks/useAuth';
 import LikeIcon from '@/components/icons/LikeIcon';
 import BoxIcon from '@/components/icons/BoxIcon';
 import WatchStatusIcon from '@/components/icons/WatchStatusIcon';
 import { ChevronLeftOutline } from '@/components/icons';
 import { fetchContentDetail } from '@/lib/api/content';
-import { upsertWatchStatus, deleteWatchRecord, addLike, deleteLike } from '@/lib/api/record';
+import { upsertWatchStatus, deleteWatchRecord, addLike } from '@/lib/api/record';
 import { TMDB_POSTER, TMDB_BACKDROP } from '@/lib/utils/content';
 import type {
   ContentDetailResponse,
@@ -96,6 +98,7 @@ function InfoRow({ label, value }: { label: string; value: string | null | undef
 export default function ContentDetailPage() {
   const router    = useRouter();
   const params    = useParams();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const mediaType = (params.mediaType as string).toUpperCase() as ContentDetailMediaType;
   const contentId = Number(params.contentId);
 
@@ -113,6 +116,10 @@ export default function ContentDetailPage() {
   // 시청 상태 메뉴
   const [statusMenuOpen, setStatusMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // 모달
+  const [loginModalVisible, setLoginModalVisible] = useState(false);
+  const [preparingModalVisible, setPreparingModalVisible] = useState(false);
 
   // 토스트
   const [toast, setToast] = useState({ visible: false, message: '' });
@@ -142,8 +149,18 @@ export default function ContentDetailPage() {
     return () => document.removeEventListener('mousedown', handleMouseDown);
   }, [statusMenuOpen]);
 
+  // ── 인증 체크 ────────────────────────────────────────────────
+  const requireAuth = () => {
+    if (!authLoading && !isAuthenticated) {
+      setLoginModalVisible(true);
+      return true;
+    }
+    return false;
+  };
+
   // ── 좋아요 토글 ─────────────────────────────────────────────
   const handleLike = async () => {
+    if (requireAuth()) return;
     if (mediaType !== 'MOVIE' && mediaType !== 'TV') return;
     try {
       if (liked) {
@@ -161,10 +178,14 @@ export default function ContentDetailPage() {
   // ── 시청 상태 변경 ──────────────────────────────────────────
   const handleStatusSelect = async (status: Exclude<WatchStatus, 'NONE'>) => {
     setStatusMenuOpen(false);
+    if (requireAuth()) return;
     if (mediaType !== 'MOVIE' && mediaType !== 'TV') return;
     try {
       await upsertWatchStatus({ contentId, watchMediaType: mediaType, watchStatus: status });
       setWatchStatus(status);
+      // recordId 갱신 (삭제 시 필요)
+      const res = await fetchContentDetail(mediaType, contentId);
+      setRecordId(res.memberRecord?.recordId ?? null);
       showToast(`${STATUS_LABEL[status]}로 변경되었습니다.`);
     } catch {/* 에러 무시 */}
   };
@@ -172,6 +193,7 @@ export default function ContentDetailPage() {
   // ── 시청 기록 삭제 ──────────────────────────────────────────
   const handleStatusDelete = async () => {
     setStatusMenuOpen(false);
+    if (requireAuth()) return;
     if (!recordId) return;
     try {
       await deleteWatchRecord(recordId);
@@ -292,6 +314,7 @@ export default function ContentDetailPage() {
           <button
             type="button"
             className="flex flex-col items-center gap-[8px] cursor-pointer"
+            onClick={() => setPreparingModalVisible(true)}
           >
             <BoxIcon size="xl" variant="none" />
             <span className="text-[11px] text-wb-grey-04">박스 추가</span>
@@ -345,6 +368,17 @@ export default function ContentDetailPage() {
 
       <BottomMenu />
 
+      <Modal
+        visible={loginModalVisible}
+        variant="login"
+        onCancel={() => setLoginModalVisible(false)}
+        onConfirm={() => { setLoginModalVisible(false); router.push('/login'); }}
+      />
+      <Modal
+        visible={preparingModalVisible}
+        variant="preparing"
+        onConfirm={() => setPreparingModalVisible(false)}
+      />
       <Toast
         message={toast.message}
         visible={toast.visible}

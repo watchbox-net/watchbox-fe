@@ -26,7 +26,6 @@ export default function BoxContentsPage() {
   const searchParams = useSearchParams();
   const boxId = Number(params.boxId);
   const boxType = (searchParams.get('type') as BoxType) || 'MY';
-  const boxName = searchParams.get('name') || '박스 컨텐츠';
 
   const { isAuthenticated, isLoading: authLoading } = useAuth();
 
@@ -219,14 +218,9 @@ export default function BoxContentsPage() {
 
       <BottomMenu />
 
-      {/* 로그인 모달 */}
       <Modal
         visible={loginModalVisible}
         variant="login"
-        title="로그인이 필요합니다"
-        body="시청 상태를 변경하려면\n로그인이 필요합니다."
-        confirmLabel="로그인"
-        cancelLabel="취소"
         onCancel={() => setLoginModalVisible(false)}
         onConfirm={() => { setLoginModalVisible(false); router.push('/login'); }}
       />

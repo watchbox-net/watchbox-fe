@@ -9,7 +9,7 @@ import ContentCard from '@/components/content/ContentCard';
 import { fetchPopularMovieList, fetchTopRatedMovieList, fetchNowShowingMovieList, fetchTrendingMovieList } from '@/api/movie';
 import { fetchPopularTvList, fetchTopRatedTvList, fetchNowShowingTvList, fetchTrendingTvList } from '@/api/tv';
 import { getDisplayTitle } from '@/lib/utils/content';
-import type { ContentItem, ContentPageResponse, ContentSummary, WatchStatus } from '@/types/content';
+import type { ContentItem, ContentPageResponse, ContentSummary } from '@/types/content';
 import type { MovieSummary } from '@/types/movie';
 import type { TvSummary } from '@/types/tv';
 import Link from 'next/link';
@@ -58,17 +58,17 @@ function CardScroll<T extends MovieSummary | TvSummary>({
   return (
     <div className="flex gap-[15px] overflow-x-auto pl-[16px] pr-[16px] pb-2 scrollbar-hide">
       {items.map((item) => (
-        <Link
+        <ContentCard
           key={item.contentSummary.contentId}
+          posterPath={item.contentSummary.posterPath}
+          title={getDisplayTitle(item.contentSummary)}
+          rating={item.contentSummary.voteAverage}
+          watchStatus={item.memberRecord?.watchStatus}
           href={`/content/${item.contentSummary.mediaType}/${item.contentSummary.contentId}`}
-        >
-          <ContentCard
-            posterPath={item.contentSummary.posterPath}
-            title={getDisplayTitle(item.contentSummary)}
-            rating={item.contentSummary.voteAverage}
-            watchStatus={item.memberRecord?.watchStatus}
-          />
-        </Link>
+          contentId={item.contentSummary.contentId}
+          mediaType={item.contentSummary.mediaType as 'MOVIE' | 'TV'}
+          recordId={item.contentRecordId}
+        />
       ))}
     </div>
   );

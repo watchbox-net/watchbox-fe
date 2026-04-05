@@ -12,7 +12,7 @@ interface MainContentProps {
  */
 export default function MainContent({ children, className = '' }: MainContentProps) {
   return (
-    <main className={`flex-1 overflow-y-auto pb-24 ${className}`.trim()}>
+    <main className={`flex-1 overflow-y-auto scrollbar-hide ${className}`.trim()}>
       {children}
     </main>
   );

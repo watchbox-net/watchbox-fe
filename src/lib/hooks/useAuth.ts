@@ -30,7 +30,7 @@ export function useAuth() {
                 const data = await response.json();
                 setAuthState({
                     isAuthenticated: true,
-                    member: data.member?.data ?? data.member,
+                    member: data.member,
                     isLoading: false,
                 });
             } else {

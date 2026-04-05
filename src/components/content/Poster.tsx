@@ -23,7 +23,7 @@ const SIZE_MAP: Record<PosterSize, { width: number; height: number; radius: stri
 // ─── Component ──────────────────────────────────────────────
 export default function Poster({
   src,
-  alt = '',
+  alt,
   size = 'large',
   className,
 }: PosterProps) {
@@ -37,7 +37,7 @@ export default function Poster({
       {src ? (
         <Image
           src={src}
-          alt={alt}
+          alt={alt ?? 'poster'}
           width={width}
           height={height}
           className={`w-full h-full object-cover ${radius}`}

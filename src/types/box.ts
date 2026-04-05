@@ -17,6 +17,8 @@ export interface MyBoxResponse {
   name: string;
   description: string | null;
   boxType: BoxType;
+  lastContentAddedAt: string | null;
+  previewPosterList: string[];
 }
 
 /** 공유 박스 */
@@ -25,7 +27,9 @@ export interface SharedBoxResponse {
   name: string;
   description: string | null;
   boxType: BoxType;
+  lastContentAddedAt: string | null;
   memberList: BoxMemberResponse[];
+  previewPosterList: string[];
 }
 
 /** 공개 타입 */

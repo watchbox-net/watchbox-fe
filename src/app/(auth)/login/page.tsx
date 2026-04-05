@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import MobileFrame from '@/components/common/MobileFrame';
+import Header from '@/components/common/Header';
+import LogoWide from '@/components/icons/LogoWide';
 
 const SPRING_BOOT_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
@@ -12,35 +14,28 @@ function LoginContent() {
     const error = searchParams.get('error');
 
     const handleGoogleLogin = () => {
-        // 브라우저에서 Spring Boot OAuth 엔드포인트로 직접 이동
         window.location.href = `${SPRING_BOOT_URL}/oauth2/authorization/google`;
     };
 
     return (
         <MobileFrame>
-            <div className="min-h-screen flex flex-col items-center justify-center px-6">
+            <Header variant="back" />
 
-                {/* 로고 / 앱 이름 */}
-                <div className="mb-12 text-center">
-                    <h1 className="text-3xl font-bold text-wb-primary">
-                        WatchBox
-                    </h1>
-                    <p className="mt-2 text-sm text-wb-grey-02">
-                        나만의 시청 기록 박스
-                    </p>
-                </div>
+            <div className="flex-1 flex flex-col items-center justify-center">
+                {/* 로고 */}
+                <LogoWide />
 
-                {/* 소셜 로그인 버튼 */}
+                {/* 구글 로그인 버튼 */}
                 <button
                     onClick={handleGoogleLogin}
-                    className="cursor-pointer"
+                    className="mt-[20px] cursor-pointer"
                 >
                     <Image
                         src="/oauth/google/web_light_rd_SU@4x.png"
                         alt="Sign up with Google"
-                        width={800}
-                        height={100}
-                        className="h-11 w-auto"
+                        width={160}
+                        height={36}
+                        className="h-[36px] w-[160px]"
                         priority
                     />
                 </button>

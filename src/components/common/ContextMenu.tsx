@@ -7,10 +7,11 @@ import {
   TrashOutline,
   PlusOutline,
   QuestionMarkCircleOutline,
+  ExclamationCircleOutline,
 } from '@/components/icons';
 
 // ─── Types ──────────────────────────────────────────────────
-export type ContextMenuItemType = 'invite' | 'edit' | 'delete' | 'add' | 'help';
+export type ContextMenuItemType = 'invite' | 'edit' | 'delete' | 'add' | 'help' | 'info';
 
 export interface ContextMenuItemConfig {
   type: ContextMenuItemType;
@@ -33,6 +34,7 @@ const PRESETS: Record<ContextMenuItemType, {
   delete: { icon: TrashOutline,    defaultLabel: '삭제' },
   add:    { icon: PlusOutline,     defaultLabel: '추가' },
   help:   { icon: QuestionMarkCircleOutline, defaultLabel: '도움말' },
+  info:   { icon: ExclamationCircleOutline, defaultLabel: '정보' },
 };
 
 // ─── Component ──────────────────────────────────────────────

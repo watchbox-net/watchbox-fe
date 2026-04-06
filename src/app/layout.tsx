@@ -1,6 +1,6 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
-import { AuthProvider } from '@/lib/context/AuthContext';
+import Providers from './Providers';
 
 export const viewport: Viewport = {
     width: 'device-width',
@@ -22,9 +22,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-          <AuthProvider>
+          <Providers>
             {children}
-          </AuthProvider>
+          </Providers>
       </body>
     </html>
   );

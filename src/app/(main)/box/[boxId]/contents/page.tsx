@@ -7,13 +7,13 @@ import Header from '@/components/common/Header';
 import ListTitle from '@/components/list/ListTitle';
 import ContentListItem from '@/components/list/ContentListItem';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
-import Modal from '@/components/common/Modal';
 import Toast from '@/components/common/Toast';
 import { PlusOutline } from '@/components/icons';
 import MainContent from '@/components/common/MainContent';
 import { fetchMyBoxContents, fetchSharedBoxContents } from '@/lib/api/box';
-import { upsertWatchStatus } from '@/lib/api/record';
 import { useAuth } from '@/lib/context/AuthContext';
+import { useLoginModal } from '@/lib/context/LoginModalContext';
+import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
 import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
 import type { ContentItem, WatchStatus } from '@/types/content';
 import type { BoxType } from '@/types/box';
@@ -26,6 +26,7 @@ export default function BoxContentsPage() {
   const boxType = (searchParams.get('type') as BoxType) || 'MY';
 
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { showLoginModal } = useLoginModal();
 
   const [items, setItems] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,12 +37,11 @@ export default function BoxContentsPage() {
   const [menuDir, setMenuDir] = useState<'down' | 'up'>('down');
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // 로그인 모달
-  const [loginModalVisible, setLoginModalVisible] = useState(false);
-
   // 토스트
   const [toast, setToast] = useState({ visible: false, message: '' });
   const showToast = (message: string) => setToast({ visible: true, message });
+
+  const { changeStatus } = useWatchStatus({ showToast });
 
   const isShared = boxType === 'SHARED';
   const headerTitle = isShared ? '공유 박스 컨텐츠' : '마이 박스 컨텐츠';
@@ -82,12 +82,8 @@ export default function BoxContentsPage() {
     setOpenMenuId(null);
     const summary = item.contentSummary;
     if (summary.mediaType !== 'MOVIE' && summary.mediaType !== 'TV') return;
-    try {
-      await upsertWatchStatus({
-        contentId: summary.contentId,
-        watchMediaType: summary.mediaType,
-        watchStatus: status,
-      });
+    const success = await changeStatus(summary.contentId, summary.mediaType, status);
+    if (success) {
       setItems((prev) =>
         prev.map((i) =>
           i.contentSummary.contentId === summary.contentId
@@ -95,14 +91,7 @@ export default function BoxContentsPage() {
             : i,
         ),
       );
-      const STATUS_LABEL: Record<Exclude<WatchStatus, 'NONE'>, string> = {
-        COMPLETED: '시청 완료',
-        WATCHING:  '시청중',
-        PLANNED:   '시청 예정',
-        PAUSED:    '시청 중단',
-      };
-      showToast(`${STATUS_LABEL[status]}로 변경되었습니다.`);
-    } catch {/* 에러 무시 */}
+    }
   };
 
   // mediaType 별 그룹핑
@@ -152,9 +141,8 @@ export default function BoxContentsPage() {
         showDivider={!isLast}
         onClick={() => router.push(`/content/${summary.mediaType}/${summary.contentId}`)}
         onStatusClick={(e) => {
-          // 미로그인 → 로그인 모달
           if (!authLoading && !isAuthenticated) {
-            setLoginModalVisible(true);
+            showLoginModal();
             return;
           }
           if (isMenuOpen) { setOpenMenuId(null); return; }
@@ -213,13 +201,6 @@ export default function BoxContentsPage() {
           </>
         )}
       </MainContent>
-
-      <Modal
-        visible={loginModalVisible}
-        variant="login"
-        onCancel={() => setLoginModalVisible(false)}
-        onConfirm={() => { setLoginModalVisible(false); router.push('/login'); }}
-      />
 
       <Toast
         message={toast.message}

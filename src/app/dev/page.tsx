@@ -11,7 +11,7 @@ interface LoginResponse {
 }
 
 export default function DevPage() {
-    const { isAuthenticated, member, isLoading: authCheckLoading, logout } = useAuth();
+    const { isAuthenticated, member, isLoading: authCheckLoading, logout, checkAuth } = useAuth();
 
     const [healthCheckResult, setHealthCheckResult] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -231,6 +231,7 @@ export default function DevPage() {
 
             // 토큰은 HttpOnly Cookie로 관리 (BFF 프록시에서 자동 처리)
             setLoginData(result.data);
+            await checkAuth();
         } catch (err: any) {
             setAuthError(err.message ?? '로그인 실패');
             console.error('Dev login error:', err);
@@ -297,6 +298,59 @@ export default function DevPage() {
                             >
                                 로그인
                             </Link>
+                        </div>
+                    )}
+                </section>
+
+                <section className="border p-4 rounded">
+                    <h2 className="font-semibold mb-2">테스트 로그인</h2>
+                    <div className="flex flex-wrap gap-2 mb-4 items-center">
+                        <select
+                            value={selectedAccountId}
+                            onChange={(e) => setSelectedAccountId(Number(e.target.value))}
+                            className="border rounded px-3 py-2"
+                        >
+                            {TEST_ACCOUNTS.map((id) => (
+                                <option key={id} value={id}>
+                                    테스터 {id}
+                                </option>
+                            ))}
+                        </select>
+                        <button
+                            onClick={handleDevLogin}
+                            disabled={authLoading}
+                            className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 disabled:bg-gray-400"
+                        >
+                            {authLoading ? '처리 중...' : '로그인'}
+                        </button>
+                        <button
+                            onClick={handleGetMember}
+                            disabled={authLoading}
+                            className="bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600 disabled:bg-gray-400"
+                        >
+                            {authLoading ? '처리 중...' : '회원 정보 조회'}
+                        </button>
+                    </div>
+
+                    {loginData && (
+                        <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded">
+                            <h3 className="font-semibold text-orange-800 mb-2">로그인 성공</h3>
+                            <p className="text-sm">memberId: {loginData.memberId}</p>
+                            <p className="text-xs text-gray-500 mt-1">토큰은 HttpOnly Cookie에 저장됨 (개발자 도구 → Application → Cookies에서 확인)</p>
+                        </div>
+                    )}
+
+                    {memberInfo && (
+                        <div className="mt-4 p-3 bg-teal-50 border border-teal-200 rounded">
+                            <h3 className="font-semibold text-teal-800 mb-2">회원 정보</h3>
+                            <pre className="text-sm whitespace-pre-wrap">{memberInfo}</pre>
+                        </div>
+                    )}
+
+                    {authError && (
+                        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded">
+                            <h3 className="font-semibold text-red-800 mb-2">오류</h3>
+                            <p className="text-sm text-red-600">{authError}</p>
                         </div>
                     )}
                 </section>
@@ -417,58 +471,7 @@ export default function DevPage() {
                     )}
                 </section>
 
-                <section className="border p-4 rounded">
-                    <h2 className="font-semibold mb-2">테스트 로그인</h2>
-                    <div className="flex flex-wrap gap-2 mb-4 items-center">
-                        <select
-                            value={selectedAccountId}
-                            onChange={(e) => setSelectedAccountId(Number(e.target.value))}
-                            className="border rounded px-3 py-2"
-                        >
-                            {TEST_ACCOUNTS.map((id) => (
-                                <option key={id} value={id}>
-                                    테스터 {id}
-                                </option>
-                            ))}
-                        </select>
-                        <button
-                            onClick={handleDevLogin}
-                            disabled={authLoading}
-                            className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 disabled:bg-gray-400"
-                        >
-                            {authLoading ? '처리 중...' : '로그인'}
-                        </button>
-                        <button
-                            onClick={handleGetMember}
-                            disabled={authLoading}
-                            className="bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600 disabled:bg-gray-400"
-                        >
-                            {authLoading ? '처리 중...' : '회원 정보 조회'}
-                        </button>
-                    </div>
 
-                    {loginData && (
-                        <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded">
-                            <h3 className="font-semibold text-orange-800 mb-2">로그인 성공</h3>
-                            <p className="text-sm">memberId: {loginData.memberId}</p>
-                            <p className="text-xs text-gray-500 mt-1">토큰은 HttpOnly Cookie에 저장됨 (개발자 도구 → Application → Cookies에서 확인)</p>
-                        </div>
-                    )}
-
-                    {memberInfo && (
-                        <div className="mt-4 p-3 bg-teal-50 border border-teal-200 rounded">
-                            <h3 className="font-semibold text-teal-800 mb-2">회원 정보</h3>
-                            <pre className="text-sm whitespace-pre-wrap">{memberInfo}</pre>
-                        </div>
-                    )}
-
-                    {authError && (
-                        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded">
-                            <h3 className="font-semibold text-red-800 mb-2">오류</h3>
-                            <p className="text-sm text-red-600">{authError}</p>
-                        </div>
-                    )}
-                </section>
 
                 <section className="border p-4 rounded">
                     <h2 className="font-semibold mb-2">디자인 시스템</h2>

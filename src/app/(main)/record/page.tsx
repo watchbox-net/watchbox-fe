@@ -7,12 +7,13 @@ import Header from '@/components/common/Header';
 import TabNav from '@/components/common/TabNav';
 import ContentListItem from '@/components/list/ContentListItem';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
-import Modal from '@/components/common/Modal';
 import Toast from '@/components/common/Toast';
 import { PlusOutline } from '@/components/icons';
 import MainContent from '@/components/common/MainContent';
-import { fetchWatchStatusList, upsertWatchStatus, deleteWatchRecord } from '@/lib/api/record';
+import { fetchWatchStatusList } from '@/lib/api/record';
 import { useAuth } from '@/lib/context/AuthContext';
+import { useLoginModal } from '@/lib/context/LoginModalContext';
+import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
 import type { ContentItem, WatchStatus } from '@/types/content';
 import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
 
@@ -29,14 +30,16 @@ export default function RecordPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { showLoginModal } = useLoginModal();
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [menuDir, setMenuDir] = useState<'down' | 'up'>('down');
-  const [loginModalVisible, setLoginModalVisible] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: '' });
   const menuRef = useRef<HTMLDivElement>(null);
 
   const showToast = (message: string) =>
     setToast({ visible: true, message });
+
+  const { changeStatus, deleteStatus } = useWatchStatus({ showToast });
 
   useEffect(() => {
     if (authLoading) return;
@@ -75,12 +78,8 @@ export default function RecordPage() {
     setOpenMenuId(null);
     const summary = item.contentSummary;
     if (summary.mediaType !== 'MOVIE' && summary.mediaType !== 'TV') return;
-    try {
-      await upsertWatchStatus({
-        contentId: summary.contentId,
-        watchMediaType: summary.mediaType,
-        watchStatus: status,
-      });
+    const success = await changeStatus(summary.contentId, summary.mediaType, status);
+    if (success) {
       setAllItems((prev) =>
         prev.map((i) =>
           (i.contentRecordId ?? i.contentSummary.contentId) ===
@@ -89,26 +88,18 @@ export default function RecordPage() {
             : i,
         ),
       );
-      const STATUS_LABEL: Record<Exclude<WatchStatus, 'NONE'>, string> = {
-        COMPLETED: '시청 완료',
-        WATCHING:  '시청중',
-        PLANNED:   '시청 예정',
-        PAUSED:    '시청 중단',
-      };
-      showToast(`${STATUS_LABEL[status]}로 변경되었습니다.`);
-    } catch {/* 에러 무시 */}
+    }
   };
 
   const handleDelete = async (item: ContentItem) => {
     setOpenMenuId(null);
     if (!item.contentRecordId) return;
-    try {
-      await deleteWatchRecord(item.contentRecordId);
+    const success = await deleteStatus(item.contentRecordId);
+    if (success) {
       setAllItems((prev) =>
         prev.filter((i) => i.contentRecordId !== item.contentRecordId),
       );
-      showToast('시청 기록에서 삭제되었습니다.');
-    } catch {/* 에러 무시 */}
+    }
   };
 
   const renderItem = (item: ContentItem, idx: number, arr: ContentItem[]) => {
@@ -142,7 +133,7 @@ export default function RecordPage() {
         showDivider={idx < arr.length - 1}
         onClick={() => router.push(`/content/${summary.mediaType}/${summary.contentId}`)}
         onStatusClick={(e) => {
-          if (!authLoading && !isAuthenticated) { setLoginModalVisible(true); return; }
+          if (!authLoading && !isAuthenticated) { showLoginModal(); return; }
           if (isMenuOpen) { setOpenMenuId(null); return; }
           const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
           setMenuDir(window.innerHeight - rect.bottom < 220 ? 'up' : 'down');
@@ -198,12 +189,6 @@ export default function RecordPage() {
         )}
       </MainContent>
 
-      <Modal
-        visible={loginModalVisible}
-        variant="login"
-        onCancel={() => setLoginModalVisible(false)}
-        onConfirm={() => { setLoginModalVisible(false); router.push('/login'); }}
-      />
       <Toast
         message={toast.message}
         visible={toast.visible}

@@ -10,12 +10,14 @@ import Toast from '@/components/common/Toast';
 import Modal from '@/components/common/Modal';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
 import { useAuth } from '@/lib/context/AuthContext';
+import { useLoginModal } from '@/lib/context/LoginModalContext';
+import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
 import LikeIcon from '@/components/icons/LikeIcon';
 import BoxIcon from '@/components/icons/BoxIcon';
 import WatchStatusIcon from '@/components/icons/WatchStatusIcon';
 import { ChevronLeftOutline } from '@/components/icons';
 import { fetchContentDetail } from '@/lib/api/content';
-import { upsertWatchStatus, deleteWatchRecord, addLike } from '@/lib/api/record';
+import { addLike } from '@/lib/api/record';
 import { TMDB_POSTER, TMDB_BACKDROP } from '@/lib/utils/content';
 import type {
   ContentDetailResponse,
@@ -25,13 +27,6 @@ import type {
   TvInfo,
 } from '@/types/content-detail';
 import type { WatchStatus } from '@/types/content';
-
-const STATUS_LABEL: Record<Exclude<WatchStatus, 'NONE'>, string> = {
-  COMPLETED: '시청 완료',
-  WATCHING:  '시청중',
-  PLANNED:   '시청 예정',
-  PAUSED:    '시청 중단',
-};
 
 // ─── mediaType별 표시 정보 추출 ─────────────────────────────
 function extractInfo(detail: ContentDetailResponse) {
@@ -98,7 +93,6 @@ function InfoRow({ label, value }: { label: string; value: string | null | undef
 export default function ContentDetailPage() {
   const router    = useRouter();
   const params    = useParams();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const mediaType = (params.mediaType as string).toUpperCase() as ContentDetailMediaType;
   const contentId = Number(params.contentId);
 
@@ -118,12 +112,17 @@ export default function ContentDetailPage() {
   const menuRef = useRef<HTMLDivElement>(null);
 
   // 모달
-  const [loginModalVisible, setLoginModalVisible] = useState(false);
   const [preparingModalVisible, setPreparingModalVisible] = useState(false);
 
   // 토스트
   const [toast, setToast] = useState({ visible: false, message: '' });
   const showToast = (msg: string) => setToast({ visible: true, message: msg });
+
+  const { changeStatus, deleteStatus, requireAuth } = useWatchStatus({
+    onStatusChanged: (status) => setWatchStatus(status),
+    onDeleted: () => setWatchStatus(null),
+    showToast,
+  });
 
   useEffect(() => {
     fetchContentDetail(mediaType, contentId)
@@ -149,18 +148,9 @@ export default function ContentDetailPage() {
     return () => document.removeEventListener('mousedown', handleMouseDown);
   }, [statusMenuOpen]);
 
-  // ── 인증 체크 ────────────────────────────────────────────────
-  const requireAuth = () => {
-    if (!authLoading && !isAuthenticated) {
-      setLoginModalVisible(true);
-      return true;
-    }
-    return false;
-  };
-
   // ── 좋아요 토글 ─────────────────────────────────────────────
   const handleLike = async () => {
-    if (requireAuth()) return;
+    if (!requireAuth()) return;
     if (mediaType !== 'MOVIE' && mediaType !== 'TV') return;
     try {
       if (liked) {
@@ -178,28 +168,20 @@ export default function ContentDetailPage() {
   // ── 시청 상태 변경 ──────────────────────────────────────────
   const handleStatusSelect = async (status: Exclude<WatchStatus, 'NONE'>) => {
     setStatusMenuOpen(false);
-    if (requireAuth()) return;
     if (mediaType !== 'MOVIE' && mediaType !== 'TV') return;
-    try {
-      await upsertWatchStatus({ contentId, watchMediaType: mediaType, watchStatus: status });
-      setWatchStatus(status);
+    const success = await changeStatus(contentId, mediaType, status);
+    if (success) {
       // recordId 갱신 (삭제 시 필요)
       const res = await fetchContentDetail(mediaType, contentId);
       setRecordId(res.memberRecord?.recordId ?? null);
-      showToast(`${STATUS_LABEL[status]}로 변경되었습니다.`);
-    } catch {/* 에러 무시 */}
+    }
   };
 
   // ── 시청 기록 삭제 ──────────────────────────────────────────
   const handleStatusDelete = async () => {
     setStatusMenuOpen(false);
-    if (requireAuth()) return;
     if (!recordId) return;
-    try {
-      await deleteWatchRecord(recordId);
-      setWatchStatus(null);
-      showToast('시청 기록에서 삭제되었습니다.');
-    } catch {/* 에러 무시 */}
+    await deleteStatus(recordId);
   };
 
   if (loading) {
@@ -368,12 +350,6 @@ export default function ContentDetailPage() {
 
       <BottomMenu />
 
-      <Modal
-        visible={loginModalVisible}
-        variant="login"
-        onCancel={() => setLoginModalVisible(false)}
-        onConfirm={() => { setLoginModalVisible(false); router.push('/login'); }}
-      />
       <Modal
         visible={preparingModalVisible}
         variant="preparing"

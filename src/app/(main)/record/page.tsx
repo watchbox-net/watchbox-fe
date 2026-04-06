@@ -3,8 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import MobileFrame from '@/components/common/MobileFrame';
-import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
 import TabNav from '@/components/common/TabNav';
 import ContentListItem from '@/components/list/ContentListItem';
@@ -156,7 +154,7 @@ export default function RecordPage() {
   };
 
   return (
-    <MobileFrame>
+    <>
       <Header
         variant="icon1"
         title="시청 기록"
@@ -200,7 +198,6 @@ export default function RecordPage() {
         )}
       </MainContent>
 
-      <BottomMenu />
       <Modal
         visible={loginModalVisible}
         variant="login"
@@ -212,6 +209,6 @@ export default function RecordPage() {
         visible={toast.visible}
         onClose={() => setToast((t) => ({ ...t, visible: false }))}
       />
-    </MobileFrame>
+    </>
   );
 }

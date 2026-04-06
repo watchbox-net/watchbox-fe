@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import MobileFrame from '@/components/common/MobileFrame';
 import Header from '@/components/common/Header';
-import BottomMenu from '@/components/common/BottomMenu';
 import MainContent from '@/components/common/MainContent';
 import Modal from '@/components/common/Modal';
 import Toast from '@/components/common/Toast';
@@ -65,7 +63,7 @@ export default function MyPage() {
   );
 
   return (
-    <MobileFrame>
+    <>
       <Header
         variant="icon1"
         title="마이 페이지"
@@ -174,8 +172,6 @@ export default function MyPage() {
         )}
       </MainContent>
 
-      <BottomMenu />
-
       <Modal
         visible={logoutModalVisible}
         variant="confirm"
@@ -192,6 +188,6 @@ export default function MyPage() {
         visible={toast.visible}
         onClose={() => setToast((t) => ({ ...t, visible: false }))}
       />
-    </MobileFrame>
+    </>
   );
 }

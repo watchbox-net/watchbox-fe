@@ -1,6 +1,4 @@
 import { cookies } from 'next/headers';
-import MobileFrame from '@/components/common/MobileFrame';
-import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
 import DiscoverTabs from './DiscoverTabs';
 import DiscoverContentList from './DiscoverContentList';
@@ -50,7 +48,7 @@ export default async function DiscoverCategoryPage({ params }: PageProps) {
     const contentItems: ContentItem[] = response.contentItemList;
 
     return (
-      <MobileFrame>
+      <>
         <Header variant="back" title={title} />
         <DiscoverTabs category={category} type={type} />
         <MainContent>
@@ -60,20 +58,18 @@ export default async function DiscoverCategoryPage({ params }: PageProps) {
             <p className="text-center text-neutral-500 py-8">컨텐츠가 없습니다.</p>
           )}
         </MainContent>
-        <BottomMenu />
-      </MobileFrame>
+      </>
     );
   } catch (error) {
     console.error(error);
     return (
-      <MobileFrame>
+      <>
         <Header variant="back" title={title} />
         <DiscoverTabs category={category} type={type} />
         <MainContent className="p-4">
           <p className="text-neutral-500">오류가 발생했습니다.</p>
         </MainContent>
-        <BottomMenu />
-      </MobileFrame>
+      </>
     );
   }
 }

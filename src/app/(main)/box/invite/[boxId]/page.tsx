@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import MobileFrame from '@/components/common/MobileFrame';
-import BottomMenu from '@/components/common/BottomMenu';
 import Toast from '@/components/common/Toast';
 import Modal from '@/components/common/Modal';
 import MainContent from '@/components/common/MainContent';
@@ -69,7 +67,7 @@ export default function BoxInvitePage() {
   };
 
   return (
-    <MobileFrame>
+    <>
       <Header variant="back" title="회원 검색하기" />
 
       {/* 검색바 */}
@@ -128,7 +126,6 @@ export default function BoxInvitePage() {
         )}
       </MainContent>
 
-      <BottomMenu />
       <Toast message={toast} visible={!!toast} onClose={() => setToast('')} />
 
       <Modal
@@ -139,6 +136,6 @@ export default function BoxInvitePage() {
         onCancel={() => setConfirmTarget(null)}
         onConfirm={handleInviteConfirm}
       />
-    </MobileFrame>
+    </>
   );
 }

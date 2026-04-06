@@ -1,7 +1,5 @@
-import MobileFrame from '@/components/common/MobileFrame';
 import Header from '@/components/common/Header';
 import Link from 'next/link';
-import BottomMenu from '@/components/common/BottomMenu';
 
 const DISCOVER_LINKS = [
   { href: '/discover/popular/movie', label: '인기 영화' },
@@ -16,7 +14,7 @@ const DISCOVER_LINKS = [
 
 export default function DiscoverPage() {
   return (
-    <MobileFrame>
+    <>
       <Header />
       <main className="p-4">
         <h1 className="text-xl font-bold mb-4">둘러보기</h1>
@@ -32,7 +30,6 @@ export default function DiscoverPage() {
           ))}
         </div>
       </main>
-      <BottomMenu />
-    </MobileFrame>
+    </>
   );
 }

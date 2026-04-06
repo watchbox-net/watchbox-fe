@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import MobileFrame from '@/components/common/MobileFrame';
-import BottomMenu from '@/components/common/BottomMenu';
 import Toast from '@/components/common/Toast';
 import MainContent from '@/components/common/MainContent';
 import Header from '@/components/common/Header';
@@ -69,7 +67,7 @@ export default function BoxInvitationsPage() {
   const pendingReceived = received.filter((inv) => inv.status === 'PENDING');
 
   return (
-    <MobileFrame>
+    <>
       <Header variant="back" title="박스 초대 요청" onBack={() => router.back()} />
 
       <MainContent>
@@ -140,8 +138,7 @@ export default function BoxInvitationsPage() {
         )}
       </MainContent>
 
-      <BottomMenu />
       <Toast message={toast} visible={!!toast} onClose={() => setToast('')} />
-    </MobileFrame>
+    </>
   );
 }

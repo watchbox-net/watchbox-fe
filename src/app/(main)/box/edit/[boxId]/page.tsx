@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import MobileFrame from '@/components/common/MobileFrame';
-import BottomMenu from '@/components/common/BottomMenu';
 import Toast from '@/components/common/Toast';
 import BoxForm from '@/components/box/BoxForm';
 import { fetchMyBox, fetchSharedBox, updateMyBox, updateSharedBox } from '@/lib/api/box';
@@ -58,17 +56,16 @@ export default function BoxEditPage() {
 
   if (loading) {
     return (
-      <MobileFrame>
+      <>
         <div className="flex-1 flex items-center justify-center">
           <p className="text-neutral-500 text-sm">불러오는 중...</p>
         </div>
-        <BottomMenu />
-      </MobileFrame>
+      </>
     );
   }
 
   return (
-    <MobileFrame>
+    <>
       <BoxForm
         mode="edit"
         initialName={initialName}
@@ -77,8 +74,7 @@ export default function BoxEditPage() {
         boxTypeDisabled
         onSubmit={handleSubmit}
       />
-      <BottomMenu />
       <Toast message="박스가 수정되었습니다!" visible={toast} onClose={() => setToast(false)} />
-    </MobileFrame>
+    </>
   );
 }

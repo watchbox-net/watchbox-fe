@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import MobileFrame from '@/components/common/MobileFrame';
-import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
 import TabNav from '@/components/common/TabNav';
 import MainContent from '@/components/common/MainContent';
@@ -79,7 +77,7 @@ export default function SearchPage() {
   };
 
   return (
-    <MobileFrame>
+    <>
       <Header
         variant={isSearchActive ? 'search-after' : 'search-before'}
         searchValue={query}
@@ -147,7 +145,6 @@ export default function SearchPage() {
         )}
       </MainContent>
 
-      <BottomMenu />
-    </MobileFrame>
+    </>
   );
 }

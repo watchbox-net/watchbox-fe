@@ -2,8 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import MobileFrame from '@/components/common/MobileFrame';
-import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
 import MainContent from '@/components/common/MainContent';
 import ContextMenu from '@/components/common/ContextMenu';
@@ -90,7 +88,7 @@ export default function BoxPage() {
   ];
 
   return (
-    <MobileFrame>
+    <>
       <Header
         variant="icon2"
         title="박스"
@@ -237,7 +235,6 @@ export default function BoxPage() {
         )}
       </MainContent>
 
-      <BottomMenu />
-    </MobileFrame>
+    </>
   );
 }

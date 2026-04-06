@@ -3,8 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import MobileFrame from '@/components/common/MobileFrame';
-import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
 import ListTitle from '@/components/list/ListTitle';
 import ContentListItem from '@/components/list/ContentListItem';
@@ -170,7 +168,7 @@ export default function BoxContentsPage() {
   };
 
   return (
-    <MobileFrame>
+    <>
       <Header
         variant="icon1-back"
         title={headerTitle}
@@ -216,8 +214,6 @@ export default function BoxContentsPage() {
         )}
       </MainContent>
 
-      <BottomMenu />
-
       <Modal
         visible={loginModalVisible}
         variant="login"
@@ -230,6 +226,6 @@ export default function BoxContentsPage() {
         visible={toast.visible}
         onClose={() => setToast((t) => ({ ...t, visible: false }))}
       />
-    </MobileFrame>
+    </>
   );
 }

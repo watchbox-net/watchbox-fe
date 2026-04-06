@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import MobileFrame from '@/components/common/MobileFrame';
-import BottomMenu from '@/components/common/BottomMenu';
 import Toast from '@/components/common/Toast';
 import BoxForm from '@/components/box/BoxForm';
 import { createMyBox, createSharedBox } from '@/lib/api/box';
@@ -26,10 +24,9 @@ export default function BoxCreatePage() {
   };
 
   return (
-    <MobileFrame>
+    <>
       <BoxForm mode="create" onSubmit={handleSubmit} />
-      <BottomMenu />
       <Toast message="박스가 생성되었습니다!" visible={toast} onClose={() => setToast(false)} />
-    </MobileFrame>
+    </>
   );
 }

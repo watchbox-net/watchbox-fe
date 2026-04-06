@@ -1,8 +1,6 @@
 export const dynamic = 'force-dynamic';
 
-import BottomMenu from '@/components/common/BottomMenu';
 import Header from '@/components/common/Header';
-import MobileFrame from '@/components/common/MobileFrame';
 import MainContent from '@/components/common/MainContent';
 import ListTitle from '@/components/list/ListTitle';
 import ContentCard from '@/components/content/ContentCard';
@@ -106,7 +104,7 @@ export default async function HomePage() {
   } = await loadSections();
 
   return (
-    <MobileFrame>
+    <>
       <Header variant="center" />
       <MainContent>
         <Section title="인기 영화" href="/discover/popular/movie" items={popularMovies} />
@@ -118,7 +116,6 @@ export default async function HomePage() {
         <Section title="이번주 화제 영화" href="/discover/trending/movie" items={trendingMovies} />
         <Section title="이번주 화제 시리즈" href="/discover/trending/tv" items={trendingTv} />
       </MainContent>
-      <BottomMenu />
-    </MobileFrame>
+    </>
   );
 }

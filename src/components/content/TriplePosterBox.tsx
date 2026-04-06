@@ -1,7 +1,8 @@
 import Image from 'next/image';
+import { TMDB_POSTER } from '@/lib/utils/content';
 
 interface TriplePosterBoxProps {
-  /** 포스터 URL 배열 (최대 3개) */
+  /** 포스터 경로 배열 (최대 3개) */
   posters?: (string | null)[];
   className?: string;
 }
@@ -13,7 +14,9 @@ interface TriplePosterBoxProps {
  * - 전체 너비: 155px
  */
 export default function TriplePosterBox({ posters = [], className }: TriplePosterBoxProps) {
-  const valid = posters.filter((p): p is string => !!p);
+  const valid = posters
+    .filter((p): p is string => !!p)
+    .map((p) => (p.startsWith('http') ? p : `${TMDB_POSTER.md}${p}`));
   // 0개: 전부 빈칸 / 1개: AAA / 2개: ABA / 3개: ABC
   const slots: (string | null)[] =
     valid.length === 0 ? [null, null, null]

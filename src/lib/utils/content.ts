@@ -1,15 +1,33 @@
 import type { ContentSummary } from '@/types/content';
 
-const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w185';
+/** TMDB 포스터 이미지 베이스 URL */
+export const TMDB_POSTER = {
+  sm: 'https://image.tmdb.org/t/p/w185',
+  md: 'https://image.tmdb.org/t/p/w342',
+  lg: 'https://image.tmdb.org/t/p/w500',
+  xl: 'https://image.tmdb.org/t/p/w780',
+  original: 'https://image.tmdb.org/t/p/original',
+} as const;
+
+/** TMDB 백드롭 이미지 베이스 URL */
+export const TMDB_BACKDROP = {
+  sm: 'https://image.tmdb.org/t/p/w300',
+  md: 'https://image.tmdb.org/t/p/w780',
+  lg: 'https://image.tmdb.org/t/p/w1280',
+} as const;
 
 /** ContentSummary에서 TMDB 이미지 URL 추출 */
-export function getImageUrl(summary: ContentSummary): string | null {
+export function getImageUrl(
+  summary: ContentSummary,
+  size: keyof typeof TMDB_POSTER = 'sm',
+): string | null {
+  const base = TMDB_POSTER[size];
   switch (summary.mediaType) {
     case 'MOVIE':
     case 'TV':
-      return summary.posterPath ? `${TMDB_IMAGE_BASE}${summary.posterPath}` : null;
+      return summary.posterPath ? `${base}${summary.posterPath}` : null;
     case 'PERSON':
-      return summary.profilePath ? `${TMDB_IMAGE_BASE}${summary.profilePath}` : null;
+      return summary.profilePath ? `${base}${summary.profilePath}` : null;
   }
 }
 

@@ -27,8 +27,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ authenticated: false }, { status: 401 });
     }
 
-    const member = await response.json();
-    return NextResponse.json({ authenticated: true, member });
+    const result = await response.json();
+    const profile = result.data?.profile ?? result.profile;
+    return NextResponse.json({ authenticated: true, member: profile });
   } catch {
     return NextResponse.json({ authenticated: false }, { status: 500 });
   }

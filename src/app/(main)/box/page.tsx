@@ -9,7 +9,7 @@ import TriplePosterBox from '@/components/content/TriplePosterBox';
 import { PlusOutline, EllipsisVerticalSolid } from '@/components/icons';
 import ListTitle from '@/components/list/ListTitle';
 import { fetchMyBoxList, fetchSharedBoxList } from '@/lib/api/box';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useAuth } from '@/lib/context/AuthContext';
 import type { MyBoxResponse, SharedBoxResponse, BoxType } from '@/types/box';
 
 type MenuTarget = { boxId: number; boxType: BoxType };
@@ -132,7 +132,7 @@ export default function BoxPage() {
               />
               {myBoxes.length > 0 && (
                 <ul>
-                  {myBoxes.map((box, idx) => (
+                  {myBoxes.map((box) => (
                     <li
                       key={box.boxId}
                       className="flex items-start pl-[16px] pr-[12px] py-[10px]"
@@ -187,7 +187,7 @@ export default function BoxPage() {
               />
               {sharedBoxes.length > 0 && (
                 <ul>
-                  {sharedBoxes.map((box, idx) => (
+                  {sharedBoxes.map((box) => (
                     <li
                       key={box.boxId}
                       className="flex items-start pl-[16px] pr-[12px] py-[10px]"

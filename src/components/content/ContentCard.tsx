@@ -9,7 +9,7 @@ import WatchStatusIcon from '@/components/icons/WatchStatusIcon';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
 import Modal from '@/components/common/Modal';
 import Toast from '@/components/common/Toast';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useAuth } from '@/lib/context/AuthContext';
 import { upsertWatchStatus, deleteWatchRecord } from '@/lib/api/record';
 import { TMDB_POSTER } from '@/lib/utils/content';
 import type { WatchStatus } from '@/types/content';

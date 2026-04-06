@@ -13,7 +13,7 @@ import { PlusOutline } from '@/components/icons';
 import MainContent from '@/components/common/MainContent';
 import { fetchMyBoxContents, fetchSharedBoxContents } from '@/lib/api/box';
 import { upsertWatchStatus } from '@/lib/api/record';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useAuth } from '@/lib/context/AuthContext';
 import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
 import type { ContentItem, WatchStatus } from '@/types/content';
 import type { BoxType } from '@/types/box';

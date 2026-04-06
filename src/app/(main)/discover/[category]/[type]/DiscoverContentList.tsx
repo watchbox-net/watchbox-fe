@@ -7,7 +7,7 @@ import ContentListItem from '@/components/list/ContentListItem';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
 import Modal from '@/components/common/Modal';
 import Toast from '@/components/common/Toast';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useAuth } from '@/lib/context/AuthContext';
 import { upsertWatchStatus, deleteWatchRecord } from '@/lib/api/record';
 import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
 import type { ContentItem, WatchStatus } from '@/types/content';

@@ -9,7 +9,7 @@ import TabNav from '@/components/common/TabNav';
 import Toast from '@/components/common/Toast';
 import Modal from '@/components/common/Modal';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useAuth } from '@/lib/context/AuthContext';
 import LikeIcon from '@/components/icons/LikeIcon';
 import BoxIcon from '@/components/icons/BoxIcon';
 import WatchStatusIcon from '@/components/icons/WatchStatusIcon';

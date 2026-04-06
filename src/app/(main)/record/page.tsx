@@ -12,7 +12,7 @@ import Toast from '@/components/common/Toast';
 import { PlusOutline } from '@/components/icons';
 import MainContent from '@/components/common/MainContent';
 import { fetchWatchStatusList, upsertWatchStatus, deleteWatchRecord } from '@/lib/api/record';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useAuth } from '@/lib/context/AuthContext';
 import type { ContentItem, WatchStatus } from '@/types/content';
 import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
 

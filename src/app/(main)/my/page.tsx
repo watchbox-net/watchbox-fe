@@ -18,7 +18,7 @@ import {
   UsersSolid,
 } from '@/components/icons';
 import { fetchMyPage } from '@/lib/api/member';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useAuth } from '@/lib/context/AuthContext';
 import type { MyPageResponse } from '@/types/mypage';
 
 export default function MyPage() {

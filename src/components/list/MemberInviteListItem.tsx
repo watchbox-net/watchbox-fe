@@ -84,7 +84,7 @@ export default function MemberInviteListItem(props: MemberInviteListItemProps) {
     return (
       <div className={`flex items-center gap-[10px] py-[10px] ${className ?? ''}`}>
         <ProfileIcon variant="list" />
-        <span className="flex-1 text-[18px] leading-[28px] text-wb-white-02 truncate">
+        <span className="flex-1 text-[18px] leading-[28px] text-wb-grey-04 truncate">
           {name}
         </span>
         <button

@@ -28,7 +28,7 @@ const VARIANT_STYLES: Record<ButtonVariant, string> = {
   // wide
   save:   'bg-wb-green text-wb-white-01',
   off:    'bg-wb-dark-05 text-wb-grey-01',
-  white:  'bg-wb-white-02 text-wb-dark-04',
+  white:  'bg-wb-white-01 text-wb-dark-04',
   // modal
   cancel: 'bg-wb-grey-01 text-wb-grey-03',
   accept: 'bg-wb-dark-02 text-wb-grey-03',

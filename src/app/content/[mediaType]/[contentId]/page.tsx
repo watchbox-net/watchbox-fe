@@ -218,7 +218,7 @@ export default function ContentDetailPage() {
 
   return (
     <MobileFrame>
-      <div className="flex-1 overflow-y-auto pb-24">
+      <div className="flex-1 overflow-y-auto scrollbar-hide pb-24">
 
         {/* ── 백드롭 + 뒤로가기 ─────────────────────────── */}
         <div className="relative h-[230px] bg-wb-dark-03 shrink-0">

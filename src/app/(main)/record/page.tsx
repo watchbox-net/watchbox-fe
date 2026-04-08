@@ -168,7 +168,7 @@ export default function RecordPage() {
             <button
               type="button"
               onClick={() => router.push('/login')}
-              className="h-[40px] px-[24px] bg-wb-orange rounded-[8px] text-[14px] font-bold text-wb-white-01"
+              className="h-[40px] px-[24px] bg-wb-primary rounded-[8px] text-[14px] font-bold text-wb-white-01"
             >
               로그인
             </button>

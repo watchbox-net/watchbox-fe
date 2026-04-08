@@ -8,10 +8,13 @@ import {
   PlusOutline,
   QuestionMarkCircleOutline,
   ExclamationCircleOutline,
+  BellAlertOutline,
+  MegaphoneOutline,
 } from '@/components/icons';
 
 // ─── Types ──────────────────────────────────────────────────
-export type ContextMenuItemType = 'invite' | 'edit' | 'delete' | 'add' | 'help' | 'info';
+export type ContextMenuItemType = 'invite' | 'edit' | 'delete' | 'add' | 'help' | 'info' | 'notification' | 'feedback';
+export type ContextMenuSize = 'small' | 'medium';
 
 export interface ContextMenuItemConfig {
   type: ContextMenuItemType;
@@ -21,6 +24,7 @@ export interface ContextMenuItemConfig {
 
 interface ContextMenuProps {
   items: ContextMenuItemConfig[];
+  size?: ContextMenuSize;
   className?: string;
 }
 
@@ -33,17 +37,24 @@ const PRESETS: Record<ContextMenuItemType, {
   edit:   { icon: PencilOutline,   defaultLabel: '수정' },
   delete: { icon: TrashOutline,    defaultLabel: '삭제' },
   add:    { icon: PlusOutline,     defaultLabel: '추가' },
-  help:   { icon: QuestionMarkCircleOutline, defaultLabel: '도움말' },
-  info:   { icon: ExclamationCircleOutline, defaultLabel: '정보' },
+  help:         { icon: QuestionMarkCircleOutline, defaultLabel: '도움말' },
+  info:         { icon: ExclamationCircleOutline, defaultLabel: '정보' },
+  notification: { icon: BellAlertOutline,          defaultLabel: '알림 설정' },
+  feedback:     { icon: MegaphoneOutline,         defaultLabel: '피드백하기' },
 };
 
 // ─── Component ──────────────────────────────────────────────
-export default function ContextMenu({ items, className }: ContextMenuProps) {
+const SIZE_CLASS: Record<ContextMenuSize, string> = {
+  small:  'w-[115px]',
+  medium: 'w-[137px]',
+};
+
+export default function ContextMenu({ items, size = 'small', className }: ContextMenuProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   return (
     <div
-      className={`bg-wb-dark-05 rounded-[15px] min-w-[110px] py-[5px] flex flex-col ${className ?? ''}`}
+      className={`bg-wb-dark-05 rounded-[15px] ${SIZE_CLASS[size]} py-[5px] flex flex-col ${className ?? ''}`}
     >
       {items.map((item, index) => {
         const preset = PRESETS[item.type];

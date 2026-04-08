@@ -211,7 +211,7 @@ export default function ContentDetailPage() {
     info.runtime ? `${info.runtime}분` : null,
   ].filter(Boolean);
 
-  const needsExpansion = (info.overview?.length ?? 0) > 120;
+  const needsExpansion = (info.overview?.length ?? 0) > 100;
 
   return (
     <MobileFrame>
@@ -259,18 +259,18 @@ export default function ContentDetailPage() {
         {/* ── 줄거리 ───────────────────────────────────── */}
         {info.overview && (
           <div className="px-[16px] mt-[20px]">
-            <p className={`text-[13px] font-medium leading-[22px] text-wb-grey-03 ${!expanded ? 'line-clamp-3' : ''}`}>
-              {info.overview}
+            <p className="text-[13px] font-medium leading-[22px] text-wb-grey-03">
+              {expanded ? info.overview : needsExpansion ? `${info.overview.slice(0, 100)}...` : info.overview}
+              {needsExpansion && (
+                <button
+                  type="button"
+                  onClick={() => setExpanded((v) => !v)}
+                  className="text-wb-white-01 ml-[4px] cursor-pointer"
+                >
+                  {expanded ? '접기' : '더보기'}
+                </button>
+              )}
             </p>
-            {needsExpansion && (
-              <button
-                type="button"
-                onClick={() => setExpanded((v) => !v)}
-                className="text-[13px] text-wb-grey-02 mt-[6px] cursor-pointer"
-              >
-                {expanded ? '접기' : '더보기'}
-              </button>
-            )}
           </div>
         )}
 

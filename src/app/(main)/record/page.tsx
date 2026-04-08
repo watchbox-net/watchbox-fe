@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/common/Header';
 import TabNav from '@/components/common/TabNav';
 import ContentListItem from '@/components/list/ContentListItem';
@@ -25,10 +26,8 @@ const TABS = [
 
 export default function RecordPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [activeTabIndex, setActiveTabIndex] = useState(0);
-  const [allItems, setAllItems] = useState<ContentItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { showLoginModal } = useLoginModal();
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
@@ -41,14 +40,15 @@ export default function RecordPage() {
 
   const { changeStatus, deleteStatus } = useWatchStatus({ showToast });
 
-  useEffect(() => {
-    if (authLoading) return;
-    if (!isAuthenticated) { setLoading(false); return; }
-    fetchWatchStatusList()
-      .then((res) => setAllItems(res.contentItemList))
-      .catch(() => setError(true))
-      .finally(() => setLoading(false));
-  }, [authLoading, isAuthenticated]);
+  const { data: allItems = [], isLoading: loading, isError: error } = useQuery({
+    queryKey: ['watchStatusList'],
+    queryFn: async () => {
+      const res = await fetchWatchStatusList();
+      return res.contentItemList;
+    },
+    enabled: !authLoading && isAuthenticated,
+    staleTime: 0, // 항상 최신 데이터 요청
+  });
 
   // 외부 클릭 시 메뉴 닫기
   useEffect(() => {
@@ -80,8 +80,8 @@ export default function RecordPage() {
     if (summary.mediaType !== 'MOVIE' && summary.mediaType !== 'TV') return;
     const success = await changeStatus(summary.contentId, summary.mediaType, status);
     if (success) {
-      setAllItems((prev) =>
-        prev.map((i) =>
+      queryClient.setQueryData<ContentItem[]>(['watchStatusList'], (prev) =>
+        (prev ?? []).map((i) =>
           (i.contentRecordId ?? i.contentSummary.contentId) ===
           (item.contentRecordId ?? summary.contentId)
             ? { ...i, memberRecord: { ...i.memberRecord, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
@@ -96,8 +96,8 @@ export default function RecordPage() {
     if (!item.contentRecordId) return;
     const success = await deleteStatus(item.contentRecordId);
     if (success) {
-      setAllItems((prev) =>
-        prev.filter((i) => i.contentRecordId !== item.contentRecordId),
+      queryClient.setQueryData<ContentItem[]>(['watchStatusList'], (prev) =>
+        (prev ?? []).filter((i) => i.contentRecordId !== item.contentRecordId),
       );
     }
   };
@@ -159,10 +159,10 @@ export default function RecordPage() {
       />
 
       <MainContent>
-        {loading && (
+        {(authLoading || loading) && (
           <p className="text-center text-neutral-500 py-8">불러오는 중...</p>
         )}
-        {!loading && !isAuthenticated && (
+        {!authLoading && !loading && !isAuthenticated && (
           <div className="flex flex-col items-center gap-[16px] py-[60px]">
             <p className="text-[16px] text-wb-grey-02">로그인이 필요한 페이지입니다.</p>
             <button

@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/common/Header';
 import TabNav from '@/components/common/TabNav';
 import MainContent from '@/components/common/MainContent';
 import Image from 'next/image';
 import { searchMulti, searchMovies, searchTv, searchPerson } from '@/lib/api/search';
-import type { ContentItem, ContentPageResponse } from '@/types/content';
 import { getImageUrl, getDisplayTitle, getSubText } from '@/lib/utils/content';
 
 const TABS = [
@@ -28,47 +28,52 @@ const searchByTab = {
 
 export default function SearchPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<TabKey>('multi');
-  const [query, setQuery] = useState('');
-  const [items, setItems] = useState<ContentItem[]>([]);
-  const [totalCount, setTotalCount] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [searched, setSearched] = useState(false);
-  const [isSearchActive, setIsSearchActive] = useState(false);
+  const searchParams = useSearchParams();
 
-  const executeSearch = async (tab: TabKey, q: string) => {
-    const trimmed = q.trim();
-    if (!trimmed) return;
+  // URL에서 상태 복원
+  const urlQuery = searchParams.get('q') ?? '';
+  const urlTab = (searchParams.get('tab') as TabKey) || 'multi';
 
-    setLoading(true);
-    setSearched(true);
-    try {
-      const result: ContentPageResponse = await searchByTab[tab](trimmed, 1);
-      setItems(result.contentItemList);
-      setTotalCount(result.totalCount);
-    } catch (error) {
-      console.error('검색 실패:', error);
-      setItems([]);
-      setTotalCount(0);
-    } finally {
-      setLoading(false);
-    }
+  const [activeTab, setActiveTab] = useState<TabKey>(urlTab);
+  const [query, setQuery] = useState(urlQuery);
+  const [isSearchActive, setIsSearchActive] = useState(!!urlQuery);
+
+  // React Query로 검색 결과 캐싱
+  const { data, isLoading } = useQuery({
+    queryKey: ['search', urlTab, urlQuery],
+    queryFn: () => searchByTab[urlTab](urlQuery, 1),
+    enabled: !!urlQuery,
+  });
+
+  const items = data?.contentItemList ?? [];
+  const totalCount = data?.totalCount ?? 0;
+  const searched = !!urlQuery;
+
+  // URL 파라미터 갱신
+  const updateUrl = (tab: TabKey, q: string) => {
+    const params = new URLSearchParams();
+    if (q.trim()) params.set('q', q.trim());
+    if (tab !== 'multi') params.set('tab', tab);
+    const qs = params.toString();
+    router.replace(`/search${qs ? `?${qs}` : ''}`, { scroll: false });
   };
 
-  const handleSearch = () => executeSearch(activeTab, query);
+  const handleSearch = () => {
+    if (!query.trim()) return;
+    updateUrl(activeTab, query);
+  };
 
   const handleTabChange = (index: number) => {
     const tab = TABS[index].key;
     setActiveTab(tab);
     if (query.trim()) {
-      executeSearch(tab, query);
+      updateUrl(tab, query);
     }
   };
 
   const handleClear = () => {
     setQuery('');
-    setItems([]);
-    setSearched(false);
+    router.replace('/search', { scroll: false });
   };
 
   const handleBack = () => {
@@ -88,24 +93,22 @@ export default function SearchPage() {
         onBack={searched ? handleBack : undefined}
       />
 
-      {/* 탭 */}
       <TabNav
         tabs={TABS.map((t) => t.label)}
         activeIndex={TABS.findIndex((t) => t.key === activeTab)}
         onChange={handleTabChange}
       />
 
-      {/* 검색 결과 */}
       <MainContent>
-        {loading && (
+        {isLoading && (
           <p className="text-center text-neutral-500 py-8">검색 중...</p>
         )}
 
-        {!loading && searched && items.length === 0 && (
+        {!isLoading && searched && items.length === 0 && (
           <p className="text-center text-neutral-500 py-8">검색 결과가 없습니다.</p>
         )}
 
-        {!loading && items.length > 0 && (
+        {!isLoading && items.length > 0 && (
           <div>
             <p className="px-4 py-2 text-xs text-neutral-500">
               총 {totalCount.toLocaleString()}건
@@ -144,7 +147,6 @@ export default function SearchPage() {
           </div>
         )}
       </MainContent>
-
     </>
   );
 }

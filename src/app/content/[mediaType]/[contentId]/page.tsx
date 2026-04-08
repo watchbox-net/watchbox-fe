@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import MobileFrame from '@/components/common/MobileFrame';
-import BottomMenu from '@/components/common/BottomMenu';
 import TabNav from '@/components/common/TabNav';
 import Toast from '@/components/common/Toast';
 import Modal from '@/components/common/Modal';
@@ -188,7 +187,6 @@ export default function ContentDetailPage() {
         <div className="flex-1 flex items-center justify-center">
           <p className="text-wb-grey-02">불러오는 중...</p>
         </div>
-        <BottomMenu />
       </MobileFrame>
     );
   }
@@ -199,7 +197,6 @@ export default function ContentDetailPage() {
         <div className="flex-1 flex items-center justify-center">
           <p className="text-wb-grey-02">오류가 발생했습니다.</p>
         </div>
-        <BottomMenu />
       </MobileFrame>
     );
   }
@@ -218,7 +215,7 @@ export default function ContentDetailPage() {
 
   return (
     <MobileFrame>
-      <div className="flex-1 overflow-y-auto scrollbar-hide pb-24">
+      <div className="flex-1 overflow-y-auto scrollbar-hide">
 
         {/* ── 백드롭 + 뒤로가기 ─────────────────────────── */}
         <div className="relative h-[230px] bg-wb-dark-03 shrink-0">
@@ -345,8 +342,6 @@ export default function ContentDetailPage() {
         )}
 
       </div>
-
-      <BottomMenu />
 
       <Modal
         visible={preparingModalVisible}

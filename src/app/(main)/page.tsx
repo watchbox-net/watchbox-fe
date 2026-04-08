@@ -4,6 +4,7 @@ import Header from '@/components/common/Header';
 import MainContent from '@/components/common/MainContent';
 import ListTitle from '@/components/list/ListTitle';
 import ContentCard from '@/components/content/ContentCard';
+import HorizontalScroll from '@/components/common/HorizontalScroll';
 import { fetchPopularMovieList, fetchTopRatedMovieList, fetchNowShowingMovieList, fetchTrendingMovieList } from '@/api/movie';
 import { fetchPopularTvList, fetchTopRatedTvList, fetchNowShowingTvList, fetchTrendingTvList } from '@/api/tv';
 import { getDisplayTitle } from '@/lib/utils/content';
@@ -50,11 +51,13 @@ async function loadSections() {
 
 function CardScroll<T extends MovieSummary | TvSummary>({
   items,
+  scrollKey,
 }: {
   items: ContentItem<T>[];
+  scrollKey: string;
 }) {
   return (
-    <div className="flex gap-[15px] overflow-x-auto pl-[16px] pr-[16px] pb-2 scrollbar-hide">
+    <HorizontalScroll scrollKey={scrollKey} className="flex gap-[15px] pl-[16px] pr-[16px] pb-2">
       {items.map((item) => (
         <ContentCard
           key={item.contentSummary.contentId}
@@ -68,7 +71,7 @@ function CardScroll<T extends MovieSummary | TvSummary>({
           recordId={item.contentRecordId}
         />
       ))}
-    </div>
+    </HorizontalScroll>
   );
 }
 
@@ -87,7 +90,7 @@ function Section<T extends MovieSummary | TvSummary>({
         <ListTitle title={title} variant="arrow" className="py-[12px]" />
       </Link>
       {items.length > 0 ? (
-        <CardScroll items={items} />
+        <CardScroll items={items} scrollKey={href} />
       ) : (
         <p className="text-sm text-wb-grey-02 px-[16px]">불러올 수 없습니다</p>
       )}

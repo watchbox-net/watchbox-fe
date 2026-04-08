@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/common/Header';
 import ListTitle from '@/components/list/ListTitle';
 import ContentListItem from '@/components/list/ContentListItem';
@@ -25,12 +26,12 @@ export default function BoxContentsPage() {
   const boxId = Number(params.boxId);
   const boxType = (searchParams.get('type') as BoxType) || 'MY';
 
+  const queryClient = useQueryClient();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { showLoginModal } = useLoginModal();
 
-  const [items, setItems] = useState<ContentItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const isShared = boxType === 'SHARED';
+  const headerTitle = isShared ? '공유 박스 컨텐츠' : '마이 박스 컨텐츠';
 
   // 시청 상태 메뉴
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
@@ -43,24 +44,15 @@ export default function BoxContentsPage() {
 
   const { changeStatus } = useWatchStatus({ showToast });
 
-  const isShared = boxType === 'SHARED';
-  const headerTitle = isShared ? '공유 박스 컨텐츠' : '마이 박스 컨텐츠';
-
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res = isShared
-          ? await fetchSharedBoxContents(boxId)
-          : await fetchMyBoxContents(boxId);
-        setItems(res.contentItemList);
-      } catch {
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, [boxId, isShared]);
+  const { data: items = [], isLoading: loading, isError: error } = useQuery({
+    queryKey: ['boxContents', boxId, boxType],
+    queryFn: async () => {
+      const res = isShared
+        ? await fetchSharedBoxContents(boxId)
+        : await fetchMyBoxContents(boxId);
+      return res.contentItemList;
+    },
+  });
 
   // 외부 클릭 시 메뉴 닫기
   useEffect(() => {
@@ -84,8 +76,8 @@ export default function BoxContentsPage() {
     if (summary.mediaType !== 'MOVIE' && summary.mediaType !== 'TV') return;
     const success = await changeStatus(summary.contentId, summary.mediaType, status);
     if (success) {
-      setItems((prev) =>
-        prev.map((i) =>
+      queryClient.setQueryData<ContentItem[]>(['boxContents', boxId, boxType], (prev) =>
+        (prev ?? []).map((i) =>
           i.contentSummary.contentId === summary.contentId
             ? { ...i, memberRecord: { ...i.memberRecord, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
             : i,

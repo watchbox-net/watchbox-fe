@@ -91,7 +91,7 @@ export default function ContentDetailPage() {
   const router    = useRouter();
   const params    = useParams();
   const mediaType = (params.mediaType as string).toUpperCase() as ContentDetailMediaType;
-  const contentId = Number(params.contentId);
+  const tmdbId = Number(params.contentId);
 
   const [detail,      setDetail]      = useState<ContentDetailResponse | null>(null);
   const [loading,     setLoading]     = useState(true);
@@ -122,7 +122,7 @@ export default function ContentDetailPage() {
   });
 
   useEffect(() => {
-    fetchContentDetail(mediaType, contentId)
+    fetchContentDetail(mediaType, tmdbId)
       .then((res) => {
         setDetail(res);
         const mr: DetailMemberRecord | null = res.memberRecord;
@@ -132,7 +132,7 @@ export default function ContentDetailPage() {
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false));
-  }, [mediaType, contentId]);
+  }, [mediaType, tmdbId]);
 
   // 외부 클릭 시 메뉴 닫기
   useEffect(() => {
@@ -151,11 +151,11 @@ export default function ContentDetailPage() {
     if (mediaType !== 'MOVIE' && mediaType !== 'TV') return;
     try {
       if (liked) {
-        await addLike({ contentId, mediaType, liked: false });
+        await addLike({ tmdbId, mediaType, liked: false });
         setLiked(false);
         showToast('좋아요를 취소했습니다.');
       } else {
-        await addLike({ contentId, mediaType, liked: true });
+        await addLike({ tmdbId, mediaType, liked: true });
         setLiked(true);
         showToast('좋아요를 등록했습니다.');
       }
@@ -166,10 +166,10 @@ export default function ContentDetailPage() {
   const handleStatusSelect = async (status: Exclude<WatchStatus, 'NONE'>) => {
     setStatusMenuOpen(false);
     if (mediaType !== 'MOVIE' && mediaType !== 'TV') return;
-    const success = await changeStatus(contentId, mediaType, status);
+    const success = await changeStatus(tmdbId, mediaType, status);
     if (success) {
       // recordId 갱신 (삭제 시 필요)
-      const res = await fetchContentDetail(mediaType, contentId);
+      const res = await fetchContentDetail(mediaType, tmdbId);
       setRecordId(res.memberRecord?.recordId ?? null);
     }
   };

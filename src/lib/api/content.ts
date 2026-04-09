@@ -9,10 +9,10 @@ import type { ContentDetailResponse, ContentDetailMediaType } from '@/types/cont
  */
 export async function fetchContentDetail(
   mediaType: ContentDetailMediaType,
-  contentId: number,
+  tmdbId: number,
 ): Promise<ContentDetailResponse> {
   const { data } = await publicApi.get<ApiResponse<ContentDetailResponse>>(
-    `/contents/${mediaType}/${contentId}`,
+    `/contents/${mediaType}/${tmdbId}`,
   );
   return data.data;
 }

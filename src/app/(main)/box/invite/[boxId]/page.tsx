@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Toast from '@/components/common/Toast';
 import Modal from '@/components/common/Modal';
 import MainContent from '@/components/common/MainContent';
@@ -10,11 +10,10 @@ import ListTitle from '@/components/list/ListTitle';
 import MemberInviteListItem from '@/components/list/MemberInviteListItem';
 import { MagnifyingGlassOutline, XCircleSolid } from '@/components/icons';
 import { searchMembers, inviteToBox } from '@/lib/api/member';
-import { fetchSharedBox } from '@/lib/api/box';
+import { fetchBox } from '@/lib/api/box';
 import type { MemberSearchResponse } from '@/types/member';
 
 export default function BoxInvitePage() {
-  const router = useRouter();
   const params = useParams();
   const boxId = Number(params.boxId);
 
@@ -30,7 +29,7 @@ export default function BoxInvitePage() {
   const [confirmTarget, setConfirmTarget] = useState<{ memberId: number; nickname: string } | null>(null);
 
   useEffect(() => {
-    fetchSharedBox(boxId).then((box) => setBoxName(box.name)).catch(() => {});
+    fetchBox(boxId).then((box) => setBoxName(box.name)).catch(() => {});
   }, [boxId]);
 
   const handleSearch = async () => {
@@ -130,9 +129,9 @@ export default function BoxInvitePage() {
 
       <Modal
         visible={!!confirmTarget}
-        variant="body-only"
+        variant="invite"
         body={`${confirmTarget?.nickname}님에게 ${boxName} 공유 박스로 초대하겠습니까?`}
-        confirmLabel="이동"
+        confirmLabel="초대"
         onCancel={() => setConfirmTarget(null)}
         onConfirm={handleInviteConfirm}
       />

@@ -32,13 +32,13 @@ export function useWatchStatus(options: UseWatchStatusOptions = {}) {
   }, [authLoading, isAuthenticated, showLoginModal]);
 
   const changeStatus = useCallback(async (
-    contentId: number,
+    tmdbId: number,
     mediaType: 'MOVIE' | 'TV',
     status: Exclude<WatchStatus, 'NONE'>,
   ) => {
     if (!requireAuth()) return false;
     try {
-      await upsertWatchStatus({ contentId, watchMediaType: mediaType, watchStatus: status });
+      await upsertWatchStatus({ tmdbId, watchMediaType: mediaType, watchStatus: status });
       options.onStatusChanged?.(status);
       options.showToast?.(`${STATUS_LABEL[status]}로 변경되었습니다.`);
       return true;

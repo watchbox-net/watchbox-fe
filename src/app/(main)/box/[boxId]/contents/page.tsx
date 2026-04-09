@@ -11,7 +11,7 @@ import WatchStatusMenu from '@/components/common/WatchStatusMenu';
 import Toast from '@/components/common/Toast';
 import { PlusOutline } from '@/components/icons';
 import MainContent from '@/components/common/MainContent';
-import { fetchMyBoxContents, fetchSharedBoxContents } from '@/lib/api/box';
+import { fetchBoxContents } from '@/lib/api/box';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
 import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
@@ -47,9 +47,7 @@ export default function BoxContentsPage() {
   const { data: items = [], isLoading: loading, isError: error } = useQuery({
     queryKey: ['boxContents', boxId, boxType],
     queryFn: async () => {
-      const res = isShared
-        ? await fetchSharedBoxContents(boxId)
-        : await fetchMyBoxContents(boxId);
+      const res = await fetchBoxContents(boxId);
       return res.contentItemList;
     },
   });
@@ -74,11 +72,11 @@ export default function BoxContentsPage() {
     setOpenMenuId(null);
     const summary = item.contentSummary;
     if (summary.mediaType !== 'MOVIE' && summary.mediaType !== 'TV') return;
-    const success = await changeStatus(summary.contentId, summary.mediaType, status);
+    const success = await changeStatus(summary.tmdbId, summary.mediaType, status);
     if (success) {
       queryClient.setQueryData<ContentItem[]>(['boxContents', boxId, boxType], (prev) =>
         (prev ?? []).map((i) =>
-          i.contentSummary.contentId === summary.contentId
+          i.contentSummary.tmdbId === summary.tmdbId
             ? { ...i, memberRecord: { ...i.memberRecord, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
             : i,
         ),
@@ -102,7 +100,7 @@ export default function BoxContentsPage() {
     const genres = 'genreList' in summary ? summary.genreList : null;
     const watchStatus = item.memberRecord?.watchStatus ?? null;
     const isLast = idx === arr.length - 1;
-    const itemId = item.boxContentId ?? summary.contentId;
+    const itemId = item.boxContentId ?? summary.tmdbId;
     const isMenuOpen = openMenuId === itemId;
 
     const boxMode = isShared
@@ -131,7 +129,7 @@ export default function BoxContentsPage() {
         watchStatus={watchStatus}
         boxMode={boxMode}
         showDivider={!isLast}
-        onClick={() => router.push(`/content/${summary.mediaType}/${summary.contentId}`)}
+        onClick={() => router.push(`/content/${summary.mediaType}/${summary.tmdbId}`)}
         onStatusClick={(e) => {
           if (!authLoading && !isAuthenticated) {
             showLoginModal();

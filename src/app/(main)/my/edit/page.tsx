@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import MobileFrame from '@/components/common/MobileFrame';
 import Header from '@/components/common/Header';
-import BottomMenu from '@/components/common/BottomMenu';
 import MainContent from '@/components/common/MainContent';
 import Button from '@/components/common/Button';
 import Toast from '@/components/common/Toast';
@@ -76,7 +74,7 @@ export default function ProfileEditPage() {
   };
 
   return (
-    <MobileFrame>
+    <>
       <Header
         variant="back"
         title="프로필 수정"
@@ -138,13 +136,11 @@ export default function ProfileEditPage() {
         )}
       </MainContent>
 
-      <BottomMenu />
-
       <Toast
         message={toast.message}
         visible={toast.visible}
         onClose={() => setToast((t) => ({ ...t, visible: false }))}
       />
-    </MobileFrame>
+    </>
   );
 }

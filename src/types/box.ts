@@ -11,25 +11,15 @@ export interface BoxMemberResponse {
   role: BoxMemberRole;
 }
 
-/** 마이 박스 */
-export interface MyBoxResponse {
+/** 통합 박스 응답 */
+export interface BoxResponse {
   boxId: number;
   name: string;
   description: string | null;
   boxType: BoxType;
   lastContentAddedAt: string | null;
   previewPosterList: string[];
-}
-
-/** 공유 박스 */
-export interface SharedBoxResponse {
-  boxId: number;
-  name: string;
-  description: string | null;
-  boxType: BoxType;
-  lastContentAddedAt: string | null;
-  memberList: BoxMemberResponse[];
-  previewPosterList: string[];
+  memberList: BoxMemberResponse[] | null;
 }
 
 /** 공개 타입 */
@@ -40,6 +30,7 @@ export interface BoxCreateRequest {
   name: string;
   description?: string;
   visibleType?: VisibleType;
+  boxType: BoxType;
 }
 
 /** 박스 수정 요청 */
@@ -62,14 +53,8 @@ export interface BoxCreateResponse {
 /** 박스 수정 응답 (생성 응답과 동일 구조) */
 export type BoxUpdateResponse = BoxCreateResponse;
 
-/** 마이 박스 리스트 응답 */
-export interface MyBoxPageResponse {
-  boxList: MyBoxResponse[];
-  boxCount: number;
-}
-
-/** 공유 박스 리스트 응답 */
-export interface SharedBoxPageResponse {
-  sharedBoxList: SharedBoxResponse[];
+/** 박스 리스트 응답 (마이 + 공유 통합) */
+export interface BoxPageResponse {
+  boxList: BoxResponse[];
   boxCount: number;
 }

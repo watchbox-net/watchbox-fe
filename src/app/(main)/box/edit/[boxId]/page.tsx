@@ -2,11 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import MobileFrame from '@/components/common/MobileFrame';
-import BottomMenu from '@/components/common/BottomMenu';
 import Toast from '@/components/common/Toast';
 import BoxForm from '@/components/box/BoxForm';
-import { fetchMyBox, fetchSharedBox, updateMyBox, updateSharedBox } from '@/lib/api/box';
+import { fetchBox, updateBox } from '@/lib/api/box';
 import type { BoxType } from '@/types/box';
 
 export default function BoxEditPage() {
@@ -24,15 +22,9 @@ export default function BoxEditPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        if (boxType === 'SHARED') {
-          const box = await fetchSharedBox(boxId);
-          setInitialName(box.name);
-          setInitialDescription(box.description || '');
-        } else {
-          const box = await fetchMyBox(boxId);
-          setInitialName(box.name);
-          setInitialDescription(box.description || '');
-        }
+        const box = await fetchBox(boxId);
+        setInitialName(box.name);
+        setInitialDescription(box.description || '');
       } catch {
         alert('박스 정보를 불러올 수 없습니다.');
         router.back();
@@ -44,13 +36,7 @@ export default function BoxEditPage() {
   }, [boxId, boxType, router]);
 
   const handleSubmit = async (data: { name: string; description?: string; boxType: BoxType }) => {
-    const req = { name: data.name, description: data.description };
-
-    if (boxType === 'MY') {
-      await updateMyBox(boxId, req);
-    } else {
-      await updateSharedBox(boxId, req);
-    }
+    await updateBox(boxId, { name: data.name, description: data.description });
 
     setToast(true);
     setTimeout(() => router.push('/box'), 1500);
@@ -58,17 +44,16 @@ export default function BoxEditPage() {
 
   if (loading) {
     return (
-      <MobileFrame>
+      <>
         <div className="flex-1 flex items-center justify-center">
           <p className="text-neutral-500 text-sm">불러오는 중...</p>
         </div>
-        <BottomMenu />
-      </MobileFrame>
+      </>
     );
   }
 
   return (
-    <MobileFrame>
+    <>
       <BoxForm
         mode="edit"
         initialName={initialName}
@@ -77,8 +62,7 @@ export default function BoxEditPage() {
         boxTypeDisabled
         onSubmit={handleSubmit}
       />
-      <BottomMenu />
       <Toast message="박스가 수정되었습니다!" visible={toast} onClose={() => setToast(false)} />
-    </MobileFrame>
+    </>
   );
 }

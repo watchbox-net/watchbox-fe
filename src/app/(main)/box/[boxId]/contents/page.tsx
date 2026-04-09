@@ -3,19 +3,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import MobileFrame from '@/components/common/MobileFrame';
-import BottomMenu from '@/components/common/BottomMenu';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/common/Header';
 import ListTitle from '@/components/list/ListTitle';
 import ContentListItem from '@/components/list/ContentListItem';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
-import Modal from '@/components/common/Modal';
 import Toast from '@/components/common/Toast';
 import { PlusOutline } from '@/components/icons';
 import MainContent from '@/components/common/MainContent';
-import { fetchMyBoxContents, fetchSharedBoxContents } from '@/lib/api/box';
-import { upsertWatchStatus } from '@/lib/api/record';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { fetchBoxContents } from '@/lib/api/box';
+import { useAuth } from '@/lib/context/AuthContext';
+import { useLoginModal } from '@/lib/context/LoginModalContext';
+import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
 import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
 import type { ContentItem, WatchStatus } from '@/types/content';
 import type { BoxType } from '@/types/box';
@@ -27,42 +26,31 @@ export default function BoxContentsPage() {
   const boxId = Number(params.boxId);
   const boxType = (searchParams.get('type') as BoxType) || 'MY';
 
+  const queryClient = useQueryClient();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { showLoginModal } = useLoginModal();
 
-  const [items, setItems] = useState<ContentItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const isShared = boxType === 'SHARED';
+  const headerTitle = isShared ? '공유 박스 컨텐츠' : '마이 박스 컨텐츠';
 
   // 시청 상태 메뉴
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [menuDir, setMenuDir] = useState<'down' | 'up'>('down');
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // 로그인 모달
-  const [loginModalVisible, setLoginModalVisible] = useState(false);
-
   // 토스트
   const [toast, setToast] = useState({ visible: false, message: '' });
   const showToast = (message: string) => setToast({ visible: true, message });
 
-  const isShared = boxType === 'SHARED';
-  const headerTitle = isShared ? '공유 박스 컨텐츠' : '마이 박스 컨텐츠';
+  const { changeStatus } = useWatchStatus({ showToast });
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res = isShared
-          ? await fetchSharedBoxContents(boxId)
-          : await fetchMyBoxContents(boxId);
-        setItems(res.contentItemList);
-      } catch {
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, [boxId, isShared]);
+  const { data: items = [], isLoading: loading, isError: error } = useQuery({
+    queryKey: ['boxContents', boxId, boxType],
+    queryFn: async () => {
+      const res = await fetchBoxContents(boxId);
+      return res.contentItemList;
+    },
+  });
 
   // 외부 클릭 시 메뉴 닫기
   useEffect(() => {
@@ -84,27 +72,16 @@ export default function BoxContentsPage() {
     setOpenMenuId(null);
     const summary = item.contentSummary;
     if (summary.mediaType !== 'MOVIE' && summary.mediaType !== 'TV') return;
-    try {
-      await upsertWatchStatus({
-        contentId: summary.contentId,
-        watchMediaType: summary.mediaType,
-        watchStatus: status,
-      });
-      setItems((prev) =>
-        prev.map((i) =>
-          i.contentSummary.contentId === summary.contentId
+    const success = await changeStatus(summary.tmdbId, summary.mediaType, status);
+    if (success) {
+      queryClient.setQueryData<ContentItem[]>(['boxContents', boxId, boxType], (prev) =>
+        (prev ?? []).map((i) =>
+          i.contentSummary.tmdbId === summary.tmdbId
             ? { ...i, memberRecord: { ...i.memberRecord, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
             : i,
         ),
       );
-      const STATUS_LABEL: Record<Exclude<WatchStatus, 'NONE'>, string> = {
-        COMPLETED: '시청 완료',
-        WATCHING:  '시청중',
-        PLANNED:   '시청 예정',
-        PAUSED:    '시청 중단',
-      };
-      showToast(`${STATUS_LABEL[status]}로 변경되었습니다.`);
-    } catch {/* 에러 무시 */}
+    }
   };
 
   // mediaType 별 그룹핑
@@ -123,7 +100,7 @@ export default function BoxContentsPage() {
     const genres = 'genreList' in summary ? summary.genreList : null;
     const watchStatus = item.memberRecord?.watchStatus ?? null;
     const isLast = idx === arr.length - 1;
-    const itemId = item.boxContentId ?? summary.contentId;
+    const itemId = item.boxContentId ?? summary.tmdbId;
     const isMenuOpen = openMenuId === itemId;
 
     const boxMode = isShared
@@ -152,11 +129,10 @@ export default function BoxContentsPage() {
         watchStatus={watchStatus}
         boxMode={boxMode}
         showDivider={!isLast}
-        onClick={() => router.push(`/content/${summary.mediaType}/${summary.contentId}`)}
+        onClick={() => router.push(`/content/${summary.mediaType}/${summary.tmdbId}`)}
         onStatusClick={(e) => {
-          // 미로그인 → 로그인 모달
           if (!authLoading && !isAuthenticated) {
-            setLoginModalVisible(true);
+            showLoginModal();
             return;
           }
           if (isMenuOpen) { setOpenMenuId(null); return; }
@@ -170,7 +146,7 @@ export default function BoxContentsPage() {
   };
 
   return (
-    <MobileFrame>
+    <>
       <Header
         variant="icon1-back"
         title={headerTitle}
@@ -216,20 +192,11 @@ export default function BoxContentsPage() {
         )}
       </MainContent>
 
-      <BottomMenu />
-
-      <Modal
-        visible={loginModalVisible}
-        variant="login"
-        onCancel={() => setLoginModalVisible(false)}
-        onConfirm={() => { setLoginModalVisible(false); router.push('/login'); }}
-      />
-
       <Toast
         message={toast.message}
         visible={toast.visible}
         onClose={() => setToast((t) => ({ ...t, visible: false }))}
       />
-    </MobileFrame>
+    </>
   );
 }

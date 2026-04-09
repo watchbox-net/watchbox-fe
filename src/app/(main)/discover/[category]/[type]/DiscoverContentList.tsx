@@ -5,10 +5,11 @@ import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import ContentListItem from '@/components/list/ContentListItem';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
-import Modal from '@/components/common/Modal';
 import Toast from '@/components/common/Toast';
-import { useAuth } from '@/lib/hooks/useAuth';
-import { upsertWatchStatus, deleteWatchRecord } from '@/lib/api/record';
+import { useAuth } from '@/lib/context/AuthContext';
+import { useLoginModal } from '@/lib/context/LoginModalContext';
+import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
+import { deleteWatchRecord } from '@/lib/api/record';
 import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
 import type { ContentItem, WatchStatus } from '@/types/content';
 
@@ -16,25 +17,20 @@ interface DiscoverContentListProps {
   items: ContentItem[];
 }
 
-const STATUS_LABEL: Record<Exclude<WatchStatus, 'NONE'>, string> = {
-  COMPLETED: '시청 완료',
-  WATCHING: '시청중',
-  PLANNED: '시청 예정',
-  PAUSED: '시청 중단',
-};
-
 export default function DiscoverContentList({ items: initialItems }: DiscoverContentListProps) {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { showLoginModal } = useLoginModal();
   const [items, setItems] = useState(initialItems);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [menuDir, setMenuDir] = useState<'down' | 'up'>('down');
-  const [loginModalVisible, setLoginModalVisible] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: '' });
   const menuRef = useRef<HTMLDivElement>(null);
 
   const showToast = (message: string) =>
     setToast({ visible: true, message });
+
+  const { changeStatus } = useWatchStatus({ showToast });
 
   const handleStatusSelect = async (
     item: ContentItem,
@@ -43,21 +39,16 @@ export default function DiscoverContentList({ items: initialItems }: DiscoverCon
     setOpenMenuId(null);
     const summary = item.contentSummary;
     if (summary.mediaType !== 'MOVIE' && summary.mediaType !== 'TV') return;
-    try {
-      await upsertWatchStatus({
-        contentId: summary.contentId,
-        watchMediaType: summary.mediaType,
-        watchStatus: status,
-      });
+    const success = await changeStatus(summary.tmdbId, summary.mediaType, status);
+    if (success) {
       setItems((prev) =>
         prev.map((i) =>
-          i.contentSummary.contentId === summary.contentId
+          i.contentSummary.tmdbId === summary.tmdbId
             ? { ...i, memberRecord: { ...i.memberRecord, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
             : i,
         ),
       );
-      showToast(`${STATUS_LABEL[status]}로 변경되었습니다.`);
-    } catch {/* 에러 무시 */}
+    }
   };
 
   const handleDelete = async (item: ContentItem) => {
@@ -67,7 +58,7 @@ export default function DiscoverContentList({ items: initialItems }: DiscoverCon
       await deleteWatchRecord(item.contentRecordId);
       setItems((prev) =>
         prev.map((i) =>
-          i.contentSummary.contentId === item.contentSummary.contentId
+          i.contentSummary.tmdbId === item.contentSummary.tmdbId
             ? { ...i, memberRecord: null, contentRecordId: null }
             : i,
         ),
@@ -83,7 +74,7 @@ export default function DiscoverContentList({ items: initialItems }: DiscoverCon
           const summary = item.contentSummary;
           const year = 'year' in summary ? summary.year : null;
           const genres = 'genreList' in summary ? summary.genreList : null;
-          const itemId = summary.contentId;
+          const itemId = summary.tmdbId;
           const isMenuOpen = openMenuId === itemId;
 
           const menu: ReactNode = isMenuOpen ? (
@@ -108,9 +99,9 @@ export default function DiscoverContentList({ items: initialItems }: DiscoverCon
               watchStatus={item.memberRecord?.watchStatus ?? null}
               boxMode={item.memberRecord?.liked != null ? { mode: 'my', liked: item.memberRecord.liked } : undefined}
               showDivider={idx < items.length - 1}
-              onClick={() => router.push(`/content/${summary.mediaType}/${summary.contentId}`)}
+              onClick={() => router.push(`/content/${summary.mediaType}/${summary.tmdbId}`)}
               onStatusClick={(e) => {
-                if (!authLoading && !isAuthenticated) { setLoginModalVisible(true); return; }
+                if (!authLoading && !isAuthenticated) { showLoginModal(); return; }
                 if (isMenuOpen) { setOpenMenuId(null); return; }
                 const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
                 setMenuDir(window.innerHeight - rect.bottom < 220 ? 'up' : 'down');
@@ -122,12 +113,6 @@ export default function DiscoverContentList({ items: initialItems }: DiscoverCon
         })}
       </div>
 
-      <Modal
-        visible={loginModalVisible}
-        variant="login"
-        onCancel={() => setLoginModalVisible(false)}
-        onConfirm={() => { setLoginModalVisible(false); router.push('/login'); }}
-      />
       <Toast
         message={toast.message}
         visible={toast.visible}

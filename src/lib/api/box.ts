@@ -1,9 +1,7 @@
 import { privateApi } from './client';
 import type {
-  MyBoxPageResponse,
-  SharedBoxPageResponse,
-  MyBoxResponse,
-  SharedBoxResponse,
+  BoxPageResponse,
+  BoxResponse,
   BoxCreateRequest,
   BoxCreateResponse,
   BoxUpdateRequest,
@@ -12,86 +10,49 @@ import type {
 import type { ContentPageResponse } from '@/types/content';
 import type { ApiResponse } from '@/types/api';
 
-/** 마이 박스 리스트 조회 */
-export async function fetchMyBoxList(): Promise<MyBoxPageResponse> {
-  const { data } = await privateApi.get<ApiResponse<MyBoxPageResponse>>(
-    '/boxes/my',
+/** 박스 리스트 조회 (마이 + 공유 통합) */
+export async function fetchBoxList(): Promise<BoxPageResponse> {
+  const { data } = await privateApi.get<ApiResponse<BoxPageResponse>>(
+    '/boxes',
   );
   return data.data;
 }
 
-/** 마이 박스 생성 */
-export async function createMyBox(req: BoxCreateRequest): Promise<BoxCreateResponse> {
+/** 박스 단일 조회 */
+export async function fetchBox(boxId: number): Promise<BoxResponse> {
+  const { data } = await privateApi.get<ApiResponse<BoxResponse>>(
+    `/boxes/${boxId}`,
+  );
+  return data.data;
+}
+
+/** 박스 생성 */
+export async function createBox(req: BoxCreateRequest): Promise<BoxCreateResponse> {
   const { data } = await privateApi.post<ApiResponse<BoxCreateResponse>>(
-    '/boxes/my',
+    '/boxes',
     req,
   );
   return data.data;
 }
 
-/** 공유 박스 생성 */
-export async function createSharedBox(req: BoxCreateRequest): Promise<BoxCreateResponse> {
-  const { data } = await privateApi.post<ApiResponse<BoxCreateResponse>>(
-    '/boxes/shared',
-    req,
-  );
-  return data.data;
-}
-
-/** 마이 박스 단건 조회 */
-export async function fetchMyBox(boxId: number): Promise<MyBoxResponse> {
-  const { data } = await privateApi.get<ApiResponse<MyBoxResponse>>(
-    `/boxes/my/${boxId}`,
-  );
-  return data.data;
-}
-
-/** 공유 박스 단건 조회 */
-export async function fetchSharedBox(boxId: number): Promise<SharedBoxResponse> {
-  const { data } = await privateApi.get<ApiResponse<SharedBoxResponse>>(
-    `/boxes/shared/${boxId}`,
-  );
-  return data.data;
-}
-
-/** 마이 박스 수정 */
-export async function updateMyBox(boxId: number, req: BoxUpdateRequest): Promise<BoxUpdateResponse> {
+/** 박스 수정 */
+export async function updateBox(boxId: number, req: BoxUpdateRequest): Promise<BoxUpdateResponse> {
   const { data } = await privateApi.patch<ApiResponse<BoxUpdateResponse>>(
-    `/boxes/my/${boxId}`,
+    `/boxes/${boxId}`,
     req,
   );
   return data.data;
 }
 
-/** 공유 박스 수정 */
-export async function updateSharedBox(boxId: number, req: BoxUpdateRequest): Promise<BoxUpdateResponse> {
-  const { data } = await privateApi.patch<ApiResponse<BoxUpdateResponse>>(
-    `/boxes/shared/${boxId}`,
-    req,
-  );
-  return data.data;
+/** 박스 삭제 */
+export async function deleteBox(boxId: number): Promise<void> {
+  await privateApi.delete(`/boxes/${boxId}`);
 }
 
-/** 마이 박스 컨텐츠 리스트 조회 */
-export async function fetchMyBoxContents(boxId: number): Promise<ContentPageResponse> {
+/** 박스 컨텐츠 리스트 조회 */
+export async function fetchBoxContents(boxId: number): Promise<ContentPageResponse> {
   const { data } = await privateApi.get<ApiResponse<ContentPageResponse>>(
-    `/boxes/my/${boxId}/contents`,
-  );
-  return data.data;
-}
-
-/** 공유 박스 컨텐츠 리스트 조회 */
-export async function fetchSharedBoxContents(boxId: number): Promise<ContentPageResponse> {
-  const { data } = await privateApi.get<ApiResponse<ContentPageResponse>>(
-    `/boxes/shared/${boxId}/contents`,
-  );
-  return data.data;
-}
-
-/** 공유 박스 리스트 조회 */
-export async function fetchSharedBoxList(): Promise<SharedBoxPageResponse> {
-  const { data } = await privateApi.get<ApiResponse<SharedBoxPageResponse>>(
-    '/boxes/shared',
+    `/boxes/${boxId}/contents`,
   );
   return data.data;
 }

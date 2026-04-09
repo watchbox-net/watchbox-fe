@@ -1,6 +1,7 @@
 /** 영화 요약 (ContentSummary → MOVIE) */
 export interface MovieSummary {
-  contentId: number;
+  contentId: number | null;
+  tmdbId: number;
   mediaType: 'MOVIE';
   popularity: number | null;
   posterPath: string | null;

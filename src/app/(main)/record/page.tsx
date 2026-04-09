@@ -3,18 +3,18 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import MobileFrame from '@/components/common/MobileFrame';
-import BottomMenu from '@/components/common/BottomMenu';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/common/Header';
 import TabNav from '@/components/common/TabNav';
 import ContentListItem from '@/components/list/ContentListItem';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
-import Modal from '@/components/common/Modal';
 import Toast from '@/components/common/Toast';
 import { PlusOutline } from '@/components/icons';
 import MainContent from '@/components/common/MainContent';
-import { fetchWatchStatusList, upsertWatchStatus, deleteWatchRecord } from '@/lib/api/record';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { fetchWatchStatusList } from '@/lib/api/record';
+import { useAuth } from '@/lib/context/AuthContext';
+import { useLoginModal } from '@/lib/context/LoginModalContext';
+import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
 import type { ContentItem, WatchStatus } from '@/types/content';
 import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
 
@@ -26,28 +26,29 @@ const TABS = [
 
 export default function RecordPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [activeTabIndex, setActiveTabIndex] = useState(0);
-  const [allItems, setAllItems] = useState<ContentItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { showLoginModal } = useLoginModal();
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [menuDir, setMenuDir] = useState<'down' | 'up'>('down');
-  const [loginModalVisible, setLoginModalVisible] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: '' });
   const menuRef = useRef<HTMLDivElement>(null);
 
   const showToast = (message: string) =>
     setToast({ visible: true, message });
 
-  useEffect(() => {
-    if (authLoading) return;
-    if (!isAuthenticated) { setLoading(false); return; }
-    fetchWatchStatusList()
-      .then((res) => setAllItems(res.contentItemList))
-      .catch(() => setError(true))
-      .finally(() => setLoading(false));
-  }, [authLoading, isAuthenticated]);
+  const { changeStatus, deleteStatus } = useWatchStatus({ showToast });
+
+  const { data: allItems = [], isLoading: loading, isError: error } = useQuery({
+    queryKey: ['watchStatusList'],
+    queryFn: async () => {
+      const res = await fetchWatchStatusList();
+      return res.contentItemList;
+    },
+    enabled: !authLoading && isAuthenticated,
+    staleTime: 0, // 항상 최신 데이터 요청
+  });
 
   // 외부 클릭 시 메뉴 닫기
   useEffect(() => {
@@ -77,47 +78,35 @@ export default function RecordPage() {
     setOpenMenuId(null);
     const summary = item.contentSummary;
     if (summary.mediaType !== 'MOVIE' && summary.mediaType !== 'TV') return;
-    try {
-      await upsertWatchStatus({
-        contentId: summary.contentId,
-        watchMediaType: summary.mediaType,
-        watchStatus: status,
-      });
-      setAllItems((prev) =>
-        prev.map((i) =>
-          (i.contentRecordId ?? i.contentSummary.contentId) ===
-          (item.contentRecordId ?? summary.contentId)
+    const success = await changeStatus(summary.tmdbId, summary.mediaType, status);
+    if (success) {
+      queryClient.setQueryData<ContentItem[]>(['watchStatusList'], (prev) =>
+        (prev ?? []).map((i) =>
+          (i.contentRecordId ?? i.contentSummary.tmdbId) ===
+          (item.contentRecordId ?? summary.tmdbId)
             ? { ...i, memberRecord: { ...i.memberRecord, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
             : i,
         ),
       );
-      const STATUS_LABEL: Record<Exclude<WatchStatus, 'NONE'>, string> = {
-        COMPLETED: '시청 완료',
-        WATCHING:  '시청중',
-        PLANNED:   '시청 예정',
-        PAUSED:    '시청 중단',
-      };
-      showToast(`${STATUS_LABEL[status]}로 변경되었습니다.`);
-    } catch {/* 에러 무시 */}
+    }
   };
 
   const handleDelete = async (item: ContentItem) => {
     setOpenMenuId(null);
     if (!item.contentRecordId) return;
-    try {
-      await deleteWatchRecord(item.contentRecordId);
-      setAllItems((prev) =>
-        prev.filter((i) => i.contentRecordId !== item.contentRecordId),
+    const success = await deleteStatus(item.contentRecordId);
+    if (success) {
+      queryClient.setQueryData<ContentItem[]>(['watchStatusList'], (prev) =>
+        (prev ?? []).filter((i) => i.contentRecordId !== item.contentRecordId),
       );
-      showToast('시청 기록에서 삭제되었습니다.');
-    } catch {/* 에러 무시 */}
+    }
   };
 
   const renderItem = (item: ContentItem, idx: number, arr: ContentItem[]) => {
     const summary = item.contentSummary;
     const year = 'year' in summary ? summary.year : null;
     const genres = 'genreList' in summary ? summary.genreList : null;
-    const itemId = item.contentRecordId ?? summary.contentId;
+    const itemId = item.contentRecordId ?? summary.tmdbId;
     const isMenuOpen = openMenuId === itemId;
 
     const menu: ReactNode = isMenuOpen ? (
@@ -142,9 +131,9 @@ export default function RecordPage() {
         watchStatus={item.memberRecord?.watchStatus ?? null}
         boxMode={{ mode: 'my', liked: item.memberRecord?.liked === true }}
         showDivider={idx < arr.length - 1}
-        onClick={() => router.push(`/content/${summary.mediaType}/${summary.contentId}`)}
+        onClick={() => router.push(`/content/${summary.mediaType}/${summary.tmdbId}`)}
         onStatusClick={(e) => {
-          if (!authLoading && !isAuthenticated) { setLoginModalVisible(true); return; }
+          if (!authLoading && !isAuthenticated) { showLoginModal(); return; }
           if (isMenuOpen) { setOpenMenuId(null); return; }
           const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
           setMenuDir(window.innerHeight - rect.bottom < 220 ? 'up' : 'down');
@@ -156,7 +145,7 @@ export default function RecordPage() {
   };
 
   return (
-    <MobileFrame>
+    <>
       <Header
         variant="icon1"
         title="시청 기록"
@@ -170,16 +159,16 @@ export default function RecordPage() {
       />
 
       <MainContent>
-        {loading && (
+        {(authLoading || loading) && (
           <p className="text-center text-neutral-500 py-8">불러오는 중...</p>
         )}
-        {!loading && !isAuthenticated && (
+        {!authLoading && !loading && !isAuthenticated && (
           <div className="flex flex-col items-center gap-[16px] py-[60px]">
             <p className="text-[16px] text-wb-grey-02">로그인이 필요한 페이지입니다.</p>
             <button
               type="button"
               onClick={() => router.push('/login')}
-              className="h-[40px] px-[24px] bg-wb-orange rounded-[8px] text-[14px] font-bold text-wb-white-02"
+              className="h-[40px] px-[24px] bg-wb-primary rounded-[8px] text-[14px] font-bold text-wb-white-01"
             >
               로그인
             </button>
@@ -200,18 +189,11 @@ export default function RecordPage() {
         )}
       </MainContent>
 
-      <BottomMenu />
-      <Modal
-        visible={loginModalVisible}
-        variant="login"
-        onCancel={() => setLoginModalVisible(false)}
-        onConfirm={() => { setLoginModalVisible(false); router.push('/login'); }}
-      />
       <Toast
         message={toast.message}
         visible={toast.visible}
         onClose={() => setToast((t) => ({ ...t, visible: false }))}
       />
-    </MobileFrame>
+    </>
   );
 }

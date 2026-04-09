@@ -4,18 +4,17 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import MobileFrame from '@/components/common/MobileFrame';
-import BottomMenu from '@/components/common/BottomMenu';
 import TabNav from '@/components/common/TabNav';
 import Toast from '@/components/common/Toast';
 import Modal from '@/components/common/Modal';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
 import LikeIcon from '@/components/icons/LikeIcon';
 import BoxIcon from '@/components/icons/BoxIcon';
 import WatchStatusIcon from '@/components/icons/WatchStatusIcon';
 import { ChevronLeftOutline } from '@/components/icons';
 import { fetchContentDetail } from '@/lib/api/content';
-import { upsertWatchStatus, deleteWatchRecord, addLike } from '@/lib/api/record';
+import { addLike } from '@/lib/api/record';
 import { TMDB_POSTER, TMDB_BACKDROP } from '@/lib/utils/content';
 import type {
   ContentDetailResponse,
@@ -25,13 +24,6 @@ import type {
   TvInfo,
 } from '@/types/content-detail';
 import type { WatchStatus } from '@/types/content';
-
-const STATUS_LABEL: Record<Exclude<WatchStatus, 'NONE'>, string> = {
-  COMPLETED: '시청 완료',
-  WATCHING:  '시청중',
-  PLANNED:   '시청 예정',
-  PAUSED:    '시청 중단',
-};
 
 // ─── mediaType별 표시 정보 추출 ─────────────────────────────
 function extractInfo(detail: ContentDetailResponse) {
@@ -98,9 +90,8 @@ function InfoRow({ label, value }: { label: string; value: string | null | undef
 export default function ContentDetailPage() {
   const router    = useRouter();
   const params    = useParams();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const mediaType = (params.mediaType as string).toUpperCase() as ContentDetailMediaType;
-  const contentId = Number(params.contentId);
+  const tmdbId = Number(params.contentId);
 
   const [detail,      setDetail]      = useState<ContentDetailResponse | null>(null);
   const [loading,     setLoading]     = useState(true);
@@ -118,15 +109,20 @@ export default function ContentDetailPage() {
   const menuRef = useRef<HTMLDivElement>(null);
 
   // 모달
-  const [loginModalVisible, setLoginModalVisible] = useState(false);
   const [preparingModalVisible, setPreparingModalVisible] = useState(false);
 
   // 토스트
   const [toast, setToast] = useState({ visible: false, message: '' });
   const showToast = (msg: string) => setToast({ visible: true, message: msg });
 
+  const { changeStatus, deleteStatus, requireAuth } = useWatchStatus({
+    onStatusChanged: (status) => setWatchStatus(status),
+    onDeleted: () => setWatchStatus(null),
+    showToast,
+  });
+
   useEffect(() => {
-    fetchContentDetail(mediaType, contentId)
+    fetchContentDetail(mediaType, tmdbId)
       .then((res) => {
         setDetail(res);
         const mr: DetailMemberRecord | null = res.memberRecord;
@@ -136,7 +132,7 @@ export default function ContentDetailPage() {
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false));
-  }, [mediaType, contentId]);
+  }, [mediaType, tmdbId]);
 
   // 외부 클릭 시 메뉴 닫기
   useEffect(() => {
@@ -149,26 +145,17 @@ export default function ContentDetailPage() {
     return () => document.removeEventListener('mousedown', handleMouseDown);
   }, [statusMenuOpen]);
 
-  // ── 인증 체크 ────────────────────────────────────────────────
-  const requireAuth = () => {
-    if (!authLoading && !isAuthenticated) {
-      setLoginModalVisible(true);
-      return true;
-    }
-    return false;
-  };
-
   // ── 좋아요 토글 ─────────────────────────────────────────────
   const handleLike = async () => {
-    if (requireAuth()) return;
+    if (!requireAuth()) return;
     if (mediaType !== 'MOVIE' && mediaType !== 'TV') return;
     try {
       if (liked) {
-        await addLike({ contentId, mediaType, liked: false });
+        await addLike({ tmdbId, mediaType, liked: false });
         setLiked(false);
         showToast('좋아요를 취소했습니다.');
       } else {
-        await addLike({ contentId, mediaType, liked: true });
+        await addLike({ tmdbId, mediaType, liked: true });
         setLiked(true);
         showToast('좋아요를 등록했습니다.');
       }
@@ -178,28 +165,20 @@ export default function ContentDetailPage() {
   // ── 시청 상태 변경 ──────────────────────────────────────────
   const handleStatusSelect = async (status: Exclude<WatchStatus, 'NONE'>) => {
     setStatusMenuOpen(false);
-    if (requireAuth()) return;
     if (mediaType !== 'MOVIE' && mediaType !== 'TV') return;
-    try {
-      await upsertWatchStatus({ contentId, watchMediaType: mediaType, watchStatus: status });
-      setWatchStatus(status);
+    const success = await changeStatus(tmdbId, mediaType, status);
+    if (success) {
       // recordId 갱신 (삭제 시 필요)
-      const res = await fetchContentDetail(mediaType, contentId);
+      const res = await fetchContentDetail(mediaType, tmdbId);
       setRecordId(res.memberRecord?.recordId ?? null);
-      showToast(`${STATUS_LABEL[status]}로 변경되었습니다.`);
-    } catch {/* 에러 무시 */}
+    }
   };
 
   // ── 시청 기록 삭제 ──────────────────────────────────────────
   const handleStatusDelete = async () => {
     setStatusMenuOpen(false);
-    if (requireAuth()) return;
     if (!recordId) return;
-    try {
-      await deleteWatchRecord(recordId);
-      setWatchStatus(null);
-      showToast('시청 기록에서 삭제되었습니다.');
-    } catch {/* 에러 무시 */}
+    await deleteStatus(recordId);
   };
 
   if (loading) {
@@ -208,7 +187,6 @@ export default function ContentDetailPage() {
         <div className="flex-1 flex items-center justify-center">
           <p className="text-wb-grey-02">불러오는 중...</p>
         </div>
-        <BottomMenu />
       </MobileFrame>
     );
   }
@@ -219,7 +197,6 @@ export default function ContentDetailPage() {
         <div className="flex-1 flex items-center justify-center">
           <p className="text-wb-grey-02">오류가 발생했습니다.</p>
         </div>
-        <BottomMenu />
       </MobileFrame>
     );
   }
@@ -234,11 +211,11 @@ export default function ContentDetailPage() {
     info.runtime ? `${info.runtime}분` : null,
   ].filter(Boolean);
 
-  const needsExpansion = (info.overview?.length ?? 0) > 120;
+  const needsExpansion = (info.overview?.length ?? 0) > 100;
 
   return (
     <MobileFrame>
-      <div className="flex-1 overflow-y-auto pb-24">
+      <div className="flex-1 overflow-y-auto scrollbar-hide">
 
         {/* ── 백드롭 + 뒤로가기 ─────────────────────────── */}
         <div className="relative h-[230px] bg-wb-dark-03 shrink-0">
@@ -282,18 +259,18 @@ export default function ContentDetailPage() {
         {/* ── 줄거리 ───────────────────────────────────── */}
         {info.overview && (
           <div className="px-[16px] mt-[20px]">
-            <p className={`text-[13px] font-medium leading-[22px] text-wb-grey-03 ${!expanded ? 'line-clamp-3' : ''}`}>
-              {info.overview}
+            <p className="text-[13px] font-medium leading-[22px] text-wb-grey-03">
+              {expanded ? info.overview : needsExpansion ? `${info.overview.slice(0, 100)}...` : info.overview}
+              {needsExpansion && (
+                <button
+                  type="button"
+                  onClick={() => setExpanded((v) => !v)}
+                  className="text-wb-white-01 ml-[4px] cursor-pointer"
+                >
+                  {expanded ? '접기' : '더보기'}
+                </button>
+              )}
             </p>
-            {needsExpansion && (
-              <button
-                type="button"
-                onClick={() => setExpanded((v) => !v)}
-                className="text-[13px] text-wb-grey-02 mt-[6px] cursor-pointer"
-              >
-                {expanded ? '접기' : '더보기'}
-              </button>
-            )}
           </div>
         )}
 
@@ -366,14 +343,6 @@ export default function ContentDetailPage() {
 
       </div>
 
-      <BottomMenu />
-
-      <Modal
-        visible={loginModalVisible}
-        variant="login"
-        onCancel={() => setLoginModalVisible(false)}
-        onConfirm={() => { setLoginModalVisible(false); router.push('/login'); }}
-      />
       <Modal
         visible={preparingModalVisible}
         variant="preparing"

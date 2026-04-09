@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import MobileFrame from '@/components/common/MobileFrame';
 import Header from '@/components/common/Header';
-import BottomMenu from '@/components/common/BottomMenu';
 import MainContent from '@/components/common/MainContent';
 import Modal from '@/components/common/Modal';
 import Toast from '@/components/common/Toast';
@@ -20,7 +18,7 @@ import {
   UsersSolid,
 } from '@/components/icons';
 import { fetchMyPage } from '@/lib/api/member';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useAuth } from '@/lib/context/AuthContext';
 import type { MyPageResponse } from '@/types/mypage';
 
 export default function MyPage() {
@@ -65,7 +63,7 @@ export default function MyPage() {
   );
 
   return (
-    <MobileFrame>
+    <>
       <Header
         variant="icon1"
         title="마이 페이지"
@@ -82,7 +80,7 @@ export default function MyPage() {
             <button
               type="button"
               onClick={() => router.push('/login')}
-              className="h-[40px] px-[24px] bg-wb-orange rounded-[8px] text-[14px] font-bold text-wb-white-02"
+              className="h-[40px] px-[24px] bg-wb-primary rounded-[8px] text-[14px] font-bold text-wb-white-01"
             >
               로그인
             </button>
@@ -174,8 +172,6 @@ export default function MyPage() {
         )}
       </MainContent>
 
-      <BottomMenu />
-
       <Modal
         visible={logoutModalVisible}
         variant="confirm"
@@ -192,6 +188,6 @@ export default function MyPage() {
         visible={toast.visible}
         onClose={() => setToast((t) => ({ ...t, visible: false }))}
       />
-    </MobileFrame>
+    </>
   );
 }

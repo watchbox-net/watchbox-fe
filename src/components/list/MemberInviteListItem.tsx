@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import ProfileIcon from '@/components/icons/ProfileIcon';
+import TriplePosterBox from '@/components/box/TriplePosterBox';
 import AddedStatusIcon from '@/components/icons/AddedStatusIcon';
 
 // ─── Types ──────────────────────────────────────────────────
@@ -20,10 +20,10 @@ type InvitationVariant = {
   variant: 'invitation';
   /** 초대받은 박스 이름 */
   boxName: string;
-  /** e.g. "멤버: 너구리, 해달" */
-  boxMembers: string;
-  /** 박스 썸네일 이미지 URL (없으면 placeholder) */
-  boxThumbnailSrc?: string;
+  /** 멤버 이름 목록 (e.g. ["너구리", "해달"]) */
+  boxMembers?: string[];
+  /** 포스터 이미지 URL 목록 (최대 3개) */
+  posters?: string[];
   /** 초대한 사람 닉네임 */
   inviterName: string;
   onAccept: () => void;
@@ -84,7 +84,7 @@ export default function MemberInviteListItem(props: MemberInviteListItemProps) {
     return (
       <div className={`flex items-center gap-[10px] py-[10px] ${className ?? ''}`}>
         <ProfileIcon variant="list" />
-        <span className="flex-1 text-[18px] leading-[28px] text-wb-white-02 truncate">
+        <span className="flex-1 text-[18px] leading-[28px] text-wb-grey-04 truncate">
           {name}
         </span>
         <button
@@ -101,27 +101,21 @@ export default function MemberInviteListItem(props: MemberInviteListItemProps) {
 
   // ── invitation variant ──
   if (props.variant === 'invitation') {
-    const { boxName, boxMembers, boxThumbnailSrc, inviterName, onAccept, onReject, className } = props;
+    const { boxName, boxMembers, posters, inviterName, onAccept, onReject, className } = props;
     return (
       <div className={`flex flex-col gap-[10px] ${className ?? ''}`}>
-        {/* 박스 정보 */}
-        <div className="flex items-center gap-[12px]">
-          {/* 박스 썸네일 (148×81) */}
-          <div className="w-[148px] h-[81px] rounded-[5px] bg-wb-dark-05 shrink-0 overflow-hidden">
-            {boxThumbnailSrc ? (
-              <Image src={boxThumbnailSrc} alt={boxName} width={148} height={81} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full bg-wb-dark-05" />
-            )}
-          </div>
-          {/* 박스 이름 + 멤버 */}
-          <div className="flex flex-col gap-[4px] min-w-0">
-            <p className="text-[16px] font-medium leading-[24px] tracking-[0.15px] text-wb-white truncate">
+        {/* 박스 정보 — TriplePosterBox + 박스명 + 멤버 */}
+        <div className="flex items-start gap-[10px]">
+          <TriplePosterBox posters={posters ?? []} />
+          <div className="flex flex-col gap-[3px] min-w-0 flex-1">
+            <p className="text-[16px] font-medium leading-[24px] tracking-[0.15px] text-white line-clamp-2">
               {boxName}
             </p>
-            <p className="text-[12px] leading-[20px] tracking-[0.25px] text-wb-primary truncate">
-              {boxMembers}
-            </p>
+            {boxMembers && boxMembers.length > 0 && (
+              <p className="text-[12px] leading-[20px] tracking-[0.25px] text-wb-primary truncate">
+                {boxMembers.join(', ')}
+              </p>
+            )}
           </div>
         </div>
 

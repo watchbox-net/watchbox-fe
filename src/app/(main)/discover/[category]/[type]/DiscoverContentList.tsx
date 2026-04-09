@@ -39,11 +39,11 @@ export default function DiscoverContentList({ items: initialItems }: DiscoverCon
     setOpenMenuId(null);
     const summary = item.contentSummary;
     if (summary.mediaType !== 'MOVIE' && summary.mediaType !== 'TV') return;
-    const success = await changeStatus(summary.contentId, summary.mediaType, status);
+    const success = await changeStatus(summary.tmdbId, summary.mediaType, status);
     if (success) {
       setItems((prev) =>
         prev.map((i) =>
-          i.contentSummary.contentId === summary.contentId
+          i.contentSummary.tmdbId === summary.tmdbId
             ? { ...i, memberRecord: { ...i.memberRecord, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
             : i,
         ),
@@ -58,7 +58,7 @@ export default function DiscoverContentList({ items: initialItems }: DiscoverCon
       await deleteWatchRecord(item.contentRecordId);
       setItems((prev) =>
         prev.map((i) =>
-          i.contentSummary.contentId === item.contentSummary.contentId
+          i.contentSummary.tmdbId === item.contentSummary.tmdbId
             ? { ...i, memberRecord: null, contentRecordId: null }
             : i,
         ),
@@ -74,7 +74,7 @@ export default function DiscoverContentList({ items: initialItems }: DiscoverCon
           const summary = item.contentSummary;
           const year = 'year' in summary ? summary.year : null;
           const genres = 'genreList' in summary ? summary.genreList : null;
-          const itemId = summary.contentId;
+          const itemId = summary.tmdbId;
           const isMenuOpen = openMenuId === itemId;
 
           const menu: ReactNode = isMenuOpen ? (
@@ -99,7 +99,7 @@ export default function DiscoverContentList({ items: initialItems }: DiscoverCon
               watchStatus={item.memberRecord?.watchStatus ?? null}
               boxMode={item.memberRecord?.liked != null ? { mode: 'my', liked: item.memberRecord.liked } : undefined}
               showDivider={idx < items.length - 1}
-              onClick={() => router.push(`/content/${summary.mediaType}/${summary.contentId}`)}
+              onClick={() => router.push(`/content/${summary.mediaType}/${summary.tmdbId}`)}
               onStatusClick={(e) => {
                 if (!authLoading && !isAuthenticated) { showLoginModal(); return; }
                 if (isMenuOpen) { setOpenMenuId(null); return; }

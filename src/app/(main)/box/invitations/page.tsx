@@ -13,6 +13,7 @@ import {
   acceptInvitation,
   rejectInvitation,
   cancelInvitation,
+  deleteInvitation,
 } from '@/lib/api/member';
 import type { InvitationReceivedResponse, InvitationSentResponse } from '@/types/member';
 
@@ -63,6 +64,16 @@ export default function BoxInvitationsPage() {
     }
   };
 
+  const handleDelete = async (requestId: number) => {
+    try {
+      await deleteInvitation(requestId);
+      setSent((prev) => prev.filter((inv) => inv.requestId !== requestId));
+      setToast('초대를 삭제했습니다.');
+    } catch {
+      setToast('삭제에 실패했습니다.');
+    }
+  };
+
   // 받은 초대 중 PENDING만 표시
   const pendingReceived = received.filter((inv) => inv.status === 'PENDING');
 
@@ -93,8 +104,9 @@ export default function BoxInvitationsPage() {
                     <MemberInviteListItem
                       key={inv.requestId}
                       variant="invitation"
-                      boxName={inv.sharedBoxTitle}
-                      boxMembers=""
+                      boxName={inv.sharedBox.name}
+                      boxMembers={inv.sharedBox.memberList?.map((m) => m.boxMemberName)}
+                      posters={inv.sharedBox.previewPosterList}
                       inviterName={inv.sender}
                       onAccept={() => handleAccept(inv.requestId)}
                       onReject={() => handleReject(inv.requestId)}
@@ -126,7 +138,7 @@ export default function BoxInvitationsPage() {
                       onAction={
                         inv.status === 'PENDING'
                           ? () => handleCancel(inv.requestId)
-                          : () => {} // TODO: 거절 삭제 기능
+                          : () => handleDelete(inv.requestId)
                       }
                       className="py-[10px]"
                     />

@@ -6,7 +6,7 @@ import ListTitle from '@/components/list/ListTitle';
 import ContentListItem from '@/components/list/ContentListItem';
 import ContentCard from '@/components/content/ContentCard';
 import MemberInviteListItem from '@/components/list/MemberInviteListItem';
-import TriplePosterBox from '@/components/content/TriplePosterBox';
+import TriplePosterBox from '@/components/box/TriplePosterBox';
 
 export default function ListComponentsPage() {
   // MemberInviteListItem - search 상태 관리 (1번 인덱스는 초기에 checked)
@@ -157,7 +157,7 @@ export default function ListComponentsPage() {
             <MemberInviteListItem
               variant="invitation"
               boxName="너구리와 해달의 공유 박스"
-              boxMembers="멤버: 너구리, 해달"
+              boxMembers={['너구리', '해달']}
               inviterName="너구리"
               onAccept={() => alert('수락')}
               onReject={() => alert('거절')}
@@ -165,7 +165,7 @@ export default function ListComponentsPage() {
             <MemberInviteListItem
               variant="invitation"
               boxName="오리와 해달의 공유 박스"
-              boxMembers="멤버: 오리, 해달"
+              boxMembers={['오리', '해달']}
               inviterName="오리"
               onAccept={() => alert('수락')}
               onReject={() => alert('거절')}

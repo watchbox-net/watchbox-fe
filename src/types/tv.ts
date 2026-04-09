@@ -1,6 +1,7 @@
 /** TV 시리즈 요약 (ContentSummary → TV) */
 export interface TvSummary {
-  contentId: number;
+  contentId: number | null;
+  tmdbId: number;
   mediaType: 'TV';
   popularity: number | null;
   posterPath: string | null;

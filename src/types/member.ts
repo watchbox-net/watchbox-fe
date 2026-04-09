@@ -42,6 +42,6 @@ export interface InvitationReceivedResponse {
   requestId: number;
   senderId: number;
   sender: string;
-  sharedBoxTitle: string;
+  sharedBox: import('@/types/box').BoxResponse;
   status: RequestStatus;
 }

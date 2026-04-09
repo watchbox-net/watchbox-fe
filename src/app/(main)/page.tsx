@@ -60,13 +60,13 @@ function CardScroll<T extends MovieSummary | TvSummary>({
     <HorizontalScroll scrollKey={scrollKey} className="flex gap-[15px] pl-[16px] pr-[16px] pb-2">
       {items.map((item) => (
         <ContentCard
-          key={item.contentSummary.contentId}
+          key={item.contentSummary.tmdbId}
           posterPath={item.contentSummary.posterPath}
           title={getDisplayTitle(item.contentSummary)}
           rating={item.contentSummary.voteAverage}
           watchStatus={item.memberRecord?.watchStatus}
-          href={`/content/${item.contentSummary.mediaType}/${item.contentSummary.contentId}`}
-          contentId={item.contentSummary.contentId}
+          href={`/content/${item.contentSummary.mediaType}/${item.contentSummary.tmdbId}`}
+          tmdbId={item.contentSummary.tmdbId}
           mediaType={item.contentSummary.mediaType as 'MOVIE' | 'TV'}
           recordId={item.contentRecordId}
         />

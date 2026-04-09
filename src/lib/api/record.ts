@@ -20,7 +20,7 @@ export async function fetchLikedList(): Promise<ContentPageResponse> {
 
 /** 시청 상태 등록/변경 (로그인 필요) */
 export async function upsertWatchStatus(params: {
-  contentId: number;
+  tmdbId: number;
   watchMediaType: 'MOVIE' | 'TV';
   watchStatus: Exclude<WatchStatus, 'NONE'>;
 }): Promise<void> {
@@ -34,7 +34,7 @@ export async function deleteWatchRecord(recordId: number): Promise<void> {
 
 /** 좋아요 등록 (로그인 필요) */
 export async function addLike(params: {
-  contentId: number;
+  tmdbId: number;
   mediaType: 'MOVIE' | 'TV';
   liked: boolean;
 }): Promise<{ recordId: number }> {

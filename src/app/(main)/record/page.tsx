@@ -78,12 +78,12 @@ export default function RecordPage() {
     setOpenMenuId(null);
     const summary = item.contentSummary;
     if (summary.mediaType !== 'MOVIE' && summary.mediaType !== 'TV') return;
-    const success = await changeStatus(summary.contentId, summary.mediaType, status);
+    const success = await changeStatus(summary.tmdbId, summary.mediaType, status);
     if (success) {
       queryClient.setQueryData<ContentItem[]>(['watchStatusList'], (prev) =>
         (prev ?? []).map((i) =>
-          (i.contentRecordId ?? i.contentSummary.contentId) ===
-          (item.contentRecordId ?? summary.contentId)
+          (i.contentRecordId ?? i.contentSummary.tmdbId) ===
+          (item.contentRecordId ?? summary.tmdbId)
             ? { ...i, memberRecord: { ...i.memberRecord, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
             : i,
         ),
@@ -106,7 +106,7 @@ export default function RecordPage() {
     const summary = item.contentSummary;
     const year = 'year' in summary ? summary.year : null;
     const genres = 'genreList' in summary ? summary.genreList : null;
-    const itemId = item.contentRecordId ?? summary.contentId;
+    const itemId = item.contentRecordId ?? summary.tmdbId;
     const isMenuOpen = openMenuId === itemId;
 
     const menu: ReactNode = isMenuOpen ? (
@@ -131,7 +131,7 @@ export default function RecordPage() {
         watchStatus={item.memberRecord?.watchStatus ?? null}
         boxMode={{ mode: 'my', liked: item.memberRecord?.liked === true }}
         showDivider={idx < arr.length - 1}
-        onClick={() => router.push(`/content/${summary.mediaType}/${summary.contentId}`)}
+        onClick={() => router.push(`/content/${summary.mediaType}/${summary.tmdbId}`)}
         onStatusClick={(e) => {
           if (!authLoading && !isAuthenticated) { showLoginModal(); return; }
           if (isMenuOpen) { setOpenMenuId(null); return; }

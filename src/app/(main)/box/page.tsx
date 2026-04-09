@@ -5,20 +5,19 @@ import { useRouter } from 'next/navigation';
 import Header from '@/components/common/Header';
 import MainContent from '@/components/common/MainContent';
 import ContextMenu from '@/components/common/ContextMenu';
-import TriplePosterBox from '@/components/content/TriplePosterBox';
+import TriplePosterBox from '@/components/box/TriplePosterBox';
 import { PlusOutline, EllipsisVerticalSolid } from '@/components/icons';
 import ListTitle from '@/components/list/ListTitle';
-import { fetchMyBoxList, fetchSharedBoxList } from '@/lib/api/box';
+import { fetchBoxList } from '@/lib/api/box';
 import { useAuth } from '@/lib/context/AuthContext';
-import type { MyBoxResponse, SharedBoxResponse, BoxType } from '@/types/box';
+import type { BoxResponse, BoxType } from '@/types/box';
 
 type MenuTarget = { boxId: number; boxType: BoxType };
 
 export default function BoxPage() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const [myBoxes, setMyBoxes] = useState<MyBoxResponse[]>([]);
-  const [sharedBoxes, setSharedBoxes] = useState<SharedBoxResponse[]>([]);
+  const [boxes, setBoxes] = useState<BoxResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -29,11 +28,8 @@ export default function BoxPage() {
   useEffect(() => {
     if (authLoading) return;
     if (!isAuthenticated) { setLoading(false); return; }
-    Promise.all([fetchMyBoxList(), fetchSharedBoxList()])
-      .then(([myRes, sharedRes]) => {
-        setMyBoxes(myRes.boxList);
-        setSharedBoxes(sharedRes.sharedBoxList);
-      })
+    fetchBoxList()
+      .then((res) => setBoxes(res.boxList))
       .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, [authLoading, isAuthenticated]);
@@ -87,6 +83,49 @@ export default function BoxPage() {
     },
   ];
 
+  const myBoxes = boxes.filter((b) => b.boxType === 'MY');
+  const sharedBoxes = boxes.filter((b) => b.boxType === 'SHARED');
+
+  const renderBoxItem = (box: BoxResponse) => (
+    <li
+      key={box.boxId}
+      className="flex items-start pl-[16px] pr-[12px] py-[10px]"
+    >
+      <div
+        className="flex gap-[10px] items-start flex-1 min-w-0 cursor-pointer"
+        onClick={() => goToContents(box.boxId, box.boxType, box.name)}
+      >
+        <TriplePosterBox posters={box.previewPosterList} />
+        <div className="flex flex-col gap-[3px] min-w-0 flex-1">
+          <p className="text-[16px] font-medium text-white leading-[24px] tracking-[0.15px] line-clamp-2">{box.name}</p>
+          {box.boxType === 'SHARED' && box.memberList && (
+            <p className="text-[12px] text-wb-primary leading-[20px] tracking-[0.25px] truncate">
+              {box.memberList.map((m) => m.boxMemberName).join(', ')}
+            </p>
+          )}
+          {box.lastContentAddedAt && (
+            <p className="text-[12px] text-wb-grey-03 leading-[20px] tracking-[0.25px]">마지막 업데이트: {box.lastContentAddedAt.slice(0, 10)}</p>
+          )}
+        </div>
+      </div>
+
+      {/* 케밥 버튼 + 컨텍스트 메뉴 */}
+      <div className="relative shrink-0" ref={openMenu?.boxId === box.boxId ? menuRef : undefined}>
+        <button
+          onClick={() => toggleMenu(box.boxId, box.boxType)}
+          className="p-1 text-white cursor-pointer"
+        >
+          <EllipsisVerticalSolid className="size-[24px]" />
+        </button>
+        {openMenu?.boxId === box.boxId && (
+          <div className="absolute right-[5px] top-full z-50 mt-1">
+            <ContextMenu items={buildMenuItems(box.boxId, box.boxType)} />
+          </div>
+        )}
+      </div>
+    </li>
+  );
+
   return (
     <>
       <Header
@@ -127,46 +166,10 @@ export default function BoxPage() {
               <ListTitle
                 title={`마이 박스 (${myBoxes.length})`}
                 variant="none"
-                onAction={() => {/* TODO: 마이 박스 섹션 메뉴 */}}
                 className="mb-3"
               />
               {myBoxes.length > 0 && (
-                <ul>
-                  {myBoxes.map((box) => (
-                    <li
-                      key={box.boxId}
-                      className="flex items-start pl-[16px] pr-[12px] py-[10px]"
-                    >
-                      <div
-                        className="flex gap-[10px] items-start flex-1 min-w-0 cursor-pointer"
-                        onClick={() => goToContents(box.boxId, 'MY', box.name)}
-                      >
-                        <TriplePosterBox posters={box.previewPosterList} />
-                        <div className="flex flex-col gap-[3px] min-w-0 flex-1">
-                          <p className="text-[16px] font-medium text-white leading-[24px] tracking-[0.15px] line-clamp-2">{box.name}</p>
-                          {box.lastContentAddedAt && (
-                            <p className="text-[12px] text-wb-grey-03 leading-[20px] tracking-[0.25px]">마지막 업데이트: {box.lastContentAddedAt.slice(0, 10)}</p>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* 케밥 버튼 + 컨텍스트 메뉴 */}
-                      <div className="relative shrink-0" ref={openMenu?.boxId === box.boxId ? menuRef : undefined}>
-                        <button
-                          onClick={() => toggleMenu(box.boxId, 'MY')}
-                          className="p-1 text-white cursor-pointer"
-                        >
-                          <EllipsisVerticalSolid className="size-[24px]" />
-                        </button>
-                        {openMenu?.boxId === box.boxId && (
-                          <div className="absolute right-[5px] top-full z-50 mt-1">
-                            <ContextMenu items={buildMenuItems(box.boxId, 'MY')} />
-                          </div>
-                        )}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                <ul>{myBoxes.map(renderBoxItem)}</ul>
               )}
               <button
                 onClick={() => router.push('/box/create')}
@@ -182,46 +185,10 @@ export default function BoxPage() {
               <ListTitle
                 title={`공유 박스 (${sharedBoxes.length})`}
                 variant="none"
-                onAction={() => {/* TODO: 공유 박스 섹션 메뉴 */}}
                 className="mb-3"
               />
               {sharedBoxes.length > 0 && (
-                <ul>
-                  {sharedBoxes.map((box) => (
-                    <li
-                      key={box.boxId}
-                      className="flex items-start pl-[16px] pr-[12px] py-[10px]"
-                    >
-                      <div
-                        className="flex gap-[10px] items-start flex-1 min-w-0 cursor-pointer"
-                        onClick={() => goToContents(box.boxId, 'SHARED', box.name)}
-                      >
-                        <TriplePosterBox posters={box.previewPosterList} />
-                        <div className="flex flex-col gap-[3px] min-w-0 flex-1">
-                          <p className="text-[16px] font-medium text-white leading-[24px] tracking-[0.15px] line-clamp-2">{box.name}</p>
-                          <p className="text-[12px] text-wb-primary leading-[20px] tracking-[0.25px] truncate">
-                            {box.memberList.map((m) => m.boxMemberName).join(', ')}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* 케밥 버튼 + 컨텍스트 메뉴 */}
-                      <div className="relative shrink-0" ref={openMenu?.boxId === box.boxId ? menuRef : undefined}>
-                        <button
-                          onClick={() => toggleMenu(box.boxId, 'SHARED')}
-                          className="p-1 text-white cursor-pointer"
-                        >
-                          <EllipsisVerticalSolid className="size-[24px]" />
-                        </button>
-                        {openMenu?.boxId === box.boxId && (
-                          <div className="absolute right-[5px] top-full z-50 mt-1">
-                            <ContextMenu items={buildMenuItems(box.boxId, 'SHARED')} />
-                          </div>
-                        )}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                <ul>{sharedBoxes.map(renderBoxItem)}</ul>
               )}
               <button
                 onClick={() => router.push('/box/create')}
@@ -234,7 +201,6 @@ export default function BoxPage() {
           </>
         )}
       </MainContent>
-
     </>
   );
 }

@@ -67,6 +67,13 @@ export async function cancelInvitation(requestId: number): Promise<void> {
   );
 }
 
+/** 보낸 초대 삭제 (거절된 초대) */
+export async function deleteInvitation(requestId: number): Promise<void> {
+  await privateApi.delete(
+    `/boxes/shared/invitations/${requestId}/delete`,
+  );
+}
+
 /** 회원 검색 (boxId 기준 초대 상태 포함) */
 export async function searchMembers(keyword: string, boxId: number): Promise<MemberSearchPageResponse> {
   const { data } = await privateApi.get<ApiResponse<MemberSearchPageResponse>>(

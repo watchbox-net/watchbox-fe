@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/common/Header';
 import TabNav from '@/components/common/TabNav';
 import MainContent from '@/components/common/MainContent';
@@ -26,7 +26,7 @@ const searchByTab = {
   person: searchPerson,
 } as const;
 
-export default function SearchPage() {
+function SearchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -116,9 +116,9 @@ export default function SearchPage() {
             <ul>
               {items.map((item) => (
                 <li
-                  key={`${item.contentSummary.mediaType}-${item.contentSummary.contentId}`}
+                  key={`${item.contentSummary.mediaType}-${item.contentSummary.tmdbId}`}
                   className="flex items-center gap-3 px-4 py-3 border-b border-neutral-800 cursor-pointer"
-                  onClick={() => router.push(`/content/${item.contentSummary.mediaType}/${item.contentSummary.contentId}`)}
+                  onClick={() => router.push(`/content/${item.contentSummary.mediaType}/${item.contentSummary.tmdbId}`)}
                 >
                   {getImageUrl(item.contentSummary) ? (
                     <Image
@@ -148,5 +148,13 @@ export default function SearchPage() {
         )}
       </MainContent>
     </>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense>
+      <SearchContent />
+    </Suspense>
   );
 }

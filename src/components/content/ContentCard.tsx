@@ -32,8 +32,8 @@ interface ContentCardProps {
   watchStatus?: WatchStatus | null;
   /** 상세 페이지 링크 (포스터+제목 영역에만 적용) */
   href?: string;
-  /** 컨텐츠 ID (시청 상태 변경 시 필요) */
-  contentId?: number;
+  /** TMDB ID (시청 상태 변경 시 필요) */
+  tmdbId?: number;
   /** 미디어 타입 (시청 상태 변경 시 필요) */
   mediaType?: 'MOVIE' | 'TV';
   /** 시청 기록 ID (기록 삭제 시 필요) */
@@ -48,7 +48,7 @@ export default function ContentCard({
   rating,
   watchStatus: initialWatchStatus,
   href,
-  contentId,
+  tmdbId,
   mediaType,
   recordId: initialRecordId,
   className,
@@ -89,8 +89,8 @@ export default function ContentCard({
   // 시청 상태 선택
   const handleStatusSelect = async (status: Exclude<WatchStatus, 'NONE'>) => {
     setStatusMenuOpen(false);
-    if (!contentId || !mediaType) return;
-    await changeStatus(contentId, mediaType, status);
+    if (!tmdbId || !mediaType) return;
+    await changeStatus(tmdbId, mediaType, status);
   };
 
   // 기록 삭제

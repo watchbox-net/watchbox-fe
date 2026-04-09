@@ -5,7 +5,8 @@ export type ContentDetailMediaType = 'MOVIE' | 'TV';
 
 // ─── MovieInfo ─────────────────────────────────────────────
 export interface MovieInfo {
-  contentId: number;
+  contentId: number | null;
+  tmdbId: number;
   titleKo: string;
   titleOriginal: string | null;
   posterPath: string | null;
@@ -26,7 +27,8 @@ export interface MovieInfo {
 
 // ─── TvInfo ────────────────────────────────────────────────
 export interface TvInfo {
-  contentId: number;
+  contentId: number | null;
+  tmdbId: number;
   nameKo: string;
   nameOriginal: string | null;
   posterPath: string | null;

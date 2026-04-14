@@ -72,8 +72,8 @@ export default function TriplePosterBox({
         <HatSmall className="shrink-0" />
       )}
 
-      {/* 포스터 영역 */}
-      <div className="flex border border-wb-dark-01 rounded-b-[5px] shrink-0 overflow-hidden">
+      {/* 포스터 영역 — ring은 box-shadow 기반으로 레이아웃 크기에 영향 없음 (Figma center stroke 동일) */}
+      <div className="flex ring-1 ring-wb-dark-01 rounded-b-[5px] shrink-0 overflow-hidden">
         {slots.map((src, i) => (
           <div
             key={i}

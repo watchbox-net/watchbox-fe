@@ -234,7 +234,7 @@ export default function ListComponentsPage() {
           </div>
           <div>
             <p className="text-xs font-semibold text-neutral-500 mb-2">medium / contents</p>
-            <div className="flex border border-wb-dark-01 rounded-b-[5px] shrink-0 overflow-hidden">
+            <div className="flex ring-1 ring-wb-dark-01 rounded-b-[5px] shrink-0 overflow-hidden">
               {[
                 SAMPLE_POSTER1,
                 SAMPLE_POSTER2,
@@ -248,7 +248,7 @@ export default function ListComponentsPage() {
           </div>
           <div>
             <p className="text-xs font-semibold text-neutral-500 mb-2">small / contents</p>
-            <div className="flex border border-wb-dark-01 rounded-b-[5px] shrink-0 overflow-hidden">
+            <div className="flex ring-1 ring-wb-dark-01 rounded-b-[5px] shrink-0 overflow-hidden">
               {[
                 SAMPLE_POSTER1,
                 SAMPLE_POSTER2,

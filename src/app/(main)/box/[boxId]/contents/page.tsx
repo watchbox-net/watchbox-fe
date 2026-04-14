@@ -16,7 +16,7 @@ import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
 import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
 import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
-import type { ContentItem, WatchStatus } from '@/types/content';
+import type { ContentItem, WatchStatus } from '@/types/content-summary';
 import type { BoxType } from '@/types/box';
 
 export default function BoxContentsPage() {

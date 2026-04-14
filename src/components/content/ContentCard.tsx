@@ -10,7 +10,7 @@ import Modal from '@/components/common/Modal';
 import Toast from '@/components/common/Toast';
 import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
 import { TMDB_POSTER } from '@/lib/utils/content';
-import type { WatchStatus } from '@/types/content';
+import type { WatchStatus } from '@/types/content-summary';
 import type { WatchStatus as IconWatchStatus } from '@/components/icons/WatchStatusIcon';
 
 const WATCH_STATUS_MAP: Record<string, IconWatchStatus> = {

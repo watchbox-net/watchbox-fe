@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
 import { upsertWatchStatus, deleteWatchRecord } from '@/lib/api/record';
-import type { WatchStatus } from '@/types/content';
+import type { WatchStatus } from '@/types/content-summary';
 
 export const STATUS_LABEL: Record<Exclude<WatchStatus, 'NONE'>, string> = {
   COMPLETED: '시청 완료',

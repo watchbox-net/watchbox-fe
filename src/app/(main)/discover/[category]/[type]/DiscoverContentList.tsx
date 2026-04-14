@@ -11,7 +11,7 @@ import { useLoginModal } from '@/lib/context/LoginModalContext';
 import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
 import { deleteWatchRecord } from '@/lib/api/record';
 import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
-import type { ContentItem, WatchStatus } from '@/types/content';
+import type { ContentItem, WatchStatus } from '@/types/content-summary';
 
 interface DiscoverContentListProps {
   items: ContentItem[];
@@ -44,7 +44,7 @@ export default function DiscoverContentList({ items: initialItems }: DiscoverCon
       setItems((prev) =>
         prev.map((i) =>
           i.contentSummary.tmdbId === summary.tmdbId
-            ? { ...i, memberRecord: { ...i.memberRecord, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
+            ? { ...i, memberRecord: { recordId: i.memberRecord?.recordId ?? null, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
             : i,
         ),
       );
@@ -53,13 +53,13 @@ export default function DiscoverContentList({ items: initialItems }: DiscoverCon
 
   const handleDelete = async (item: ContentItem) => {
     setOpenMenuId(null);
-    if (!item.contentRecordId) return;
+    if (!item.memberRecord?.recordId) return;
     try {
-      await deleteWatchRecord(item.contentRecordId);
+      await deleteWatchRecord(item.memberRecord.recordId);
       setItems((prev) =>
         prev.map((i) =>
           i.contentSummary.tmdbId === item.contentSummary.tmdbId
-            ? { ...i, memberRecord: null, contentRecordId: null }
+            ? { ...i, memberRecord: null }
             : i,
         ),
       );

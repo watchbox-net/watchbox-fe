@@ -7,7 +7,7 @@ import type {
   BoxUpdateRequest,
   BoxUpdateResponse,
 } from '@/types/box';
-import type { ContentPageResponse } from '@/types/content';
+import type { ContentPageResponse } from '@/types/content-summary';
 import type { ApiResponse } from '@/types/api';
 
 /** 박스 리스트 조회 (마이 + 공유 통합) */

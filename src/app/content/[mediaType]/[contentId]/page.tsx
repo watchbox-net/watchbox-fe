@@ -19,11 +19,11 @@ import { TMDB_POSTER, TMDB_BACKDROP } from '@/lib/utils/content';
 import type {
   ContentDetailResponse,
   ContentDetailMediaType,
-  DetailMemberRecord,
   MovieInfo,
   TvInfo,
 } from '@/types/content-detail';
-import type { WatchStatus } from '@/types/content';
+import type { MemberRecord } from '@/types/interaction';
+import type { WatchStatus } from '@/types/content-summary';
 
 // ─── mediaType별 표시 정보 추출 ─────────────────────────────
 function extractInfo(detail: ContentDetailResponse) {
@@ -125,7 +125,7 @@ export default function ContentDetailPage() {
     fetchContentDetail(mediaType, tmdbId)
       .then((res) => {
         setDetail(res);
-        const mr: DetailMemberRecord | null = res.memberRecord;
+        const mr: MemberRecord | null = res.memberRecord;
         setLiked(mr?.liked === true);
         setRecordId(mr?.recordId ?? null);
         setWatchStatus(mr?.watchStatus ?? null);

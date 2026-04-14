@@ -1,5 +1,5 @@
 import { publicApi } from './client';
-import type { ContentPageResponse } from '@/types/content';
+import type { ContentPageResponse } from '@/types/content-summary';
 import type { MovieSummary } from '@/types/movie';
 import type { TvSummary } from '@/types/tv';
 import type { PersonSummary } from '@/types/person';

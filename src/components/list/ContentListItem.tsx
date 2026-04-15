@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import Poster from '@/components/content/Poster';
 import WatchStatusIcon from '@/components/icons/WatchStatusIcon';
 import MemberInfo from '@/components/list/MemberInfo';
-import type { WatchStatus as WatchStatusType } from '@/types/content';
+import type { WatchStatus as WatchStatusType } from '@/types/content-summary';
 
 // ─── Types ──────────────────────────────────────────────────
 

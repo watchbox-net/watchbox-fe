@@ -1,4 +1,4 @@
-import type { ContentSummary } from '@/types/content';
+import type { ContentSummary } from '@/types/content-summary';
 
 /** TMDB 포스터 이미지 베이스 URL */
 export const TMDB_POSTER = {

@@ -1,5 +1,5 @@
 import { privateApi } from './client';
-import type { ContentPageResponse, WatchStatus } from '@/types/content';
+import type { ContentPageResponse, WatchStatus } from '@/types/content-summary';
 import type { ApiResponse } from '@/types/api';
 
 /** 시청 상태 등록된 기록 리스트 조회 (로그인 필요) */

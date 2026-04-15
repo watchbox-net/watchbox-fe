@@ -15,7 +15,7 @@ import { fetchWatchStatusList } from '@/lib/api/record';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
 import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
-import type { ContentItem, WatchStatus } from '@/types/content';
+import type { ContentItem, WatchStatus } from '@/types/content-summary';
 import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
 
 const TABS = [
@@ -82,9 +82,9 @@ export default function RecordPage() {
     if (success) {
       queryClient.setQueryData<ContentItem[]>(['watchStatusList'], (prev) =>
         (prev ?? []).map((i) =>
-          (i.contentRecordId ?? i.contentSummary.tmdbId) ===
-          (item.contentRecordId ?? summary.tmdbId)
-            ? { ...i, memberRecord: { ...i.memberRecord, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
+          (i.memberRecord?.recordId ?? i.contentSummary.tmdbId) ===
+          (item.memberRecord?.recordId ?? summary.tmdbId)
+            ? { ...i, memberRecord: { recordId: i.memberRecord?.recordId ?? null, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
             : i,
         ),
       );
@@ -93,11 +93,11 @@ export default function RecordPage() {
 
   const handleDelete = async (item: ContentItem) => {
     setOpenMenuId(null);
-    if (!item.contentRecordId) return;
-    const success = await deleteStatus(item.contentRecordId);
+    if (!item.memberRecord?.recordId) return;
+    const success = await deleteStatus(item.memberRecord.recordId);
     if (success) {
       queryClient.setQueryData<ContentItem[]>(['watchStatusList'], (prev) =>
-        (prev ?? []).filter((i) => i.contentRecordId !== item.contentRecordId),
+        (prev ?? []).filter((i) => i.memberRecord?.recordId !== item.memberRecord?.recordId),
       );
     }
   };
@@ -106,7 +106,7 @@ export default function RecordPage() {
     const summary = item.contentSummary;
     const year = 'year' in summary ? summary.year : null;
     const genres = 'genreList' in summary ? summary.genreList : null;
-    const itemId = item.contentRecordId ?? summary.tmdbId;
+    const itemId = item.memberRecord?.recordId ?? summary.tmdbId;
     const isMenuOpen = openMenuId === itemId;
 
     const menu: ReactNode = isMenuOpen ? (

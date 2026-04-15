@@ -29,7 +29,7 @@ export default function BoxPage() {
     if (authLoading) return;
     if (!isAuthenticated) { setLoading(false); return; }
     fetchBoxList()
-      .then((res) => setBoxes(res.boxList))
+      .then((res) => setBoxes(res.boxList ?? []))
       .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, [authLoading, isAuthenticated]);

@@ -1,5 +1,5 @@
 import { ApiResponse } from '@/types/api';
-import type { ContentPageResponse } from '@/types/content';
+import type { ContentPageResponse } from '@/types/content-summary';
 import type { TvSummary } from '@/types/tv';
 
 const BACKEND_API_URL = process.env.BACKEND_API_URL;

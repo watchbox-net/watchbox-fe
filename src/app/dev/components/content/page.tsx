@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Poster from '@/components/content/Poster';
 
-const SAMPLE_POSTER = 'https://image.tmdb.org/t/p/w185/pB8BM7pdSp6B6Ih7QI4S2t0POhQ.jpg';
+const SAMPLE_POSTER = 'https://image.tmdb.org/t/p/w185/ib6v6qUXzez1x2qIOLN7C0yJNPQ.jpg';
 
 export default function ContentComponentsPage() {
   return (

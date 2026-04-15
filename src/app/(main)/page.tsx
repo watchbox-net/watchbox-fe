@@ -8,7 +8,7 @@ import HorizontalScroll from '@/components/common/HorizontalScroll';
 import { fetchPopularMovieList, fetchTopRatedMovieList, fetchNowShowingMovieList, fetchTrendingMovieList } from '@/api/movie';
 import { fetchPopularTvList, fetchTopRatedTvList, fetchNowShowingTvList, fetchTrendingTvList } from '@/api/tv';
 import { getDisplayTitle } from '@/lib/utils/content';
-import type { ContentItem, ContentPageResponse, ContentSummary } from '@/types/content';
+import type { ContentItem, ContentPageResponse, ContentSummary } from '@/types/content-summary';
 import type { MovieSummary } from '@/types/movie';
 import type { TvSummary } from '@/types/tv';
 import Link from 'next/link';
@@ -68,7 +68,7 @@ function CardScroll<T extends MovieSummary | TvSummary>({
           href={`/content/${item.contentSummary.mediaType}/${item.contentSummary.tmdbId}`}
           tmdbId={item.contentSummary.tmdbId}
           mediaType={item.contentSummary.mediaType as 'MOVIE' | 'TV'}
-          recordId={item.contentRecordId}
+          recordId={item.memberRecord?.recordId ?? null}
         />
       ))}
     </HorizontalScroll>

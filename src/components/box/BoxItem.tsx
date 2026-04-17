@@ -58,7 +58,7 @@ export default function BoxItem({
             {name}
           </p>
           {update && lastContentAddedAt && (
-            <p className="text-[13px] text-wb-grey-03 leading-[17px] tracking-[0.25px]">
+            <p className="text-[13px] text-wb-grey-04 leading-[17px] tracking-[0.25px]">
               업데이트: {lastContentAddedAt.slice(0, 10)}
             </p>
           )}

@@ -72,11 +72,11 @@ export default function MyPage() {
 
       <MainContent>
         {loading && (
-          <p className="text-center text-wb-grey-02 py-8">불러오는 중...</p>
+          <p className="text-center text-wb-grey-03 py-8">불러오는 중...</p>
         )}
         {!loading && !isAuthenticated && (
           <div className="flex flex-col items-center gap-[16px] py-[60px]">
-            <p className="text-[16px] text-wb-grey-02">로그인이 필요한 페이지입니다.</p>
+            <p className="text-[16px] text-wb-grey-03">로그인이 필요한 페이지입니다.</p>
             <button
               type="button"
               onClick={() => router.push('/login')}
@@ -87,7 +87,7 @@ export default function MyPage() {
           </div>
         )}
         {!loading && isAuthenticated && error && (
-          <p className="text-center text-wb-grey-02 py-8">
+          <p className="text-center text-wb-grey-03 py-8">
             오류가 발생했습니다.
           </p>
         )}
@@ -102,7 +102,7 @@ export default function MyPage() {
                 </p>
                 <div className="flex items-center gap-[5px]">
                   <GoogleCircleLogo variant="light" />
-                  <span className="text-[14px] text-wb-grey-02 leading-[14px]">
+                  <span className="text-[14px] text-wb-grey-03 leading-[14px]">
                     {data.profile.email}
                   </span>
                 </div>
@@ -112,23 +112,23 @@ export default function MyPage() {
             {/* ── 통계 행 1: 좋아요 / 박스 / 기록 ────────── */}
             <div className="flex items-start justify-around pt-[24px]">
               <div className="flex flex-col items-center gap-[9px] w-[56px]">
-                <span className="text-[18px] text-wb-grey-02">좋아요</span>
+                <span className="text-[18px] text-wb-grey-03">좋아요</span>
                 <LikeIcon size="xl" active />
-                <span className="text-[32px] text-wb-grey-02">
+                <span className="text-[32px] text-wb-grey-03">
                   {data.memberStats.likeCount}
                 </span>
               </div>
               <div className="flex flex-col items-center gap-[9px] w-[50px]">
-                <span className="text-[18px] text-wb-grey-02">박스</span>
+                <span className="text-[18px] text-wb-grey-03">박스</span>
                 <BoxIcon size="xl" variant="added" />
-                <span className="text-[32px] text-wb-grey-02">
+                <span className="text-[32px] text-wb-grey-03">
                   {data.memberStats.boxCount}
                 </span>
               </div>
               <div className="flex flex-col items-center gap-[9px] w-[50px]">
-                <span className="text-[18px] text-wb-grey-02">기록</span>
+                <span className="text-[18px] text-wb-grey-03">기록</span>
                 <WatchStatusIcon size="xl" status="completed" />
-                <span className="text-[32px] text-wb-grey-02">
+                <span className="text-[32px] text-wb-grey-03">
                   {data.memberStats.watchStatusCount}
                 </span>
               </div>
@@ -137,16 +137,16 @@ export default function MyPage() {
             {/* ── 통계 행 2: 팔로워 / 팔로잉 ─────────────── */}
             <div className="flex items-start justify-center gap-[100px] pt-[50px]">
               <div className="flex flex-col items-center gap-[9px] w-[53px]">
-                <span className="text-[18px] text-wb-grey-02">팔로워</span>
-                <UsersSolid className="size-[50px] text-wb-grey-02" />
-                <span className="text-[32px] text-wb-grey-02">
+                <span className="text-[18px] text-wb-grey-03">팔로워</span>
+                <UsersSolid className="size-[50px] text-wb-grey-03" />
+                <span className="text-[32px] text-wb-grey-03">
                   0
                 </span>
               </div>
               <div className="flex flex-col items-center gap-[9px] w-[52px]">
-                <span className="text-[18px] text-wb-grey-02">팔로잉</span>
-                <UserGroupSolid className="size-[50px] text-wb-grey-02" />
-                <span className="text-[32px] text-wb-grey-02">
+                <span className="text-[18px] text-wb-grey-03">팔로잉</span>
+                <UserGroupSolid className="size-[50px] text-wb-grey-03" />
+                <span className="text-[32px] text-wb-grey-03">
                   0
                 </span>
               </div>

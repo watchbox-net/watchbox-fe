@@ -37,7 +37,7 @@ export default function SheetContentItem({
         <div className="flex flex-col gap-[6px] min-w-0">
           <p className="text-[16px] font-medium text-white truncate">{title}</p>
           {infoLine && (
-            <p className="text-[12px] text-wb-grey-02 truncate">{infoLine}</p>
+            <p className="text-[12px] text-wb-grey-03 truncate">{infoLine}</p>
           )}
         </div>
       </div>

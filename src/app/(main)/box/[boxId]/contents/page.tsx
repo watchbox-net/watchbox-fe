@@ -157,7 +157,7 @@ export default function BoxContentsPage() {
       <Header
         variant="icon1-back"
         title={headerTitle}
-        rightIcon={<PlusOutline className="size-6 text-wb-grey-04" />}
+        rightIcon={<PlusOutline className="size-6 text-wb-white-02" />}
         onRightIconClick={() => {/* TODO: 컨텐츠 추가 */}}
       />
 

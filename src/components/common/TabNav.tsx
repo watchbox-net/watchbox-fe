@@ -21,8 +21,8 @@ export default function TabNav({ tabs, activeIndex, onChange }: TabNavProps) {
             onClick={() => onChange?.(i)}
             className={`flex-1 pt-[9px] pb-[10px] px-[10px] wb-menu-tab text-center border-b ${
               isActive
-                ? 'text-wb-grey-04 border-wb-white'
-                : 'text-wb-grey-02 border-wb-grey-02'
+                ? 'text-wb-white-02 border-wb-white'
+                : 'text-wb-grey-03 border-wb-grey-03'
             }`}
           >
             {label}

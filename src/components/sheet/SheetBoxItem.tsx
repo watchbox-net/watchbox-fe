@@ -52,11 +52,11 @@ export default function SheetBoxItem({
           </p>
           {isShared ? (
             <p className="text-[13px] leading-[17px] tracking-[0.25px] truncate w-[205px]">
-              <span className="text-wb-grey-03">공유 박스 - </span>
-              <span className="text-wb-grey-02">{memberNames?.join(' · ')}</span>
+              <span className="text-wb-grey-04">공유 박스 - </span>
+              <span className="text-wb-grey-03">{memberNames?.join(' · ')}</span>
             </p>
           ) : (
-            <p className="text-[13px] text-wb-grey-03 leading-[17px] tracking-[0.25px]">
+            <p className="text-[13px] text-wb-grey-04 leading-[17px] tracking-[0.25px]">
               내 박스
             </p>
           )}

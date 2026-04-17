@@ -92,7 +92,7 @@ function Section<T extends MovieSummary | TvSummary>({
       {items.length > 0 ? (
         <CardScroll items={items} scrollKey={href} />
       ) : (
-        <p className="text-sm text-wb-grey-02 px-[16px]">불러올 수 없습니다</p>
+        <p className="text-sm text-wb-grey-03 px-[16px]">불러올 수 없습니다</p>
       )}
     </section>
   );

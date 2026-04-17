@@ -86,7 +86,7 @@ export default function BoxInvitationsPage() {
 
       <MainContent>
         {loading && (
-          <p className="text-center text-wb-grey-02 py-8">불러오는 중...</p>
+          <p className="text-center text-wb-grey-03 py-8">불러오는 중...</p>
         )}
 
         {!loading && (
@@ -100,7 +100,7 @@ export default function BoxInvitationsPage() {
               />
 
               {pendingReceived.length === 0 ? (
-                <p className="pl-[16px] text-sm text-wb-grey-02">받은 초대가 없습니다.</p>
+                <p className="pl-[16px] text-sm text-wb-grey-03">받은 초대가 없습니다.</p>
               ) : (
                 <BoxInvitationReceivedList>
                   {pendingReceived.map((inv) => (
@@ -127,7 +127,7 @@ export default function BoxInvitationsPage() {
               />
 
               {sent.length === 0 ? (
-                <p className="pl-[16px] text-sm text-wb-grey-02">보낸 초대가 없습니다.</p>
+                <p className="pl-[16px] text-sm text-wb-grey-03">보낸 초대가 없습니다.</p>
               ) : (
                 <BoxInvitationSendedList>
                   {sent.map((inv) => (

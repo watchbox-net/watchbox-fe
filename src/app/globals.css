@@ -15,10 +15,9 @@
 
   /* Dark Theme / Grey */
   --wb-grey-01: #525252;
-  --wb-grey-012: #7C7B7B;
-  --wb-grey-02: #a3a3a3;
-  --wb-grey-03: #b1b1b1;
-  --wb-grey-04: #d9d9d9;
+  --wb-grey-02: #7C7B7B;
+  --wb-grey-03: #a3a3a3;
+  --wb-grey-04: #b1b1b1;
 
   /* Light Theme */
   --wb-black: #000000;
@@ -47,7 +46,6 @@
 
   /* Grey scale */
   --color-wb-grey-01: var(--wb-grey-01);
-  --color-wb-grey-012: var(--wb-grey-012);
   --color-wb-grey-02: var(--wb-grey-02);
   --color-wb-grey-03: var(--wb-grey-03);
   --color-wb-grey-04: var(--wb-grey-04);

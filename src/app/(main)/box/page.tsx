@@ -93,7 +93,7 @@ export default function BoxPage() {
 
         {!authLoading && !isAuthenticated && (
           <div className="flex flex-col items-center gap-[16px] py-[60px]">
-            <p className="text-[16px] text-wb-grey-02">로그인이 필요한 페이지입니다.</p>
+            <p className="text-[16px] text-wb-grey-03">로그인이 필요한 페이지입니다.</p>
             <button
               type="button"
               onClick={() => router.push('/login')}
@@ -137,8 +137,8 @@ export default function BoxPage() {
               onClick={() => router.push('/box/create')}
               className="flex items-center justify-center gap-2 w-full py-4 cursor-pointer rounded-[8px] hover:bg-wb-dark-05 transition-colors"
             >
-              <PlusOutline className="size-6 text-wb-grey-03" />
-              <span className="text-lg text-wb-grey-03">새 박스 만들기</span>
+              <PlusOutline className="size-6 text-wb-grey-04" />
+              <span className="text-lg text-wb-grey-04">새 박스 만들기</span>
             </button>
           </>
         )}

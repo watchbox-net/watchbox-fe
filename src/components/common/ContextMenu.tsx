@@ -81,8 +81,8 @@ export default function ContextMenu({ items, size = 'small', className }: Contex
             onMouseLeave={() => setHoveredIndex(null)}
             onClick={item.onClick}
           >
-            <Icon className="size-[24px] text-wb-grey-03 shrink-0" />
-            <span className="text-[14px] font-medium leading-[24px] tracking-[0.1px] text-wb-grey-03 whitespace-nowrap">
+            <Icon className="size-[24px] text-wb-grey-04 shrink-0" />
+            <span className="text-[14px] font-medium leading-[24px] tracking-[0.1px] text-wb-grey-04 whitespace-nowrap">
               {label}
             </span>
           </button>

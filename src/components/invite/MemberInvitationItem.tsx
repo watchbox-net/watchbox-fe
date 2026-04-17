@@ -83,7 +83,7 @@ export default function MemberInvitationItem(props: MemberInvitationItemProps) {
       <div className={`flex h-[30px] items-center justify-between px-[16px] ${className ?? ''}`}>
         <div className="flex items-center gap-[10px] min-w-0">
           <ProfileIcon variant="list" />
-          <span className="text-[18px] leading-[28px] text-wb-grey-04 truncate">
+          <span className="text-[18px] leading-[28px] text-wb-white-01 truncate">
             {name}
           </span>
         </div>
@@ -107,7 +107,7 @@ export default function MemberInvitationItem(props: MemberInvitationItemProps) {
       <div className={`flex h-[30px] items-center justify-between pl-[16px] pr-[5px] ${className ?? ''}`}>
         <div className="flex items-center gap-[10px] min-w-0">
           <ProfileIcon variant="list" />
-          <span className="text-[14px] leading-[20px] text-wb-grey-02 truncate">
+          <span className="text-[14px] leading-[20px] text-wb-grey-03 truncate">
             초대자: {inviterName}
           </span>
         </div>
@@ -133,7 +133,7 @@ export default function MemberInvitationItem(props: MemberInvitationItemProps) {
         <p className={`text-[14px] leading-none text-white ${expanded ? '' : 'truncate'}`}>
           {receiverName} 님에게 {boxName} 참가 요청
         </p>
-        <p className="text-[11px] leading-none text-wb-grey-02 mt-[7px]">
+        <p className="text-[11px] leading-none text-wb-grey-03 mt-[7px]">
           상태: {status === 'pending' ? '대기중' : '거절'}
         </p>
       </button>

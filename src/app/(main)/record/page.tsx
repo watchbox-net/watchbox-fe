@@ -147,9 +147,8 @@ export default function RecordPage() {
   return (
     <>
       <Header
-        variant="icon1"
+        variant="center"
         title="시청 기록"
-        rightIcon={<PlusOutline className="size-6 text-wb-grey-04" />}
         onRightIconClick={() => {/* TODO: 추가 기능 */}}
       />
       <TabNav
@@ -164,7 +163,7 @@ export default function RecordPage() {
         )}
         {!authLoading && !loading && !isAuthenticated && (
           <div className="flex flex-col items-center gap-[16px] py-[60px]">
-            <p className="text-[16px] text-wb-grey-02">로그인이 필요한 페이지입니다.</p>
+            <p className="text-[16px] text-wb-grey-03">로그인이 필요한 페이지입니다.</p>
             <button
               type="button"
               onClick={() => router.push('/login')}

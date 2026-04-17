@@ -82,10 +82,10 @@ export default function ProfileEditPage() {
 
       <MainContent>
         {loading && (
-          <p className="text-center text-wb-grey-02 py-8">불러오는 중...</p>
+          <p className="text-center text-wb-grey-03 py-8">불러오는 중...</p>
         )}
         {!loading && error && (
-          <p className="text-center text-wb-grey-02 py-8">
+          <p className="text-center text-wb-grey-03 py-8">
             오류가 발생했습니다.
           </p>
         )}
@@ -95,8 +95,8 @@ export default function ProfileEditPage() {
             <div className="flex flex-col items-center gap-[5px] pt-[48px] pb-[20px]">
               <ProfileIcon variant="edit" />
               <div className="flex items-center gap-[7px]">
-                <PencilOutline className="size-[18px] text-wb-grey-02" />
-                <span className="text-[16px] font-medium text-wb-grey-02">
+                <PencilOutline className="size-[18px] text-wb-grey-03" />
+                <span className="text-[16px] font-medium text-wb-grey-03">
                   이미지 변경
                 </span>
               </div>
@@ -104,7 +104,7 @@ export default function ProfileEditPage() {
 
             {/* ── 닉네임 입력 ───────────────────────────── */}
             <div className="px-[12px] pt-[20px]">
-              <p className="text-[14px] font-medium text-wb-grey-03 leading-none mb-[5px]">
+              <p className="text-[14px] font-medium text-wb-grey-04 leading-none mb-[5px]">
                 닉네임
               </p>
               <div className="px-[0px] py-[5px]">

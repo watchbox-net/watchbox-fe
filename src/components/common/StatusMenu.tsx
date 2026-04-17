@@ -57,7 +57,7 @@ export default function StatusMenu({ className, onSelect }: StatusMenuProps) {
               ? <XMarkIcon className="size-[24px] text-wb-dark-04" strokeWidth={2} />
               : <WatchStatusIcon status={item.iconStatus!} size="medium" />
             }
-            <span className="text-[14px] font-medium leading-[24px] tracking-[0.1px] text-wb-grey-03 whitespace-nowrap">
+            <span className="text-[14px] font-medium leading-[24px] tracking-[0.1px] text-wb-grey-04 whitespace-nowrap">
               {item.label}
             </span>
           </button>

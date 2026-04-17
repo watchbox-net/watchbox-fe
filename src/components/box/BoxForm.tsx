@@ -62,7 +62,7 @@ export default function BoxForm({
       <MainContent className="px-[12px] flex flex-col">
         {/* 이름 */}
         <div className="mb-5">
-          <label className="block text-[14px] font-medium text-wb-grey-03 mb-[5px]">
+          <label className="block text-[14px] font-medium text-wb-grey-04 mb-[5px]">
             이름
           </label>
           <div className="py-[5px]">
@@ -81,7 +81,7 @@ export default function BoxForm({
 
         {/* 설명 */}
         <div className="mb-5">
-          <label className="block text-[14px] font-medium text-wb-grey-03 mb-[5px]">
+          <label className="block text-[14px] font-medium text-wb-grey-04 mb-[5px]">
             설명(선택)
           </label>
           <div className="py-[5px]">
@@ -99,7 +99,7 @@ export default function BoxForm({
 
         {/* 박스 유형 */}
         <div className="mb-5">
-          <label className="block text-[14px] font-medium text-wb-grey-03 mb-[5px]">
+          <label className="block text-[14px] font-medium text-wb-grey-04 mb-[5px]">
             박스 유형
           </label>
           <div className="py-[5px] relative">
@@ -117,7 +117,7 @@ export default function BoxForm({
               <option value="SHARED">공유 박스</option>
             </select>
             {!boxTypeDisabled && (
-              <ChevronDownOutline className="absolute right-[15px] top-1/2 -translate-y-1/2 size-[22px] text-wb-grey-04 pointer-events-none" />
+              <ChevronDownOutline className="absolute right-[15px] top-1/2 -translate-y-1/2 size-[22px] text-wb-white-02 pointer-events-none" />
             )}
           </div>
         </div>

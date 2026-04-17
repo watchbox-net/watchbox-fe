@@ -73,14 +73,14 @@ export default function BoxInvitePage() {
       {/* 검색바 */}
       <div className="px-4 pb-[27px]">
         <div className="bg-wb-dark-05 flex items-center h-[36px] pl-4 pr-3 rounded-[10px]">
-          <MagnifyingGlassOutline className="size-[17px] text-wb-grey-02 shrink-0" />
+          <MagnifyingGlassOutline className="size-[17px] text-wb-grey-03 shrink-0" />
           <input
             type="text"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             placeholder="초대할 회원을 검색해보세요"
-            className="flex-1 ml-[9px] bg-transparent text-wb-grey-04 placeholder:text-wb-grey-02 text-[15px] font-normal leading-none outline-none"
+            className="flex-1 ml-[9px] bg-transparent text-wb-white-02 placeholder:text-wb-grey-03 text-[15px] font-normal leading-none outline-none"
           />
           {keyword && (
             <button
@@ -88,7 +88,7 @@ export default function BoxInvitePage() {
               onClick={() => { setKeyword(''); setResults([]); setSearched(false); }}
               className="shrink-0 ml-1 cursor-pointer"
             >
-              <XCircleSolid className="size-[15px] text-wb-grey-02" />
+              <XCircleSolid className="size-[15px] text-wb-grey-03" />
             </button>
           )}
         </div>
@@ -97,11 +97,11 @@ export default function BoxInvitePage() {
       {/* 검색 결과 */}
       <MainContent>
         {loading && (
-          <p className="text-center text-wb-grey-02 py-8">검색 중...</p>
+          <p className="text-center text-wb-grey-03 py-8">검색 중...</p>
         )}
 
         {!loading && searched && results.length === 0 && (
-          <p className="text-center text-wb-grey-02 py-8">검색 결과가 없습니다.</p>
+          <p className="text-center text-wb-grey-03 py-8">검색 결과가 없습니다.</p>
         )}
 
         {!loading && results.length > 0 && (

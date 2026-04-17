@@ -3,7 +3,7 @@
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 // ─── Types ──────────────────────────────────────────────────
-export type DeleteIconVariant = 'light' | 'grey';
+export type DeleteIconVariant = 'light' | 'grey' | 'dark';
 
 interface DeleteIconProps {
   variant?: DeleteIconVariant;
@@ -12,8 +12,9 @@ interface DeleteIconProps {
 
 // ─── Variant → Color class ──────────────────────────────────
 const VARIANT_COLORS: Record<DeleteIconVariant, string> = {
-  light: 'text-wb-grey-04',
+  light: 'text-wb-white-02',
   grey:  'text-wb-grey-01',
+  dark:  'text-wb-dark-01',
 };
 
 // ─── Component ──────────────────────────────────────────────

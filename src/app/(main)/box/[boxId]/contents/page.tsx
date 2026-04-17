@@ -6,7 +6,8 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/common/Header';
 import ListTitle from '@/components/list/ListTitle';
-import ContentListItem from '@/components/list/ContentListItem';
+import ContentItem from '@/components/list/ContentItem';
+import ContentList from '@/components/list/ContentList';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
 import Toast from '@/components/common/Toast';
 import { PlusOutline } from '@/components/icons';
@@ -16,7 +17,7 @@ import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
 import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
 import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
-import type { ContentItem, WatchStatus } from '@/types/content';
+import type { ContentItem as ContentItemData, WatchStatus } from '@/types/content-summary';
 import type { BoxType } from '@/types/box';
 
 export default function BoxContentsPage() {
@@ -66,7 +67,7 @@ export default function BoxContentsPage() {
   }, [openMenuId]);
 
   const handleStatusSelect = async (
-    item: ContentItem,
+    item: ContentItemData,
     status: Exclude<WatchStatus, 'NONE'>,
   ) => {
     setOpenMenuId(null);
@@ -74,10 +75,17 @@ export default function BoxContentsPage() {
     if (summary.mediaType !== 'MOVIE' && summary.mediaType !== 'TV') return;
     const success = await changeStatus(summary.tmdbId, summary.mediaType, status);
     if (success) {
-      queryClient.setQueryData<ContentItem[]>(['boxContents', boxId, boxType], (prev) =>
+      queryClient.setQueryData<ContentItemData[]>(['boxContents', boxId, boxType], (prev) =>
         (prev ?? []).map((i) =>
           i.contentSummary.tmdbId === summary.tmdbId
-            ? { ...i, memberRecord: { ...i.memberRecord, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
+            ? {
+                ...i,
+                memberRecord: {
+                  recordId: i.memberRecord?.recordId ?? null,
+                  liked: i.memberRecord?.liked ?? null,
+                  watchStatus: status,
+                },
+              }
             : i,
         ),
       );
@@ -92,7 +100,7 @@ export default function BoxContentsPage() {
     return { movies, tvs, persons };
   }, [items]);
 
-  const renderItem = (item: ContentItem, idx: number, arr: ContentItem[]) => {
+  const renderItem = (item: ContentItemData, idx: number, arr: ContentItemData[]) => {
     const summary = item.contentSummary;
     const imageUrl = getImageUrl(summary);
     const title = getDisplayTitle(summary);
@@ -120,7 +128,7 @@ export default function BoxContentsPage() {
     ) : null;
 
     return (
-      <ContentListItem
+      <ContentItem
         key={itemId}
         posterSrc={imageUrl}
         title={title}
@@ -128,7 +136,6 @@ export default function BoxContentsPage() {
         genres={genres}
         watchStatus={watchStatus}
         boxMode={boxMode}
-        showDivider={!isLast}
         onClick={() => router.push(`/content/${summary.mediaType}/${summary.tmdbId}`)}
         onStatusClick={(e) => {
           if (!authLoading && !isAuthenticated) {
@@ -150,7 +157,7 @@ export default function BoxContentsPage() {
       <Header
         variant="icon1-back"
         title={headerTitle}
-        rightIcon={<PlusOutline className="size-6 text-wb-grey-04" />}
+        rightIcon={<PlusOutline className="size-6 text-wb-white-02" />}
         onRightIconClick={() => {/* TODO: 컨텐츠 추가 */}}
       />
 
@@ -173,19 +180,19 @@ export default function BoxContentsPage() {
             {grouped.movies.length > 0 && (
               <section className="mb-4">
                 <ListTitle title={`영화 (${grouped.movies.length})`} variant="none" className="mb-1" />
-                {grouped.movies.map(renderItem)}
+                <ContentList>{grouped.movies.map(renderItem)}</ContentList>
               </section>
             )}
             {grouped.tvs.length > 0 && (
               <section className="mb-4">
                 <ListTitle title={`시리즈 (${grouped.tvs.length})`} variant="none" className="mb-1" />
-                {grouped.tvs.map(renderItem)}
+                <ContentList>{grouped.tvs.map(renderItem)}</ContentList>
               </section>
             )}
             {grouped.persons.length > 0 && (
               <section className="mb-4">
                 <ListTitle title={`인물 (${grouped.persons.length})`} variant="none" className="mb-1" />
-                {grouped.persons.map(renderItem)}
+                <ContentList>{grouped.persons.map(renderItem)}</ContentList>
               </section>
             )}
           </>

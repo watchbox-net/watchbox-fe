@@ -78,14 +78,14 @@ export default function DevComponentsPage() {
               <li>높이: <code className="bg-neutral-200 px-1 rounded">50px</code> (검색: 60px)</li>
               <li>패딩: <code className="bg-neutral-200 px-1 rounded">px-10</code> <code className="bg-neutral-200 px-1 rounded">py-12</code></li>
               <li>타이틀: <code className="bg-neutral-200 px-1 rounded">wb-header-title</code> 16px/Bold</li>
-              <li>타이틀 색상: <code className="bg-neutral-200 px-1 rounded">wb-grey-04</code> #D9D9D9</li>
+              <li>타이틀 색상: <code className="bg-neutral-200 px-1 rounded">wb-white-02</code> #D9D9D9</li>
               <li>편집/완료: <code className="bg-neutral-200 px-1 rounded">wb-header-edit</code> 14px/Medium</li>
               <li>편집/완료 색상: <code className="bg-neutral-200 px-1 rounded">wb-primary</code> #F59E0B</li>
-              <li>아이콘: 24×24px, <code className="bg-neutral-200 px-1 rounded">wb-grey-04</code></li>
+              <li>아이콘: 24×24px, <code className="bg-neutral-200 px-1 rounded">wb-white-02</code></li>
               <li>알림↔검색 간격: 15px</li>
               <li>검색바: <code className="bg-neutral-200 px-1 rounded">wb-dark-05</code> h-36 rounded-10</li>
-              <li>검색 아이콘: 17×17px, <code className="bg-neutral-200 px-1 rounded">wb-grey-02</code></li>
-              <li>검색 텍스트: 15px/Regular, <code className="bg-neutral-200 px-1 rounded">wb-grey-02</code></li>
+              <li>검색 아이콘: 17×17px, <code className="bg-neutral-200 px-1 rounded">wb-grey-03</code></li>
+              <li>검색 텍스트: 15px/Regular, <code className="bg-neutral-200 px-1 rounded">wb-grey-03</code></li>
             </ul>
           </div>
           <div className="bg-neutral-50 rounded-lg p-4 text-xs">
@@ -150,7 +150,7 @@ export default function DevComponentsPage() {
         <div className="mx-auto w-[393px] bg-neutral-100 rounded-2xl overflow-hidden shadow-lg border border-neutral-200">
           {/* 가상 컨텐츠 영역 */}
           <div className="h-60 flex items-center justify-center bg-wb-dark-02">
-            <p className="text-wb-grey-02 text-sm">
+            <p className="text-wb-grey-03 text-sm">
               현재 경로: <span className="text-wb-white font-semibold">{activePath}</span>
             </p>
           </div>
@@ -217,7 +217,7 @@ export default function DevComponentsPage() {
             <div className="mx-auto w-[393px] bg-wb-dark-02 rounded-2xl overflow-hidden shadow-lg border border-neutral-200">
               <TabNav tabs={['Tab1', 'Tab2']} activeIndex={tab2} onChange={setTab2} />
               <div className="h-24 flex items-center justify-center">
-                <p className="text-wb-grey-02 text-sm">
+                <p className="text-wb-grey-03 text-sm">
                   활성: <span className="text-wb-white font-semibold">{['Tab1', 'Tab2'][tab2]}</span>
                 </p>
               </div>
@@ -245,7 +245,7 @@ export default function DevComponentsPage() {
             <div className="mx-auto w-[393px] bg-wb-dark-02 rounded-2xl overflow-hidden shadow-lg border border-neutral-200">
               <TabNav tabs={['Tab1', 'Tab2', 'Tab3']} activeIndex={tab3} onChange={setTab3} />
               <div className="h-24 flex items-center justify-center">
-                <p className="text-wb-grey-02 text-sm">
+                <p className="text-wb-grey-03 text-sm">
                   활성: <span className="text-wb-white font-semibold">{['Tab1', 'Tab2', 'Tab3'][tab3]}</span>
                 </p>
               </div>
@@ -273,7 +273,7 @@ export default function DevComponentsPage() {
             <div className="mx-auto w-[393px] bg-wb-dark-02 rounded-2xl overflow-hidden shadow-lg border border-neutral-200">
               <TabNav tabs={['Tab1', 'Tab2', 'Tab3', 'Tab4']} activeIndex={tab4} onChange={setTab4} />
               <div className="h-24 flex items-center justify-center">
-                <p className="text-wb-grey-02 text-sm">
+                <p className="text-wb-grey-03 text-sm">
                   활성: <span className="text-wb-white font-semibold">{['Tab1', 'Tab2', 'Tab3', 'Tab4'][tab4]}</span>
                 </p>
               </div>
@@ -289,10 +289,10 @@ export default function DevComponentsPage() {
               <li>각 탭: <code className="bg-neutral-200 px-1 rounded">flex-1</code> (균등 분할)</li>
               <li>패딩: <code className="bg-neutral-200 px-1 rounded">pt-9 pb-10 px-10</code></li>
               <li>텍스트: <code className="bg-neutral-200 px-1 rounded">wb-menu-tab</code> 16px/Medium</li>
-              <li>활성 텍스트: <code className="bg-neutral-200 px-1 rounded">wb-grey-04</code> #D9D9D9</li>
+              <li>활성 텍스트: <code className="bg-neutral-200 px-1 rounded">wb-white-02</code> #D9D9D9</li>
               <li>활성 보더: <code className="bg-neutral-200 px-1 rounded">wb-white</code> #FFFFFF</li>
-              <li>비활성 텍스트: <code className="bg-neutral-200 px-1 rounded">wb-grey-02</code> #A3A3A3</li>
-              <li>비활성 보더: <code className="bg-neutral-200 px-1 rounded">wb-grey-02</code> #A3A3A3</li>
+              <li>비활성 텍스트: <code className="bg-neutral-200 px-1 rounded">wb-grey-03</code> #A3A3A3</li>
+              <li>비활성 보더: <code className="bg-neutral-200 px-1 rounded">wb-grey-03</code> #A3A3A3</li>
               <li>2탭: 393/2 = 196.5px</li>
               <li>3탭: 393/3 = 131px</li>
               <li>4탭: 393/4 = 98.25px</li>

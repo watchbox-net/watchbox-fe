@@ -26,7 +26,7 @@ export default function WatchStatusMenu({
 }: WatchStatusMenuProps) {
   return (
     <div
-      className={`bg-wb-dark-05 rounded-[15px] w-[135px] py-[5px] flex flex-col ${className ?? ''}`}
+      className={`bg-wb-dark-05 rounded-[12px] w-[135px] py-[5px] flex flex-col ${className ?? ''}`}
     >
       {STATUS_ITEMS.map(({ status, label }, index) => (
         <button
@@ -40,7 +40,7 @@ export default function WatchStatusMenu({
           onClick={() => onSelect(status)}
         >
           <WatchStatusIcon status={status.toLowerCase() as 'completed' | 'watching' | 'planned' | 'paused'} size="medium" />
-          <span className="text-[14px] font-medium text-wb-grey-03 whitespace-nowrap">
+          <span className="text-[14px] font-medium text-wb-grey-04 whitespace-nowrap">
             {label}
           </span>
         </button>
@@ -53,8 +53,8 @@ export default function WatchStatusMenu({
           className="flex items-center h-[45px] w-full px-[16px] gap-[16px] cursor-pointer transition-colors hover:bg-wb-grey-01 rounded-b-[10px]"
           onClick={onDelete}
         >
-          <XMarkOutline className="size-[24px] text-wb-grey-03 shrink-0" />
-          <span className="text-[14px] font-medium text-wb-grey-03 whitespace-nowrap">
+          <XMarkOutline className="size-[24px] text-wb-grey-04 shrink-0" />
+          <span className="text-[14px] font-medium text-wb-grey-04 whitespace-nowrap">
             기록 삭제
           </span>
         </button>

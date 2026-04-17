@@ -12,9 +12,9 @@ interface ProfileIconProps {
 
 // ─── Variant config ─────────────────────────────────────────
 const VARIANT_STYLES: Record<ProfileIconVariant, string> = {
-  edit:   'size-[96px] text-wb-grey-03',
-  mypage: 'size-[72px] text-wb-grey-03',
-  list:   'size-[28px] text-wb-grey-03',
+  edit:   'size-[96px] text-wb-grey-04',
+  mypage: 'size-[72px] text-wb-grey-04',
+  list:   'size-[28px] text-wb-grey-04',
 };
 
 // ─── Component ──────────────────────────────────────────────

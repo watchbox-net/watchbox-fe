@@ -6,7 +6,10 @@ import Toast from '@/components/common/Toast';
 import MainContent from '@/components/common/MainContent';
 import Header from '@/components/common/Header';
 import ListTitle from '@/components/list/ListTitle';
-import MemberInviteListItem from '@/components/list/MemberInviteListItem';
+import MemberInvitationItem from '@/components/invite/MemberInvitationItem';
+import BoxInvitationReceivedItem from '@/components/invite/BoxInvitationReceivedItem';
+import BoxInvitationReceivedList from '@/components/invite/BoxInvitationReceivedList';
+import BoxInvitationSendedList from '@/components/invite/BoxInvitationSendedList';
 import {
   fetchReceivedInvitations,
   fetchSentInvitations,
@@ -83,7 +86,7 @@ export default function BoxInvitationsPage() {
 
       <MainContent>
         {loading && (
-          <p className="text-center text-wb-grey-02 py-8">불러오는 중...</p>
+          <p className="text-center text-wb-grey-03 py-8">불러오는 중...</p>
         )}
 
         {!loading && (
@@ -97,22 +100,21 @@ export default function BoxInvitationsPage() {
               />
 
               {pendingReceived.length === 0 ? (
-                <p className="pl-[16px] text-sm text-wb-grey-02">받은 초대가 없습니다.</p>
+                <p className="pl-[16px] text-sm text-wb-grey-03">받은 초대가 없습니다.</p>
               ) : (
-                <ul className="px-[16px] space-y-[15px]">
+                <BoxInvitationReceivedList>
                   {pendingReceived.map((inv) => (
-                    <MemberInviteListItem
+                    <BoxInvitationReceivedItem
                       key={inv.requestId}
-                      variant="invitation"
                       boxName={inv.sharedBox.name}
-                      boxMembers={inv.sharedBox.memberList?.map((m) => m.boxMemberName)}
+                      memberNames={inv.sharedBox.memberList?.map((m) => m.boxMemberName)}
                       posters={inv.sharedBox.previewPosterList}
                       inviterName={inv.sender}
                       onAccept={() => handleAccept(inv.requestId)}
                       onReject={() => handleReject(inv.requestId)}
                     />
                   ))}
-                </ul>
+                </BoxInvitationReceivedList>
               )}
             </section>
 
@@ -125,14 +127,14 @@ export default function BoxInvitationsPage() {
               />
 
               {sent.length === 0 ? (
-                <p className="pl-[16px] text-sm text-wb-grey-02">보낸 초대가 없습니다.</p>
+                <p className="pl-[16px] text-sm text-wb-grey-03">보낸 초대가 없습니다.</p>
               ) : (
-                <ul className="px-[16px]">
+                <BoxInvitationSendedList>
                   {sent.map((inv) => (
-                    <MemberInviteListItem
+                    <MemberInvitationItem
                       key={inv.requestId}
-                      variant="status"
-                      userName={inv.receiver}
+                      type="sended"
+                      receiverName={inv.receiver}
                       boxName={inv.sharedBoxTitle}
                       status={inv.status === 'REJECTED' ? 'rejected' : 'pending'}
                       onAction={
@@ -140,10 +142,9 @@ export default function BoxInvitationsPage() {
                           ? () => handleCancel(inv.requestId)
                           : () => handleDelete(inv.requestId)
                       }
-                      className="py-[10px]"
                     />
                   ))}
-                </ul>
+                </BoxInvitationSendedList>
               )}
             </section>
           </>

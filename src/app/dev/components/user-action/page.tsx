@@ -94,7 +94,7 @@ export default function UserActionComponentsPage() {
         {/* 스펙 */}
         <div className="bg-neutral-100 rounded-lg p-4 text-sm text-neutral-700 space-y-1">
           <p className="font-semibold text-black mb-2">디자인 스펙</p>
-          <p>배경 — bg-wb-grey-03 (#b1b1b1), rounded:18px</p>
+          <p>배경 — bg-wb-grey-04 (#b1b1b1), rounded:18px</p>
           <p>패딩 — pt:25px, pb:18px, px:23px, w:321px</p>
           <p>제목 — wb-modal-header (20px SemiBold), text-wb-dark-02</p>
           <p>본문 — wb-modal-body (16px Medium), text-wb-dark-05</p>
@@ -117,7 +117,7 @@ export default function UserActionComponentsPage() {
           <p className="font-semibold text-black mb-2">디자인 스펙</p>
           <p>배경 — bg-wb-dark-05 (#353535), rounded:15px, w:135px</p>
           <p>아이템 — h:45px, py:5px, gap:24px</p>
-          <p>텍스트 — 14px Medium, lh:24px, text-wb-grey-03</p>
+          <p>텍스트 — 14px Medium, lh:24px, text-wb-grey-04</p>
           <p>Hover — bg-wb-grey-01 (#525252), top/bottom rounded:10px</p>
           <p>아이콘 — WatchStatusIcon medium (24px)</p>
         </div>
@@ -157,9 +157,9 @@ export default function UserActionComponentsPage() {
           <p>배경 — bg-wb-dark-05 (#353535), rounded:15px</p>
           <p>사이즈 — small: min-w:110px / medium: min-w:137px</p>
           <p>아이템 — h:45px, px:16px, gap:24px</p>
-          <p>텍스트 — 14px Medium, lh:24px, text-wb-grey-03</p>
+          <p>텍스트 — 14px Medium, lh:24px, text-wb-grey-04</p>
           <p>Hover — bg-wb-grey-01 (#525252), top/bottom rounded:10px</p>
-          <p>아이콘 — heroicons outline 24px, text-wb-grey-03</p>
+          <p>아이콘 — heroicons outline 24px, text-wb-grey-04</p>
           <p>항목 — invite, edit, delete, add, help, info, notification, feedback</p>
         </div>
       </section>

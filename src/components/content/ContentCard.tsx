@@ -10,7 +10,7 @@ import Modal from '@/components/common/Modal';
 import Toast from '@/components/common/Toast';
 import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
 import { TMDB_POSTER } from '@/lib/utils/content';
-import type { WatchStatus } from '@/types/content';
+import type { WatchStatus } from '@/types/content-summary';
 import type { WatchStatus as IconWatchStatus } from '@/components/icons/WatchStatusIcon';
 
 const WATCH_STATUS_MAP: Record<string, IconWatchStatus> = {
@@ -120,7 +120,7 @@ export default function ContentCard({
             {rating != null ? rating.toFixed(1) : '-'}
           </span>
           <div className="flex items-center gap-[8px]">
-            <BoxIcon variant="none" size="small" className="cursor-pointer" onClick={() => setPreparingModalVisible(true)} />
+            <BoxIcon variant="outline" size="small" className="cursor-pointer" onClick={() => setPreparingModalVisible(true)} />
             <div ref={statusIconRef}>
               <WatchStatusIcon status={iconStatus} size="small" className="cursor-pointer" onClick={() => {
                 if (statusIconRef.current) {

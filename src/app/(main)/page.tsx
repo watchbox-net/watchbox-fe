@@ -8,7 +8,7 @@ import HorizontalScroll from '@/components/common/HorizontalScroll';
 import { fetchPopularMovieList, fetchTopRatedMovieList, fetchNowShowingMovieList, fetchTrendingMovieList } from '@/api/movie';
 import { fetchPopularTvList, fetchTopRatedTvList, fetchNowShowingTvList, fetchTrendingTvList } from '@/api/tv';
 import { getDisplayTitle } from '@/lib/utils/content';
-import type { ContentItem, ContentPageResponse, ContentSummary } from '@/types/content';
+import type { ContentItem, ContentPageResponse, ContentSummary } from '@/types/content-summary';
 import type { MovieSummary } from '@/types/movie';
 import type { TvSummary } from '@/types/tv';
 import Link from 'next/link';
@@ -68,7 +68,7 @@ function CardScroll<T extends MovieSummary | TvSummary>({
           href={`/content/${item.contentSummary.mediaType}/${item.contentSummary.tmdbId}`}
           tmdbId={item.contentSummary.tmdbId}
           mediaType={item.contentSummary.mediaType as 'MOVIE' | 'TV'}
-          recordId={item.contentRecordId}
+          recordId={item.memberRecord?.recordId ?? null}
         />
       ))}
     </HorizontalScroll>
@@ -92,7 +92,7 @@ function Section<T extends MovieSummary | TvSummary>({
       {items.length > 0 ? (
         <CardScroll items={items} scrollKey={href} />
       ) : (
-        <p className="text-sm text-wb-grey-02 px-[16px]">불러올 수 없습니다</p>
+        <p className="text-sm text-wb-grey-03 px-[16px]">불러올 수 없습니다</p>
       )}
     </section>
   );
@@ -110,14 +110,14 @@ export default async function HomePage() {
     <>
       <Header variant="center" />
       <MainContent>
-        <Section title="인기 영화" href="/discover/popular/movie" items={popularMovies} />
-        <Section title="인기 시리즈" href="/discover/popular/tv" items={popularTv} />
-        <Section title="높은 평점의 영화" href="/discover/top-rated/movie" items={topRatedMovies} />
-        <Section title="높은 평점의 시리즈" href="/discover/top-rated/tv" items={topRatedTv} />
-        <Section title="현재 상영중인 영화" href="/discover/now-showing/movie" items={nowShowingMovies} />
-        <Section title="현재 방영중인 시리즈" href="/discover/now-showing/tv" items={nowShowingTv} />
         <Section title="이번주 화제 영화" href="/discover/trending/movie" items={trendingMovies} />
         <Section title="이번주 화제 시리즈" href="/discover/trending/tv" items={trendingTv} />
+        <Section title="인기 영화" href="/discover/popular/movie" items={popularMovies} />
+        <Section title="인기 시리즈" href="/discover/popular/tv" items={popularTv} />
+        <Section title="현재 상영중인 영화" href="/discover/now-showing/movie" items={nowShowingMovies} />
+        <Section title="현재 방영중인 시리즈" href="/discover/now-showing/tv" items={nowShowingTv} />
+        <Section title="높은 평점의 영화" href="/discover/top-rated/movie" items={topRatedMovies} />
+        <Section title="높은 평점의 시리즈" href="/discover/top-rated/tv" items={topRatedTv} />
       </MainContent>
     </>
   );

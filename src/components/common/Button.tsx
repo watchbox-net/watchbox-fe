@@ -30,8 +30,8 @@ const VARIANT_STYLES: Record<ButtonVariant, string> = {
   off:    'bg-wb-dark-05 text-wb-grey-01',
   white:  'bg-wb-white-01 text-wb-dark-04',
   // modal
-  cancel: 'bg-wb-grey-01 text-wb-grey-03',
-  accept: 'bg-wb-dark-02 text-wb-grey-03',
+  cancel: 'bg-wb-grey-01 text-wb-grey-04',
+  accept: 'bg-wb-dark-02 text-wb-grey-04',
   invite: 'bg-wb-green text-wb-white-01',
   alert:  'bg-wb-red text-wb-white-01',
   // list

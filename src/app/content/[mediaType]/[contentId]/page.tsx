@@ -19,11 +19,11 @@ import { TMDB_POSTER, TMDB_BACKDROP } from '@/lib/utils/content';
 import type {
   ContentDetailResponse,
   ContentDetailMediaType,
-  DetailMemberRecord,
   MovieInfo,
   TvInfo,
 } from '@/types/content-detail';
-import type { WatchStatus } from '@/types/content';
+import type { MemberRecord } from '@/types/interaction';
+import type { WatchStatus } from '@/types/content-summary';
 
 // ─── mediaType별 표시 정보 추출 ─────────────────────────────
 function extractInfo(detail: ContentDetailResponse) {
@@ -80,8 +80,8 @@ function InfoRow({ label, value }: { label: string; value: string | null | undef
   if (!value) return null;
   return (
     <div className="flex gap-[20px] py-[7px]">
-      <span className="w-[51px] shrink-0 text-[14px] text-wb-grey-02">{label}</span>
-      <span className="text-[14px] text-wb-grey-04">{value}</span>
+      <span className="w-[51px] shrink-0 text-[14px] text-wb-grey-03">{label}</span>
+      <span className="text-[14px] text-wb-white-02">{value}</span>
     </div>
   );
 }
@@ -125,7 +125,7 @@ export default function ContentDetailPage() {
     fetchContentDetail(mediaType, tmdbId)
       .then((res) => {
         setDetail(res);
-        const mr: DetailMemberRecord | null = res.memberRecord;
+        const mr: MemberRecord | null = res.memberRecord;
         setLiked(mr?.liked === true);
         setRecordId(mr?.recordId ?? null);
         setWatchStatus(mr?.watchStatus ?? null);
@@ -185,7 +185,7 @@ export default function ContentDetailPage() {
     return (
       <MobileFrame>
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-wb-grey-02">불러오는 중...</p>
+          <p className="text-wb-grey-03">불러오는 중...</p>
         </div>
       </MobileFrame>
     );
@@ -195,7 +195,7 @@ export default function ContentDetailPage() {
     return (
       <MobileFrame>
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-wb-grey-02">오류가 발생했습니다.</p>
+          <p className="text-wb-grey-03">오류가 발생했습니다.</p>
         </div>
       </MobileFrame>
     );
@@ -230,7 +230,7 @@ export default function ContentDetailPage() {
             onClick={() => router.back()}
             className="absolute top-3 left-3 cursor-pointer"
           >
-            <ChevronLeftOutline className="size-6 text-wb-grey-04" />
+            <ChevronLeftOutline className="size-6 text-wb-white-02" />
           </button>
         </div>
 
@@ -248,10 +248,10 @@ export default function ContentDetailPage() {
               {info.titleKo}
             </h1>
             {info.titleOriginal && (
-              <p className="text-[11px] text-wb-grey-03 truncate">{info.titleOriginal}</p>
+              <p className="text-[11px] text-wb-grey-04 truncate">{info.titleOriginal}</p>
             )}
             {metaParts.length > 0 && (
-              <p className="text-[12px] text-wb-grey-03 mt-[2px]">{metaParts.join(' · ')}</p>
+              <p className="text-[12px] text-wb-grey-04 mt-[2px]">{metaParts.join(' · ')}</p>
             )}
           </div>
         </div>
@@ -259,7 +259,7 @@ export default function ContentDetailPage() {
         {/* ── 줄거리 ───────────────────────────────────── */}
         {info.overview && (
           <div className="px-[16px] mt-[20px]">
-            <p className="text-[13px] font-medium leading-[22px] text-wb-grey-03">
+            <p className="text-[13px] font-medium leading-[22px] text-wb-grey-04">
               {expanded ? info.overview : needsExpansion ? `${info.overview.slice(0, 100)}...` : info.overview}
               {needsExpansion && (
                 <button
@@ -284,7 +284,7 @@ export default function ContentDetailPage() {
             onClick={handleLike}
           >
             <LikeIcon size="xl" active={liked} />
-            <span className="text-[11px] text-wb-grey-04">좋아요</span>
+            <span className="text-[11px] text-wb-white-02">좋아요</span>
           </button>
 
           {/* 박스에 추가 */}
@@ -294,7 +294,7 @@ export default function ContentDetailPage() {
             onClick={() => setPreparingModalVisible(true)}
           >
             <BoxIcon size="xl" variant="none" />
-            <span className="text-[11px] text-wb-grey-04">박스 추가</span>
+            <span className="text-[11px] text-wb-white-02">박스 추가</span>
           </button>
 
           {/* 시청 상태 */}
@@ -306,7 +306,7 @@ export default function ContentDetailPage() {
             >
               <WatchStatusIcon size="xl" status={toIconStatus(watchStatus)} />
             </button>
-            <span className="text-[11px] text-wb-grey-04">시청 상태</span>
+            <span className="text-[11px] text-wb-white-02">시청 상태</span>
 
             {/* 시청 상태 메뉴 - 아이콘 아래로 */}
             {statusMenuOpen && (
@@ -337,7 +337,7 @@ export default function ContentDetailPage() {
         )}
         {activeTab === 1 && (
           <div className="px-[16px] pt-[20px]">
-            <p className="text-[14px] text-wb-grey-02 text-center py-8">준비 중입니다.</p>
+            <p className="text-[14px] text-wb-grey-03 text-center py-8">준비 중입니다.</p>
           </div>
         )}
 

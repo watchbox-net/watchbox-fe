@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/common/Header';
 import TabNav from '@/components/common/TabNav';
-import ContentListItem from '@/components/list/ContentListItem';
+import ContentItem from '@/components/list/ContentItem';
+import ContentList from '@/components/list/ContentList';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
 import Toast from '@/components/common/Toast';
 import { PlusOutline } from '@/components/icons';
@@ -15,7 +16,7 @@ import { fetchWatchStatusList } from '@/lib/api/record';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
 import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
-import type { ContentItem, WatchStatus } from '@/types/content';
+import type { ContentItem as ContentItemData, WatchStatus } from '@/types/content-summary';
 import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
 
 const TABS = [
@@ -72,7 +73,7 @@ export default function RecordPage() {
         );
 
   const handleStatusSelect = async (
-    item: ContentItem,
+    item: ContentItemData,
     status: Exclude<WatchStatus, 'NONE'>,
   ) => {
     setOpenMenuId(null);
@@ -80,33 +81,33 @@ export default function RecordPage() {
     if (summary.mediaType !== 'MOVIE' && summary.mediaType !== 'TV') return;
     const success = await changeStatus(summary.tmdbId, summary.mediaType, status);
     if (success) {
-      queryClient.setQueryData<ContentItem[]>(['watchStatusList'], (prev) =>
+      queryClient.setQueryData<ContentItemData[]>(['watchStatusList'], (prev) =>
         (prev ?? []).map((i) =>
-          (i.contentRecordId ?? i.contentSummary.tmdbId) ===
-          (item.contentRecordId ?? summary.tmdbId)
-            ? { ...i, memberRecord: { ...i.memberRecord, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
+          (i.memberRecord?.recordId ?? i.contentSummary.tmdbId) ===
+          (item.memberRecord?.recordId ?? summary.tmdbId)
+            ? { ...i, memberRecord: { recordId: i.memberRecord?.recordId ?? null, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
             : i,
         ),
       );
     }
   };
 
-  const handleDelete = async (item: ContentItem) => {
+  const handleDelete = async (item: ContentItemData) => {
     setOpenMenuId(null);
-    if (!item.contentRecordId) return;
-    const success = await deleteStatus(item.contentRecordId);
+    if (!item.memberRecord?.recordId) return;
+    const success = await deleteStatus(item.memberRecord.recordId);
     if (success) {
-      queryClient.setQueryData<ContentItem[]>(['watchStatusList'], (prev) =>
-        (prev ?? []).filter((i) => i.contentRecordId !== item.contentRecordId),
+      queryClient.setQueryData<ContentItemData[]>(['watchStatusList'], (prev) =>
+        (prev ?? []).filter((i) => i.memberRecord?.recordId !== item.memberRecord?.recordId),
       );
     }
   };
 
-  const renderItem = (item: ContentItem, idx: number, arr: ContentItem[]) => {
+  const renderItem = (item: ContentItemData, idx: number, arr: ContentItemData[]) => {
     const summary = item.contentSummary;
     const year = 'year' in summary ? summary.year : null;
     const genres = 'genreList' in summary ? summary.genreList : null;
-    const itemId = item.contentRecordId ?? summary.tmdbId;
+    const itemId = item.memberRecord?.recordId ?? summary.tmdbId;
     const isMenuOpen = openMenuId === itemId;
 
     const menu: ReactNode = isMenuOpen ? (
@@ -122,7 +123,7 @@ export default function RecordPage() {
     ) : null;
 
     return (
-      <ContentListItem
+      <ContentItem
         key={itemId}
         posterSrc={getImageUrl(summary)}
         title={getDisplayTitle(summary)}
@@ -130,7 +131,6 @@ export default function RecordPage() {
         genres={genres}
         watchStatus={item.memberRecord?.watchStatus ?? null}
         boxMode={{ mode: 'my', liked: item.memberRecord?.liked === true }}
-        showDivider={idx < arr.length - 1}
         onClick={() => router.push(`/content/${summary.mediaType}/${summary.tmdbId}`)}
         onStatusClick={(e) => {
           if (!authLoading && !isAuthenticated) { showLoginModal(); return; }
@@ -147,9 +147,8 @@ export default function RecordPage() {
   return (
     <>
       <Header
-        variant="icon1"
+        variant="center"
         title="시청 기록"
-        rightIcon={<PlusOutline className="size-6 text-wb-grey-04" />}
         onRightIconClick={() => {/* TODO: 추가 기능 */}}
       />
       <TabNav
@@ -164,7 +163,7 @@ export default function RecordPage() {
         )}
         {!authLoading && !loading && !isAuthenticated && (
           <div className="flex flex-col items-center gap-[16px] py-[60px]">
-            <p className="text-[16px] text-wb-grey-02">로그인이 필요한 페이지입니다.</p>
+            <p className="text-[16px] text-wb-grey-03">로그인이 필요한 페이지입니다.</p>
             <button
               type="button"
               onClick={() => router.push('/login')}
@@ -185,7 +184,7 @@ export default function RecordPage() {
           </p>
         )}
         {!loading && isAuthenticated && !error && filteredItems.length > 0 && (
-          <div>{filteredItems.map(renderItem)}</div>
+          <ContentList>{filteredItems.map(renderItem)}</ContentList>
         )}
       </MainContent>
 

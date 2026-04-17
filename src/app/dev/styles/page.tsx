@@ -145,9 +145,9 @@ const COLOR_GROUPS: ColorGroup[] = [
     description: '텍스트, 보조 텍스트, 구분선에 사용',
     colors: [
       { token: '--wb-grey-01', twClass: 'wb-grey-01', hex: '#525252', label: 'grey01' },
-      { token: '--wb-grey-02', twClass: 'wb-grey-02', hex: '#a3a3a3', label: 'grey02' },
-      { token: '--wb-grey-03', twClass: 'wb-grey-03', hex: '#b1b1b1', label: 'grey03' },
-      { token: '--wb-grey-04', twClass: 'wb-grey-04', hex: '#d9d9d9', label: 'grey04' },
+      { token: '--wb-grey-02', twClass: 'wb-grey-02', hex: '#7C7B7B', label: 'grey02' },
+      { token: '--wb-grey-03', twClass: 'wb-grey-03', hex: '#A3A3A3', label: 'grey03' },
+      { token: '--wb-grey-04', twClass: 'wb-grey-04', hex: '#B1B1B1', label: 'grey04' },
     ],
   },
   {
@@ -408,7 +408,7 @@ export default function DevStylesPage() {
         <h2 className="text-xl font-bold text-black mb-1">Color Palette</h2>
         <p className="text-sm text-neutral-500 mb-6">
           Figma Color Styles &mdash; <code className="bg-neutral-100 px-1 rounded text-xs">bg-wb-primary</code>,{' '}
-          <code className="bg-neutral-100 px-1 rounded text-xs">text-wb-grey-02</code> 형태로 사용
+          <code className="bg-neutral-100 px-1 rounded text-xs">text-wb-grey-03</code> 형태로 사용
         </p>
 
         <div className="space-y-8">
@@ -431,11 +431,11 @@ export default function DevStylesPage() {
         <div className="mt-6 bg-neutral-100 rounded-lg p-4 text-sm text-black">
           <p className="font-semibold mb-2">사용법</p>
           <pre className="overflow-x-auto text-xs">{`/* Tailwind 클래스 */
-bg-wb-primary        text-wb-grey-02       border-wb-dark-03
+bg-wb-primary        text-wb-grey-03       border-wb-dark-03
 
 /* CSS 변수 */
 background: var(--wb-primary);
-color: var(--wb-grey-02);`}</pre>
+color: var(--wb-grey-03);`}</pre>
         </div>
       </section>
 
@@ -497,7 +497,7 @@ color: var(--wb-grey-02);`}</pre>
           <p className="font-semibold mb-2">사용법</p>
           <pre className="overflow-x-auto text-xs">{`/* Tailwind @utility 클래스 (globals.css에 정의) */
 <h1 className="wb-header-title text-wb-white">제목</h1>
-<p className="wb-content-info text-wb-grey-02">부제</p>
+<p className="wb-content-info text-wb-grey-03">부제</p>
 <span className="wb-menu-bottombar">탭 라벨</span>`}</pre>
         </div>
       </section>

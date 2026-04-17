@@ -82,24 +82,24 @@ export default function Header({
       {/* 뒤로가기 */}
       {hasBack && (
         <button type="button" onClick={handleBack} className="shrink-0">
-          <ChevronLeftOutline className="size-6 text-wb-grey-04" />
+          <ChevronLeftOutline className="size-6 text-wb-white-02" />
         </button>
       )}
 
       {/* ── 타이틀 헤더 (비검색 variants) ── */}
       {!isSearch && (
         <>
-          <p className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 wb-header-title text-wb-grey-04 whitespace-nowrap">
+          <p className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 wb-header-title text-wb-white-02 whitespace-nowrap">
             {title}
           </p>
 
           {(variant === 'icon2' || variant === 'icon2-back') && (
             <div className="ml-auto flex items-center gap-[15px]">
               <button type="button" onClick={onAlarm}>
-                <BellSolid className="size-6 text-wb-grey-04" />
+                <BellSolid className="size-6 text-wb-white-02" />
               </button>
               <button type="button" onClick={onSearch}>
-                <MagnifyingGlassOutline className="size-6 text-wb-grey-04" />
+                <MagnifyingGlassOutline className="size-6 text-wb-white-02" />
               </button>
             </div>
           )}
@@ -111,7 +111,7 @@ export default function Header({
               </div>
             ) : (
               <button type="button" onClick={onRightIconClick ?? onSearch} className="ml-auto">
-                <MagnifyingGlassOutline className="size-6 text-wb-grey-04" />
+                <MagnifyingGlassOutline className="size-6 text-wb-white-02" />
               </button>
             )
           )}
@@ -133,7 +133,7 @@ export default function Header({
       {/* ── 검색바 (검색 variants) ── */}
       {isSearch && variant === 'search-after' && (
         <div className="bg-wb-dark-05 flex items-center h-[36px] pl-4 pr-3 rounded-[10px] flex-1">
-          <MagnifyingGlassOutline className="size-[17px] text-wb-grey-02 shrink-0" />
+          <MagnifyingGlassOutline className="size-[17px] text-wb-grey-03 shrink-0" />
           <input
             type="text"
             value={searchValue ?? ''}
@@ -141,11 +141,11 @@ export default function Header({
             onKeyDown={(e) => e.key === 'Enter' && onSearchSubmit?.()}
             placeholder={searchPlaceholder}
             autoFocus
-            className="flex-1 ml-[9px] bg-transparent text-wb-grey-04 placeholder:text-wb-grey-02 text-[15px] font-normal leading-none outline-none"
+            className="flex-1 ml-[9px] bg-transparent text-wb-white-02 placeholder:text-wb-grey-03 text-[15px] font-normal leading-none outline-none"
           />
           {searchValue && (
             <button type="button" onClick={onSearchClear} className="shrink-0 ml-1">
-              <XCircleSolid className="size-[15px] text-wb-grey-02" />
+              <XCircleSolid className="size-[15px] text-wb-grey-03" />
             </button>
           )}
         </div>
@@ -157,8 +157,8 @@ export default function Header({
           onClick={onSearchBarClick}
           className="bg-wb-dark-05 flex items-center h-[36px] pl-4 pr-3 rounded-[10px] flex-1 text-left"
         >
-          <MagnifyingGlassOutline className="size-[17px] text-wb-grey-02 shrink-0" />
-          <span className="ml-[9px] text-wb-grey-02 text-[15px] font-normal leading-none whitespace-nowrap">
+          <MagnifyingGlassOutline className="size-[17px] text-wb-grey-03 shrink-0" />
+          <span className="ml-[9px] text-wb-grey-03 text-[15px] font-normal leading-none whitespace-nowrap">
             {searchPlaceholder}
           </span>
         </button>

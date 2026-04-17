@@ -1,6 +1,6 @@
 import { publicApi } from './client';
 import type { ApiResponse } from '@/types/api';
-import type { ContentPageResponse } from '@/types/content';
+import type { ContentPageResponse } from '@/types/content-summary';
 
 /** Discover 카테고리별 컨텐츠 목록 조회 (BFF 프록시 경유) */
 export async function fetchDiscoverList(

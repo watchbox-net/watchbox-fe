@@ -54,7 +54,7 @@ export default function ContextMenu({ items, size = 'small', className }: Contex
 
   return (
     <div
-      className={`bg-wb-dark-05 rounded-[15px] ${SIZE_CLASS[size]} py-[5px] flex flex-col ${className ?? ''}`}
+      className={`bg-wb-dark-05 rounded-[12px] ${SIZE_CLASS[size]} py-[5px] flex flex-col ${className ?? ''}`}
     >
       {items.map((item, index) => {
         const preset = PRESETS[item.type];
@@ -81,8 +81,8 @@ export default function ContextMenu({ items, size = 'small', className }: Contex
             onMouseLeave={() => setHoveredIndex(null)}
             onClick={item.onClick}
           >
-            <Icon className="size-[24px] text-wb-grey-03 shrink-0" />
-            <span className="text-[14px] font-medium leading-[24px] tracking-[0.1px] text-wb-grey-03 whitespace-nowrap">
+            <Icon className="size-[24px] text-wb-grey-04 shrink-0" />
+            <span className="text-[14px] font-medium leading-[24px] tracking-[0.1px] text-wb-grey-04 whitespace-nowrap">
               {label}
             </span>
           </button>

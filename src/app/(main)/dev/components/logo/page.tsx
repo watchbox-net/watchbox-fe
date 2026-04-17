@@ -9,7 +9,7 @@ export default function DevLogoPage() {
 
       {/* LogoWide */}
       <section className="mb-10">
-        <h2 className="text-lg font-semibold text-wb-grey-02 mb-4">LogoWide</h2>
+        <h2 className="text-lg font-semibold text-wb-grey-03 mb-4">LogoWide</h2>
         <div className="flex flex-col gap-6">
           {/* 다크 배경 */}
           <div className="bg-wb-dark-01 rounded-[12px] p-8 flex items-center justify-center">

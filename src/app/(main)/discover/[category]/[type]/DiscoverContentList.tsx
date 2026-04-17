@@ -3,7 +3,8 @@
 import { useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import ContentListItem from '@/components/list/ContentListItem';
+import ContentItem from '@/components/list/ContentItem';
+import ContentList from '@/components/list/ContentList';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
 import Toast from '@/components/common/Toast';
 import { useAuth } from '@/lib/context/AuthContext';
@@ -11,10 +12,10 @@ import { useLoginModal } from '@/lib/context/LoginModalContext';
 import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
 import { deleteWatchRecord } from '@/lib/api/record';
 import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
-import type { ContentItem, WatchStatus } from '@/types/content';
+import type { ContentItem as ContentItemData, WatchStatus } from '@/types/content-summary';
 
 interface DiscoverContentListProps {
-  items: ContentItem[];
+  items: ContentItemData[];
 }
 
 export default function DiscoverContentList({ items: initialItems }: DiscoverContentListProps) {
@@ -33,7 +34,7 @@ export default function DiscoverContentList({ items: initialItems }: DiscoverCon
   const { changeStatus } = useWatchStatus({ showToast });
 
   const handleStatusSelect = async (
-    item: ContentItem,
+    item: ContentItemData,
     status: Exclude<WatchStatus, 'NONE'>,
   ) => {
     setOpenMenuId(null);
@@ -44,22 +45,22 @@ export default function DiscoverContentList({ items: initialItems }: DiscoverCon
       setItems((prev) =>
         prev.map((i) =>
           i.contentSummary.tmdbId === summary.tmdbId
-            ? { ...i, memberRecord: { ...i.memberRecord, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
+            ? { ...i, memberRecord: { recordId: i.memberRecord?.recordId ?? null, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
             : i,
         ),
       );
     }
   };
 
-  const handleDelete = async (item: ContentItem) => {
+  const handleDelete = async (item: ContentItemData) => {
     setOpenMenuId(null);
-    if (!item.contentRecordId) return;
+    if (!item.memberRecord?.recordId) return;
     try {
-      await deleteWatchRecord(item.contentRecordId);
+      await deleteWatchRecord(item.memberRecord.recordId);
       setItems((prev) =>
         prev.map((i) =>
           i.contentSummary.tmdbId === item.contentSummary.tmdbId
-            ? { ...i, memberRecord: null, contentRecordId: null }
+            ? { ...i, memberRecord: null }
             : i,
         ),
       );
@@ -69,8 +70,8 @@ export default function DiscoverContentList({ items: initialItems }: DiscoverCon
 
   return (
     <>
-      <div>
-        {items.map((item, idx) => {
+      <ContentList>
+        {items.map((item) => {
           const summary = item.contentSummary;
           const year = 'year' in summary ? summary.year : null;
           const genres = 'genreList' in summary ? summary.genreList : null;
@@ -90,7 +91,7 @@ export default function DiscoverContentList({ items: initialItems }: DiscoverCon
           ) : null;
 
           return (
-            <ContentListItem
+            <ContentItem
               key={itemId}
               posterSrc={getImageUrl(summary)}
               title={getDisplayTitle(summary)}
@@ -98,7 +99,6 @@ export default function DiscoverContentList({ items: initialItems }: DiscoverCon
               genres={genres}
               watchStatus={item.memberRecord?.watchStatus ?? null}
               boxMode={item.memberRecord?.liked != null ? { mode: 'my', liked: item.memberRecord.liked } : undefined}
-              showDivider={idx < items.length - 1}
               onClick={() => router.push(`/content/${summary.mediaType}/${summary.tmdbId}`)}
               onStatusClick={(e) => {
                 if (!authLoading && !isAuthenticated) { showLoginModal(); return; }
@@ -111,7 +111,7 @@ export default function DiscoverContentList({ items: initialItems }: DiscoverCon
             />
           );
         })}
-      </div>
+      </ContentList>
 
       <Toast
         message={toast.message}

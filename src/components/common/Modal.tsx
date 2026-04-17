@@ -60,7 +60,7 @@ export default function Modal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-wb-black/50">
-      <div className="bg-wb-grey-03 rounded-[18px] pt-[25px] pb-[18px] px-[23px] w-[321px]">
+      <div className="bg-wb-grey-04 rounded-[18px] pt-[25px] pb-[18px] px-[23px] w-[321px]">
         <div className="flex flex-col gap-[30px]">
           {/* Text Content */}
           <div className="flex flex-col gap-[14px]">

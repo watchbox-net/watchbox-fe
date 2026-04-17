@@ -6,7 +6,7 @@ import MainContent from '@/components/common/MainContent';
 import { fetchPopularMovieList, fetchTopRatedMovieList, fetchNowShowingMovieList, fetchTrendingMovieList } from '@/api/movie';
 import { fetchPopularTvList, fetchTopRatedTvList, fetchNowShowingTvList, fetchTrendingTvList } from '@/api/tv';
 import { notFound } from 'next/navigation';
-import type { ContentItem } from '@/types/content';
+import type { ContentItem } from '@/types/content-summary';
 
 interface PageProps {
   params: Promise<{

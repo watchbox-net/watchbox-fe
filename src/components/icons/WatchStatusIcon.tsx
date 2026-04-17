@@ -28,9 +28,9 @@ const STATUS_COLORS: Record<WatchStatus, string> = {
   completed: 'text-wb-green',
   watching:  'text-wb-orange',
   planned:   'text-wb-purple',
-  paused:    'text-wb-dark-04',
+  paused:    'text-wb-grey-02',
   none:      'text-wb-grey-01',
-  outline:   'text-wb-grey-03',
+  outline:   'text-wb-grey-01',
 };
 
 // ─── Component ──────────────────────────────────────────────

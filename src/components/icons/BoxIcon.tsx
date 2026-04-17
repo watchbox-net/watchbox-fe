@@ -25,9 +25,9 @@ const SIZE_CLASSES: Record<BoxIconSize, string> = {
 
 // ─── Variant → Color class ──────────────────────────────────
 const VARIANT_COLORS: Record<BoxIconVariant, string> = {
-  added:   'text-wb-grey-04',
+  added:   'text-wb-grey-03',
   none:    'text-wb-grey-01',
-  outline: 'text-wb-grey-03',
+  outline: 'text-wb-grey-01',
 };
 
 // ─── Component ──────────────────────────────────────────────

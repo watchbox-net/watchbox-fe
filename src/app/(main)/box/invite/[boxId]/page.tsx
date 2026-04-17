@@ -7,7 +7,8 @@ import Modal from '@/components/common/Modal';
 import MainContent from '@/components/common/MainContent';
 import Header from '@/components/common/Header';
 import ListTitle from '@/components/list/ListTitle';
-import MemberInviteListItem from '@/components/list/MemberInviteListItem';
+import MemberInvitationItem from '@/components/invite/MemberInvitationItem';
+import SearchedMemberList from '@/components/invite/SearchedMemberList';
 import { MagnifyingGlassOutline, XCircleSolid } from '@/components/icons';
 import { searchMembers, inviteToBox } from '@/lib/api/member';
 import { fetchBox } from '@/lib/api/box';
@@ -110,17 +111,17 @@ export default function BoxInvitePage() {
               variant="none"
               className="pl-[16px] pr-[12px] mb-[25px]"
             />
-            <ul className="px-[16px]">
+            <SearchedMemberList>
               {results.map((member) => (
-                <MemberInviteListItem
+                <MemberInvitationItem
                   key={member.memberId}
-                  variant="search"
+                  type="searched"
                   name={member.nickname}
                   added={isAdded(member)}
                   onAdd={() => setConfirmTarget({ memberId: member.memberId, nickname: member.nickname })}
                 />
               ))}
-            </ul>
+            </SearchedMemberList>
           </>
         )}
       </MainContent>

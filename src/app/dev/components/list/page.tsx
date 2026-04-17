@@ -1,11 +1,9 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import ListTitle from '@/components/list/ListTitle';
-import ContentListItem from '@/components/list/ContentListItem';
+import ContentItem from '@/components/list/ContentItem';
 import ContentCard from '@/components/content/ContentCard';
-import MemberInviteListItem from '@/components/list/MemberInviteListItem';
 import TriplePosterBox from '@/components/box/TriplePosterBox';
 import HatMedium from '@/components/box/HatMedium';
 import HatSmall from '@/components/box/HatSmall';
@@ -18,11 +16,6 @@ const SAMPLE_POSTER2 = 'https://image.tmdb.org/t/p/w185/ib6v6qUXzez1x2qIOLN7C0yJ
 const SAMPLE_POSTER3 = 'https://image.tmdb.org/t/p/w185/l18o0AK18KS118tWeROOKYkF0ng.jpg'; // 아바타 불과 재
 
 export default function ListComponentsPage() {
-  // MemberInviteListItem - search 상태 관리 (1번 인덱스는 초기에 checked)
-  const [addedIds, setAddedIds] = useState<Set<number>>(new Set([1]));
-  const toggle = (id: number) =>
-    setAddedIds((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
-
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-10">
       <div className="flex items-center gap-3">
@@ -50,7 +43,7 @@ export default function ListComponentsPage() {
         </div>
       </section>
 
-      {/* ── ContentListItem ─────────────────── */}
+      {/* ── ContentItem ─────────────────── */}
       <section>
         <h2 className="text-xl font-bold text-black mb-4">Content List Item</h2>
 
@@ -58,34 +51,33 @@ export default function ListComponentsPage() {
         <div className="mb-6">
           <p className="text-sm font-semibold text-neutral-600 mb-2">마이 박스 (liked 표시)</p>
           <div className="bg-wb-dark-02 rounded-lg">
-            <ContentListItem
+            <ContentItem
               title="더 립"
               year={2025}
               genres={['액션', '스릴러', '범죄']}
               watchStatus="WATCHING"
               boxMode={{ mode: 'my', liked: false }}
             />
-            <ContentListItem
+            <ContentItem
               title="주토피아 2"
               year={2025}
               genres={['애니메이션', '코미디', '모험']}
               watchStatus="WATCHING"
               boxMode={{ mode: 'my', liked: true }}
             />
-            <ContentListItem
+            <ContentItem
               title="아바타: 불과 재"
               year={2025}
               genres={['SF', '모험', '판타지']}
               watchStatus="PLANNED"
               boxMode={{ mode: 'my', liked: false }}
             />
-            <ContentListItem
+            <ContentItem
               title="프레데터: 죽음의 땅"
               year={2025}
               genres={['액션', 'SF', '모험']}
               watchStatus="COMPLETED"
               boxMode={{ mode: 'my', liked: true }}
-              showDivider={false}
             />
           </div>
         </div>
@@ -94,113 +86,30 @@ export default function ListComponentsPage() {
         <div className="mb-6">
           <p className="text-sm font-semibold text-neutral-600 mb-2">공유 박스 (공유 멤버 표시)</p>
           <div className="bg-wb-dark-02 rounded-lg">
-            <ContentListItem
+            <ContentItem
               title="더 립"
               year={2025}
               genres={['액션', '스릴러', '범죄']}
               watchStatus="PLANNED"
               boxMode={{ mode: 'shared', publishers: ['사용자A', '사용자B'] }}
             />
-            <ContentListItem
+            <ContentItem
               title="주토피아 2"
               year={2025}
               genres={['애니메이션', '코미디', '모험']}
               watchStatus="WATCHING"
               boxMode={{ mode: 'shared', publishers: ['사용자A', '사용자B'] }}
             />
-            <ContentListItem
+            <ContentItem
               title="스폰지밥 무비: 네모바지를 찾아서"
               year={2025}
               genres={['애니메이션', '가족', '코미디']}
               watchStatus="PLANNED"
               boxMode={{ mode: 'shared', publishers: ['사용자A'] }}
-              showDivider={false}
             />
           </div>
         </div>
 
-      </section>
-
-      {/* ── MemberInviteListItem ────────────────── */}
-      <section>
-        <h2 className="text-xl font-bold text-black mb-4">Member Invite List Item</h2>
-
-        {/* search */}
-        <div className="mb-6">
-          <p className="text-sm font-semibold text-neutral-600 mb-2">Searched Member List</p>
-          <div className="bg-wb-dark-02 rounded-lg px-[16px]">
-            {['너구리 1', '너구리 2', '너구리 3', '너구리 4', '너구리 5'].map((name, i) => (
-              <MemberInviteListItem
-                key={i}
-                variant="search"
-                name={name}
-                added={addedIds.has(i)}
-                onAdd={() => toggle(i)}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* invitation */}
-        <div className="mb-6">
-          <p className="text-sm font-semibold text-neutral-600 mb-2">Member Invitation List</p>
-          <div className="bg-wb-dark-02 rounded-lg px-[16px] space-y-[15px] py-[12px]">
-            <MemberInviteListItem
-              variant="invitation"
-              boxName="너구리와 해달의 공유 박스"
-              boxMembers={['너구리', '해달']}
-              inviterName="너구리"
-              onAccept={() => alert('수락')}
-              onReject={() => alert('거절')}
-            />
-            <MemberInviteListItem
-              variant="invitation"
-              boxName="오리와 해달의 공유 박스"
-              boxMembers={['오리', '해달']}
-              inviterName="오리"
-              onAccept={() => alert('수락')}
-              onReject={() => alert('거절')}
-            />
-          </div>
-        </div>
-
-        {/* status */}
-        <div className="mb-6">
-          <p className="text-sm font-semibold text-neutral-600 mb-2">Invitation Status List</p>
-          <div className="bg-wb-dark-02 rounded-lg px-[16px]">
-            <MemberInviteListItem
-              variant="status"
-              userName="사용자A"
-              boxName="공유 박스A"
-              status="pending"
-              onAction={() => alert('취소')}
-              className=""
-            />
-            <MemberInviteListItem
-              variant="status"
-              userName="사용자B"
-              boxName="공유 박스A"
-              status="pending"
-              onAction={() => alert('취소')}
-              className=""
-            />
-            <MemberInviteListItem
-              variant="status"
-              userName="사용자C"
-              boxName="공유 박스A"
-              status="rejected"
-              onAction={() => alert('삭제')}
-              className=""
-            />
-            <MemberInviteListItem
-              variant="status"
-              userName="사용자A"
-              boxName="공유 박스B"
-              status="pending"
-              onAction={() => alert('취소')}
-            />
-          </div>
-        </div>
       </section>
 
       {/* ── Hat (TriplePosterBox 모자) ───────────── */}

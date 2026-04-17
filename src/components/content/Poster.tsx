@@ -3,7 +3,7 @@
 import Image from 'next/image';
 
 // ─── Types ──────────────────────────────────────────────────
-export type PosterSize = 'large' | 'medium' | 'small';
+export type PosterSize = 'large' | 'medium' | 'small' | 'xsmall';
 
 interface PosterProps {
   /** 포스터 이미지 URL (없으면 placeholder) */
@@ -17,7 +17,8 @@ interface PosterProps {
 const SIZE_MAP: Record<PosterSize, { width: number; height: number; radius: string }> = {
   large:  { width: 140, height: 199, radius: 'rounded-[10px]' },
   medium: { width: 115, height: 163, radius: 'rounded-[10px]' },
-  small:  { width: 60,  height: 90,  radius: 'rounded-[5px]' },
+  small:  { width: 60,  height: 85,  radius: 'rounded-[5px]' },
+  xsmall: { width: 50,  height: 71,  radius: 'rounded-[5px]' },
 };
 
 // ─── Component ──────────────────────────────────────────────

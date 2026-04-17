@@ -11,8 +11,8 @@ export interface BoxMemberResponse {
   role: BoxMemberRole;
 }
 
-/** 통합 박스 응답 */
-export interface BoxResponse {
+/** 박스 아이템 (백엔드 BoxItem 대응) */
+export interface BoxItem {
   boxId: number;
   name: string;
   description: string | null;
@@ -55,6 +55,6 @@ export type BoxUpdateResponse = BoxCreateResponse;
 
 /** 박스 리스트 응답 (마이 + 공유 통합) */
 export interface BoxPageResponse {
-  boxList: BoxResponse[];
+  boxItemList: BoxItem[];
   boxCount: number;
 }

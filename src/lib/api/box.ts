@@ -1,7 +1,7 @@
 import { privateApi } from './client';
 import type {
   BoxPageResponse,
-  BoxResponse,
+  BoxItem,
   BoxCreateRequest,
   BoxCreateResponse,
   BoxUpdateRequest,
@@ -19,8 +19,8 @@ export async function fetchBoxList(): Promise<BoxPageResponse> {
 }
 
 /** 박스 단일 조회 */
-export async function fetchBox(boxId: number): Promise<BoxResponse> {
-  const { data } = await privateApi.get<ApiResponse<BoxResponse>>(
+export async function fetchBox(boxId: number): Promise<BoxItem> {
+  const { data } = await privateApi.get<ApiResponse<BoxItem>>(
     `/boxes/${boxId}`,
   );
   return data.data;

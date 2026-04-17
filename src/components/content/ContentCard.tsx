@@ -120,7 +120,7 @@ export default function ContentCard({
             {rating != null ? rating.toFixed(1) : '-'}
           </span>
           <div className="flex items-center gap-[8px]">
-            <BoxIcon variant="none" size="small" className="cursor-pointer" onClick={() => setPreparingModalVisible(true)} />
+            <BoxIcon variant="outline" size="small" className="cursor-pointer" onClick={() => setPreparingModalVisible(true)} />
             <div ref={statusIconRef}>
               <WatchStatusIcon status={iconStatus} size="small" className="cursor-pointer" onClick={() => {
                 if (statusIconRef.current) {

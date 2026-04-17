@@ -26,7 +26,7 @@ export default function WatchStatusMenu({
 }: WatchStatusMenuProps) {
   return (
     <div
-      className={`bg-wb-dark-05 rounded-[15px] w-[135px] py-[5px] flex flex-col ${className ?? ''}`}
+      className={`bg-wb-dark-05 rounded-[12px] w-[135px] py-[5px] flex flex-col ${className ?? ''}`}
     >
       {STATUS_ITEMS.map(({ status, label }, index) => (
         <button

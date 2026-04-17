@@ -77,7 +77,14 @@ export default function BoxContentsPage() {
       queryClient.setQueryData<ContentItem[]>(['boxContents', boxId, boxType], (prev) =>
         (prev ?? []).map((i) =>
           i.contentSummary.tmdbId === summary.tmdbId
-            ? { ...i, memberRecord: { ...i.memberRecord, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
+            ? {
+                ...i,
+                memberRecord: {
+                  recordId: i.memberRecord?.recordId ?? null,
+                  liked: i.memberRecord?.liked ?? null,
+                  watchStatus: status,
+                },
+              }
             : i,
         ),
       );

@@ -28,7 +28,7 @@ export default function StatusMenu({ className, onSelect }: StatusMenuProps) {
 
   return (
     <div
-      className={`bg-wb-dark-05 rounded-[15px] w-[135px] py-[5px] flex flex-col ${className ?? ''}`}
+      className={`bg-wb-dark-05 rounded-[12px] w-[135px] py-[5px] flex flex-col ${className ?? ''}`}
     >
       {MENU_ITEMS.map((item, index) => {
         const isHovered = hoveredIndex === index;

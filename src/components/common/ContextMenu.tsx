@@ -54,7 +54,7 @@ export default function ContextMenu({ items, size = 'small', className }: Contex
 
   return (
     <div
-      className={`bg-wb-dark-05 rounded-[15px] ${SIZE_CLASS[size]} py-[5px] flex flex-col ${className ?? ''}`}
+      className={`bg-wb-dark-05 rounded-[12px] ${SIZE_CLASS[size]} py-[5px] flex flex-col ${className ?? ''}`}
     >
       {items.map((item, index) => {
         const preset = PRESETS[item.type];

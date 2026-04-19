@@ -1,11 +1,13 @@
 import MobileFrame from '@/components/common/MobileFrame';
-import BottomMenu from '@/components/common/BottomMenu';
+import BottomNav from '@/components/common/BottomNav';
+import PathTracker from '@/components/common/PathTracker';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <MobileFrame>
+      <PathTracker />
       {children}
-      <BottomMenu />
+      <BottomNav />
     </MobileFrame>
   );
 }

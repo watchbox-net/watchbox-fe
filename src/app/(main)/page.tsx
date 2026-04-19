@@ -11,7 +11,6 @@ import { getDisplayTitle } from '@/lib/utils/content';
 import type { ContentItem, ContentPageResponse, ContentSummary } from '@/types/content-summary';
 import type { MovieSummary } from '@/types/movie';
 import type { TvSummary } from '@/types/tv';
-import Link from 'next/link';
 import { cookies } from 'next/headers';
 
 async function loadSections() {
@@ -69,6 +68,8 @@ function CardScroll<T extends MovieSummary | TvSummary>({
           tmdbId={item.contentSummary.tmdbId}
           mediaType={item.contentSummary.mediaType as 'MOVIE' | 'TV'}
           recordId={item.memberRecord?.recordId ?? null}
+          year={item.contentSummary.year}
+          genres={item.contentSummary.genreList}
         />
       ))}
     </HorizontalScroll>
@@ -86,9 +87,7 @@ function Section<T extends MovieSummary | TvSummary>({
 }) {
   return (
     <section className="mb-6">
-      <Link href={href}>
-        <ListTitle title={title} variant="arrow" className="py-[12px]" />
-      </Link>
+      <ListTitle title={title} variant="arrow" href={href} className="py-[12px]" />
       {items.length > 0 ? (
         <CardScroll items={items} scrollKey={href} />
       ) : (
@@ -110,8 +109,8 @@ export default async function HomePage() {
     <>
       <Header variant="center" />
       <MainContent>
-        <Section title="이번주 화제 영화" href="/discover/trending/movie" items={trendingMovies} />
-        <Section title="이번주 화제 시리즈" href="/discover/trending/tv" items={trendingTv} />
+        <Section title="이번주 트렌드 영화" href="/discover/trending/movie" items={trendingMovies} />
+        <Section title="이번주 트렌드 시리즈" href="/discover/trending/tv" items={trendingTv} />
         <Section title="인기 영화" href="/discover/popular/movie" items={popularMovies} />
         <Section title="인기 시리즈" href="/discover/popular/tv" items={popularTv} />
         <Section title="현재 상영중인 영화" href="/discover/now-showing/movie" items={nowShowingMovies} />

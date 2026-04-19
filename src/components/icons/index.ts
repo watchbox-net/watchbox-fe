@@ -27,9 +27,8 @@ export {
   BellSlashIcon as BellSlashOutline,
   CheckIcon as CheckOutline,
   CheckCircleIcon as CheckCircleOutline,
-  ChevronDownIcon as ChevronDownOutline,
-  ChevronLeftIcon as ChevronLeftOutline,
-  ChevronRightIcon as ChevronRightOutline,
+  // ChevronDown → 아래에서 strokeWidth=0.5 래핑
+  // ChevronLeft, ChevronRight → 아래에서 strokeWidth=2 래핑
   ChevronUpIcon as ChevronUpOutline,
   Cog6ToothIcon as Cog6ToothOutline,
   Cog8ToothIcon as Cog8ToothOutline,
@@ -75,13 +74,27 @@ export {
 } from '@heroicons/react/24/outline';
 
 import React from 'react';
-import { PlusIcon as _PlusIcon, XMarkIcon as _XMarkIcon } from '@heroicons/react/24/outline';
+import {
+  PlusIcon as _PlusIcon,
+  XMarkIcon as _XMarkIcon,
+  ChevronLeftIcon as _ChevronLeftIcon,
+  ChevronRightIcon as _ChevronRightIcon,
+  ChevronDownIcon as _ChevronDownIcon,
+} from '@heroicons/react/24/outline';
 
-// Plus, XMark 기본 strokeWidth=2
+// Plus, XMark, ChevronLeft, ChevronRight 기본 strokeWidth=2
 export const PlusOutline = ((props: React.ComponentProps<typeof _PlusIcon>) =>
   React.createElement(_PlusIcon, { strokeWidth: 2, ...props })) as typeof _PlusIcon;
 export const XMarkOutline = ((props: React.ComponentProps<typeof _XMarkIcon>) =>
   React.createElement(_XMarkIcon, { strokeWidth: 2, ...props })) as typeof _XMarkIcon;
+export const ChevronLeftOutline = ((props: React.ComponentProps<typeof _ChevronLeftIcon>) =>
+  React.createElement(_ChevronLeftIcon, { strokeWidth: 2, ...props })) as typeof _ChevronLeftIcon;
+export const ChevronRightOutline = ((props: React.ComponentProps<typeof _ChevronRightIcon>) =>
+  React.createElement(_ChevronRightIcon, { strokeWidth: 2, ...props })) as typeof _ChevronRightIcon;
+
+// ChevronDown 기본 strokeWidth=0.5
+export const ChevronDownOutline = ((props: React.ComponentProps<typeof _ChevronDownIcon>) =>
+  React.createElement(_ChevronDownIcon, { strokeWidth: 0.5, ...props })) as typeof _ChevronDownIcon;
 
 // ─── Solid (24x24 fill) ─────────────────────────────────────
 export {
@@ -138,11 +151,8 @@ export const SolidIcons = _Solid;
 export { default as WatchStatusIcon } from './WatchStatusIcon';
 export { default as LikeIcon } from './LikeIcon';
 export { default as BoxIcon } from './BoxIcon';
-export { default as DeleteIcon } from './DeleteIcon';
-export { default as AddedStatusIcon } from './AddedStatusIcon';
 export { default as ProfileIcon } from './ProfileIcon';
 export { default as GoogleCircleLogo } from './GoogleCircleLogo';
-export { default as LogoWide } from './LogoWide';
 
 export type { WatchStatus, WatchStatusSize } from './WatchStatusIcon';
 export type { LikeIconSize } from './LikeIcon';

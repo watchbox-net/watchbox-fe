@@ -5,7 +5,6 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import MobileFrame from '@/components/common/MobileFrame';
 import Header from '@/components/common/Header';
-import LogoWide from '@/components/icons/LogoWide';
 
 const SPRING_BOOT_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
@@ -23,7 +22,13 @@ function LoginContent() {
 
             <div className="flex-1 flex flex-col items-center justify-center">
                 {/* 로고 */}
-                <LogoWide />
+                <Image
+                    src="/logo-text/LogoTextH2.5.svg"
+                    alt="WatchBox"
+                    width={206}
+                    height={43}
+                    priority
+                />
 
                 {/* 구글 로그인 버튼 */}
                 <button

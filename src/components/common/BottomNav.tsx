@@ -31,11 +31,13 @@ const TABS: NavTab[] = [
 // ─── 컴포넌트 ────────────────────────────────────────────────
 
 interface BottomNavProps {
-  /** 데모용: pathname을 외부에서 주입할 때 사용 */
+  /** 활성 탭 결정용 pathname 주입 (데모용 또는 상세 페이지 등 (main) 밖에서 이전 경로 반영) */
   overridePathname?: string;
+  /** sticky 레이아웃 비활성화 (데모용) */
+  disableSticky?: boolean;
 }
 
-export default function BottomNav({ overridePathname }: BottomNavProps) {
+export default function BottomNav({ overridePathname, disableSticky }: BottomNavProps) {
   const realPathname = usePathname();
   const pathname = overridePathname ?? realPathname;
 
@@ -46,7 +48,7 @@ export default function BottomNav({ overridePathname }: BottomNavProps) {
 
   return (
     <nav className={`bg-wb-dark-01 flex items-center justify-between px-4 ${
-      overridePathname ? 'w-full' : 'sticky bottom-0 w-full'
+      disableSticky ? 'w-full' : 'sticky bottom-0 w-full'
     }`}>
       {TABS.map((tab) => {
         const active = isActive(tab.href);

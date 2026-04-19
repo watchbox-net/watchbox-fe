@@ -155,7 +155,7 @@ export default function DevComponentsPage() {
             </p>
           </div>
           {/* BottomNav */}
-          <BottomNav overridePathname={activePath} />
+          <BottomNav overridePathname={activePath} disableSticky />
         </div>
 
         {/* 스펙 */}

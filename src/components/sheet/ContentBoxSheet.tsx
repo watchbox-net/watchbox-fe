@@ -28,8 +28,10 @@ export interface SheetBox {
 interface ContentBoxSheetProps {
   /** 시트 표시 여부 */
   visible: boolean;
-  /** 시트가 닫힐 때 호출 (완료 또는 배경 탭) */
-  onClose: () => void;
+  /** 취소 (배경 오버레이 / 취소 버튼 / 시트 닫기 — 변경사항 버림) */
+  onCancel: () => void;
+  /** 완료 (API 요청 등 실제 저장 — ContentBoxSheetContainer에서 연결) */
+  onDone?: () => void;
   /** 상단에 표시되는 추가 대상 컨텐츠 */
   content: SheetContent;
   /** 박스 리스트 */
@@ -48,7 +50,8 @@ interface ContentBoxSheetProps {
  */
 export default function ContentBoxSheet({
   visible,
-  onClose,
+  onCancel,
+  onDone,
   content,
   boxes,
   onToggleBox,
@@ -66,7 +69,7 @@ export default function ContentBoxSheet({
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center"
-      onClick={onClose}
+      onClick={onCancel}
     >
       {/* 오버레이 */}
       <div className="absolute inset-0 bg-wb-black/50" aria-hidden />
@@ -76,7 +79,7 @@ export default function ContentBoxSheet({
         className="relative w-full max-w-[430px] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <ContentBoxSheetHead onDone={onClose} />
+        <ContentBoxSheetHead onCancel={onCancel} onDone={onDone ?? onCancel} />
 
         <div className="bg-wb-dark-02 flex flex-col gap-[12px] pb-[10px]">
           {/* 추가 대상 컨텐츠 정보 */}

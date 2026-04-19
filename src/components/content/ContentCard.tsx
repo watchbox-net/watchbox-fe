@@ -6,8 +6,10 @@ import Poster from '@/components/content/Poster';
 import BoxIcon from '@/components/icons/BoxIcon';
 import WatchStatusIcon from '@/components/icons/WatchStatusIcon';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
-import Modal from '@/components/common/Modal';
 import Toast from '@/components/common/Toast';
+import ContentBoxSheetContainer from '@/components/sheet/ContentBoxSheetContainer';
+import { useAuth } from '@/lib/context/AuthContext';
+import { useLoginModal } from '@/lib/context/LoginModalContext';
 import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
 import { TMDB_POSTER } from '@/lib/utils/content';
 import type { WatchStatus } from '@/types/content-summary';
@@ -38,6 +40,10 @@ interface ContentCardProps {
   mediaType?: 'MOVIE' | 'TV';
   /** 시청 기록 ID (기록 삭제 시 필요) */
   recordId?: number | null;
+  /** 박스 시트용: 연도 */
+  year?: number | null;
+  /** 박스 시트용: 장르 목록 */
+  genres?: string[] | null;
   className?: string;
 }
 
@@ -51,23 +57,33 @@ export default function ContentCard({
   tmdbId,
   mediaType,
   recordId: initialRecordId,
+  year,
+  genres,
   className,
 }: ContentCardProps) {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { showLoginModal } = useLoginModal();
   const posterSrc = posterPath ? `${TMDB_POSTER.md}${posterPath}` : null;
 
   const [watchStatus, setWatchStatus] = useState(initialWatchStatus);
   const [recordId, setRecordId] = useState(initialRecordId ?? null);
   const iconStatus: IconWatchStatus = (watchStatus && WATCH_STATUS_MAP[watchStatus]) ?? 'none';
 
-  // 메뉴 & 모달 상태
+  // 메뉴 & 시트 상태
   const [statusMenuOpen, setStatusMenuOpen] = useState(false);
   const [menuPos, setMenuPos] = useState({ top: 0, right: 0, dir: 'down' as 'down' | 'up' });
-  const [preparingModalVisible, setPreparingModalVisible] = useState(false);
+  const [boxSheetVisible, setBoxSheetVisible] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: '' });
   const menuRef = useRef<HTMLDivElement>(null);
   const statusIconRef = useRef<HTMLDivElement>(null);
 
   const showToast = (msg: string) => setToast({ visible: true, message: msg });
+
+  const handleBoxClick = () => {
+    if (!authLoading && !isAuthenticated) { showLoginModal(); return; }
+    if (!tmdbId || !mediaType) return;
+    setBoxSheetVisible(true);
+  };
 
   const { changeStatus, deleteStatus } = useWatchStatus({
     onStatusChanged: (status) => setWatchStatus(status),
@@ -120,7 +136,7 @@ export default function ContentCard({
             {rating != null ? rating.toFixed(1) : '-'}
           </span>
           <div className="flex items-center gap-[8px]">
-            <BoxIcon variant="outline" size="small" className="cursor-pointer" onClick={() => setPreparingModalVisible(true)} />
+            <BoxIcon variant="outline" size="small" className="cursor-pointer" onClick={handleBoxClick} />
             <div ref={statusIconRef}>
               <WatchStatusIcon status={iconStatus} size="small" className="cursor-pointer" onClick={() => {
                 if (statusIconRef.current) {
@@ -152,12 +168,21 @@ export default function ContentCard({
         </div>
       )}
 
-      {/* 준비중 모달 */}
-      <Modal
-        visible={preparingModalVisible}
-        variant="preparing"
-        onConfirm={() => setPreparingModalVisible(false)}
-      />
+      {/* 박스 추가 시트 */}
+      {tmdbId && mediaType && (
+        <ContentBoxSheetContainer
+          visible={boxSheetVisible}
+          onClose={() => setBoxSheetVisible(false)}
+          content={{ posterSrc, title, year, genres }}
+          mediaType={mediaType}
+          tmdbId={tmdbId}
+          onCompleted={({ added, removed }) => {
+            if (added > 0 && removed > 0) showToast('박스 목록을 변경했습니다.');
+            else if (added > 0) showToast('박스에 추가했습니다.');
+            else if (removed > 0) showToast('박스에서 제거했습니다.');
+          }}
+        />
+      )}
 
       <Toast
         message={toast.message}

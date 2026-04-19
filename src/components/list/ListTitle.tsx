@@ -1,6 +1,5 @@
-'use client';
-
-import { ChevronRightIcon } from '@heroicons/react/24/solid';
+import Link from 'next/link';
+import { ChevronRightOutline } from '@/components/icons';
 import { EllipsisVerticalIcon } from '@heroicons/react/24/solid';
 
 // ─── Types ──────────────────────────────────────────────────
@@ -9,6 +8,8 @@ export type ListTitleVariant = 'none' | 'arrow' | 'kebab';
 interface ListTitleProps {
   title: string;
   variant?: ListTitleVariant;
+  /** arrow variant에서 Link로 이동할 경로 (onAction보다 우선) */
+  href?: string;
   onAction?: () => void;
   className?: string;
 }
@@ -17,6 +18,7 @@ interface ListTitleProps {
 export default function ListTitle({
   title,
   variant = 'none',
+  href,
   onAction,
   className,
 }: ListTitleProps) {
@@ -27,9 +29,15 @@ export default function ListTitle({
       <p className="text-[20px] font-bold leading-none text-white">{title}</p>
 
       {variant === 'arrow' && (
-        <button onClick={onAction} className="cursor-pointer shrink-0">
-          <ChevronRightIcon className="size-[26px] text-white" />
-        </button>
+        href ? (
+          <Link href={href} className="cursor-pointer shrink-0" aria-label={`${title} 더보기`}>
+            <ChevronRightOutline className="size-[26px] text-white" />
+          </Link>
+        ) : (
+          <button onClick={onAction} className="cursor-pointer shrink-0" aria-label={`${title} 더보기`}>
+            <ChevronRightOutline className="size-[26px] text-white" />
+          </button>
+        )
       )}
 
       {variant === 'kebab' && (

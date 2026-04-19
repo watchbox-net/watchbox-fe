@@ -10,7 +10,6 @@ import ContentItem from '@/components/list/ContentItem';
 import ContentList from '@/components/list/ContentList';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
 import Toast from '@/components/common/Toast';
-import { PlusOutline } from '@/components/icons';
 import MainContent from '@/components/common/MainContent';
 import { fetchWatchStatusList } from '@/lib/api/record';
 import { useAuth } from '@/lib/context/AuthContext';
@@ -103,7 +102,7 @@ export default function RecordPage() {
     }
   };
 
-  const renderItem = (item: ContentItemData, idx: number, arr: ContentItemData[]) => {
+  const renderItem = (item: ContentItemData) => {
     const summary = item.contentSummary;
     const year = 'year' in summary ? summary.year : null;
     const genres = 'genreList' in summary ? summary.genreList : null;
@@ -167,7 +166,7 @@ export default function RecordPage() {
             <button
               type="button"
               onClick={() => router.push('/login')}
-              className="h-[40px] px-[24px] bg-wb-primary rounded-[8px] text-[14px] font-bold text-wb-white-01"
+              className="h-[40px] px-[24px] bg-wb-green rounded-[8px] text-[14px] font-bold text-wb-white-01"
             >
               로그인
             </button>

@@ -79,7 +79,7 @@ export default function SheetComponentsPage() {
       <section>
         <h2 className="text-xl font-bold text-black mb-4">Content Box Sheet Head</h2>
         <div className="bg-wb-dark-02 rounded-lg overflow-hidden">
-          <ContentBoxSheetHead onDone={() => alert('완료')} />
+          <ContentBoxSheetHead onCancel={() => alert('취소')} onDone={() => alert('완료')} />
         </div>
       </section>
 
@@ -160,7 +160,8 @@ export default function SheetComponentsPage() {
 
         <ContentBoxSheet
           visible={sheetVisible}
-          onClose={() => setSheetVisible(false)}
+          onCancel={() => setSheetVisible(false)}
+          onDone={() => { alert('완료 (dev: API 호출 안 함)'); setSheetVisible(false); }}
           content={SAMPLE_CONTENT}
           boxes={sheetBoxes}
           onToggleBox={handleToggleBox}

@@ -1,11 +1,10 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/common/Header';
-import ListTitle from '@/components/list/ListTitle';
 import ContentItem from '@/components/list/ContentItem';
 import ContentList from '@/components/list/ContentList';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
@@ -26,13 +25,13 @@ export default function BoxContentsPage() {
   const searchParams = useSearchParams();
   const boxId = Number(params.boxId);
   const boxType = (searchParams.get('type') as BoxType) || 'MY';
+  const boxName = searchParams.get('name') ?? '';
 
   const queryClient = useQueryClient();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { showLoginModal } = useLoginModal();
 
   const isShared = boxType === 'SHARED';
-  const headerTitle = isShared ? '공유 박스 컨텐츠' : '마이 박스 컨텐츠';
 
   // 시청 상태 메뉴
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
@@ -92,22 +91,13 @@ export default function BoxContentsPage() {
     }
   };
 
-  // mediaType 별 그룹핑
-  const grouped = useMemo(() => {
-    const movies = items.filter((i) => i.contentSummary.mediaType === 'MOVIE');
-    const tvs = items.filter((i) => i.contentSummary.mediaType === 'TV');
-    const persons = items.filter((i) => i.contentSummary.mediaType === 'PERSON');
-    return { movies, tvs, persons };
-  }, [items]);
-
-  const renderItem = (item: ContentItemData, idx: number, arr: ContentItemData[]) => {
+  const renderItem = (item: ContentItemData) => {
     const summary = item.contentSummary;
     const imageUrl = getImageUrl(summary);
     const title = getDisplayTitle(summary);
     const year = 'year' in summary ? summary.year : null;
     const genres = 'genreList' in summary ? summary.genreList : null;
     const watchStatus = item.memberRecord?.watchStatus ?? null;
-    const isLast = idx === arr.length - 1;
     const itemId = item.boxContentId ?? summary.tmdbId;
     const isMenuOpen = openMenuId === itemId;
 
@@ -156,7 +146,7 @@ export default function BoxContentsPage() {
     <>
       <Header
         variant="icon1-back"
-        title={headerTitle}
+        title={boxName}
         rightIcon={<PlusOutline className="size-6 text-wb-white-02" />}
         onRightIconClick={() => {/* TODO: 컨텐츠 추가 */}}
       />
@@ -176,26 +166,7 @@ export default function BoxContentsPage() {
           </p>
         )}
         {!loading && !error && items.length > 0 && (
-          <>
-            {grouped.movies.length > 0 && (
-              <section className="mb-4">
-                <ListTitle title={`영화 (${grouped.movies.length})`} variant="none" className="mb-1" />
-                <ContentList>{grouped.movies.map(renderItem)}</ContentList>
-              </section>
-            )}
-            {grouped.tvs.length > 0 && (
-              <section className="mb-4">
-                <ListTitle title={`시리즈 (${grouped.tvs.length})`} variant="none" className="mb-1" />
-                <ContentList>{grouped.tvs.map(renderItem)}</ContentList>
-              </section>
-            )}
-            {grouped.persons.length > 0 && (
-              <section className="mb-4">
-                <ListTitle title={`인물 (${grouped.persons.length})`} variant="none" className="mb-1" />
-                <ContentList>{grouped.persons.map(renderItem)}</ContentList>
-              </section>
-            )}
-          </>
+          <ContentList>{items.map(renderItem)}</ContentList>
         )}
       </MainContent>
 

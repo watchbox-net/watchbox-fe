@@ -4,10 +4,14 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import MobileFrame from '@/components/common/MobileFrame';
+import BottomNav from '@/components/common/BottomNav';
+import { LAST_MAIN_PATH_KEY } from '@/components/common/PathTracker';
 import TabNav from '@/components/common/TabNav';
 import Toast from '@/components/common/Toast';
-import Modal from '@/components/common/Modal';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
+import ContentBoxSheetContainer from '@/components/sheet/ContentBoxSheetContainer';
+import { useAuth } from '@/lib/context/AuthContext';
+import { useLoginModal } from '@/lib/context/LoginModalContext';
 import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
 import LikeIcon from '@/components/icons/LikeIcon';
 import BoxIcon from '@/components/icons/BoxIcon';
@@ -108,8 +112,17 @@ export default function ContentDetailPage() {
   const [statusMenuOpen, setStatusMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // 모달
-  const [preparingModalVisible, setPreparingModalVisible] = useState(false);
+  // 박스 추가 시트
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { showLoginModal } = useLoginModal();
+  const [boxSheetVisible, setBoxSheetVisible] = useState(false);
+
+  // BottomNav 활성 경로 (진입 전 (main) 페이지)
+  const [lastMainPath, setLastMainPath] = useState('/');
+  useEffect(() => {
+    const saved = sessionStorage.getItem(LAST_MAIN_PATH_KEY);
+    if (saved) setLastMainPath(saved);
+  }, []);
 
   // 토스트
   const [toast, setToast] = useState({ visible: false, message: '' });
@@ -187,6 +200,7 @@ export default function ContentDetailPage() {
         <div className="flex-1 flex items-center justify-center">
           <p className="text-wb-grey-03">불러오는 중...</p>
         </div>
+        <BottomNav overridePathname={lastMainPath} />
       </MobileFrame>
     );
   }
@@ -197,6 +211,7 @@ export default function ContentDetailPage() {
         <div className="flex-1 flex items-center justify-center">
           <p className="text-wb-grey-03">오류가 발생했습니다.</p>
         </div>
+        <BottomNav overridePathname={lastMainPath} />
       </MobileFrame>
     );
   }
@@ -291,10 +306,13 @@ export default function ContentDetailPage() {
           <button
             type="button"
             className="flex flex-col items-center gap-[8px] cursor-pointer"
-            onClick={() => setPreparingModalVisible(true)}
+            onClick={() => {
+              if (!authLoading && !isAuthenticated) { showLoginModal(); return; }
+              setBoxSheetVisible(true);
+            }}
           >
-            <BoxIcon size="xl" variant="none" />
-            <span className="text-[11px] text-wb-white-02">박스 추가</span>
+            <BoxIcon size="xl" variant="outline" />
+            <span className="text-[11px] text-wb-white-02">박스에 추가</span>
           </button>
 
           {/* 시청 상태 */}
@@ -343,16 +361,31 @@ export default function ContentDetailPage() {
 
       </div>
 
-      <Modal
-        visible={preparingModalVisible}
-        variant="preparing"
-        onConfirm={() => setPreparingModalVisible(false)}
-      />
+      {(mediaType === 'MOVIE' || mediaType === 'TV') && (
+        <ContentBoxSheetContainer
+          visible={boxSheetVisible}
+          onClose={() => setBoxSheetVisible(false)}
+          content={{
+            posterSrc: posterUrl,
+            title: info.titleKo,
+            year: info.year,
+            genres: info.genreList,
+          }}
+          mediaType={mediaType}
+          tmdbId={tmdbId}
+          onCompleted={({ added, removed }) => {
+            if (added > 0 && removed > 0) showToast('박스 목록을 변경했습니다.');
+            else if (added > 0) showToast('박스에 추가했습니다.');
+            else if (removed > 0) showToast('박스에서 제거했습니다.');
+          }}
+        />
+      )}
       <Toast
         message={toast.message}
         visible={toast.visible}
         onClose={() => setToast((t) => ({ ...t, visible: false }))}
       />
+      <BottomNav overridePathname={lastMainPath} />
     </MobileFrame>
   );
 }

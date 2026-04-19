@@ -13,7 +13,6 @@ import {
   BoxIcon,
   WatchStatusIcon,
   PencilSolid,
-  Cog6ToothSolid,
   UserGroupSolid,
   UsersSolid,
 } from '@/components/icons';
@@ -28,6 +27,7 @@ export default function MyPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [preparingModalVisible, setPreparingModalVisible] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: '' });
 
   const showToast = (msg: string) => setToast({ visible: true, message: msg });
@@ -51,24 +51,9 @@ export default function MyPage() {
       .finally(() => setLoading(false));
   }, [authLoading, isAuthenticated]);
 
-  const rightIcons = (
-    <div className="flex items-center gap-[15px]">
-      <button type="button" onClick={() => router.push('/my/edit')}>
-        <PencilSolid className="size-6 text-white" />
-      </button>
-      <button type="button">
-        <Cog6ToothSolid className="size-6 text-white" />
-      </button>
-    </div>
-  );
-
   return (
     <>
-      <Header
-        variant="icon1"
-        title="마이 페이지"
-        rightIcon={rightIcons}
-      />
+      <Header variant="center" title="마이 페이지" />
 
       <MainContent>
         {loading && (
@@ -92,83 +77,126 @@ export default function MyPage() {
           </p>
         )}
         {!loading && !error && data && (
-          <>
+          <div className="flex flex-col gap-[45px] pt-[20px]">
             {/* ── 프로필 섹션 ────────────────────────────── */}
-            <div className="flex items-center gap-[12px] px-[32px] pt-[19px] pb-[20px]">
+            <div className="flex items-center gap-[12px] px-[32px]">
               <ProfileIcon variant="mypage" />
               <div className="flex flex-col gap-[2px]">
-                <p className="text-[26px] font-semibold text-white leading-normal">
-                  {data.profile.nickname}
-                </p>
                 <div className="flex items-center gap-[5px]">
+                  <p className="text-[26px] font-semibold text-white leading-normal">
+                    {data.profile.nickname}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => router.push('/my/edit')}
+                    aria-label="프로필 수정"
+                  >
+                    <PencilSolid className="size-6 text-white" />
+                  </button>
+                </div>
+                <div className="flex items-center gap-[5px] h-[16px]">
                   <GoogleCircleLogo variant="light" />
-                  <span className="text-[14px] text-wb-grey-03 leading-[14px]">
+                  <span className="text-[14px] text-wb-grey-02 leading-[14px]">
                     {data.profile.email}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* ── 통계 행 1: 좋아요 / 박스 / 기록 ────────── */}
-            <div className="flex items-start justify-around pt-[24px]">
-              <div className="flex flex-col items-center gap-[9px] w-[56px]">
-                <span className="text-[18px] text-wb-grey-03">좋아요</span>
-                <LikeIcon size="xl" active />
-                <span className="text-[32px] text-wb-grey-03">
-                  {data.memberStats.likeCount}
-                </span>
+            {/* ── 회원 통계 ─────────────────────────────── */}
+            <div className="flex flex-col gap-[45px] items-center px-[32px]">
+              {/* 좋아요 / 박스 / 기록 */}
+              <div className="flex items-center gap-[80px]">
+                <button
+                  type="button"
+                  onClick={() => router.push('/record')}
+                  className="flex flex-col items-center justify-center gap-[9px] w-[56px]"
+                >
+                  <span className="text-[18px] text-wb-grey-03">좋아요</span>
+                  <LikeIcon size="xl" active />
+                  <span className="text-[32px] text-wb-grey-03 leading-none">
+                    {data.memberStats.likeCount}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.push('/box')}
+                  className="flex flex-col items-center justify-center gap-[9px] w-[50px]"
+                >
+                  <span className="text-[18px] text-wb-grey-03">박스</span>
+                  <BoxIcon size="xl" variant="added" />
+                  <span className="text-[32px] text-wb-grey-03 leading-none">
+                    {data.memberStats.boxCount}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.push('/record')}
+                  className="flex flex-col items-center justify-center gap-[9px] w-[50px]"
+                >
+                  <span className="text-[18px] text-wb-grey-03">기록</span>
+                  <WatchStatusIcon size="xl" status="completed" />
+                  <span className="text-[32px] text-wb-grey-03 leading-none">
+                    {data.memberStats.watchStatusCount}
+                  </span>
+                </button>
               </div>
-              <div className="flex flex-col items-center gap-[9px] w-[50px]">
-                <span className="text-[18px] text-wb-grey-03">박스</span>
-                <BoxIcon size="xl" variant="added" />
-                <span className="text-[32px] text-wb-grey-03">
-                  {data.memberStats.boxCount}
-                </span>
-              </div>
-              <div className="flex flex-col items-center gap-[9px] w-[50px]">
-                <span className="text-[18px] text-wb-grey-03">기록</span>
-                <WatchStatusIcon size="xl" status="completed" />
-                <span className="text-[32px] text-wb-grey-03">
-                  {data.memberStats.watchStatusCount}
-                </span>
-              </div>
-            </div>
 
-            {/* ── 통계 행 2: 팔로워 / 팔로잉 ─────────────── */}
-            <div className="flex items-start justify-center gap-[100px] pt-[50px]">
-              <div className="flex flex-col items-center gap-[9px] w-[53px]">
-                <span className="text-[18px] text-wb-grey-03">팔로워</span>
-                <UsersSolid className="size-[50px] text-wb-grey-03" />
-                <span className="text-[32px] text-wb-grey-03">
-                  0
-                </span>
-              </div>
-              <div className="flex flex-col items-center gap-[9px] w-[52px]">
-                <span className="text-[18px] text-wb-grey-03">팔로잉</span>
-                <UserGroupSolid className="size-[50px] text-wb-grey-03" />
-                <span className="text-[32px] text-wb-grey-03">
-                  0
-                </span>
+              {/* 팔로워 / 팔로잉 */}
+              <div className="flex items-center gap-[100px] w-[205px]">
+                <button
+                  type="button"
+                  onClick={() => setPreparingModalVisible(true)}
+                  className="flex flex-col items-center justify-center gap-[9px] w-[53px]"
+                >
+                  <span className="text-[18px] text-wb-grey-01">팔로워</span>
+                  <UsersSolid className="size-[50px] text-wb-grey-01" />
+                  <span className="text-[32px] text-wb-grey-01 leading-none">0</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreparingModalVisible(true)}
+                  className="flex flex-col items-center justify-center gap-[9px] w-[52px]"
+                >
+                  <span className="text-[18px] text-wb-grey-01">팔로잉</span>
+                  <UserGroupSolid className="size-[50px] text-wb-grey-01" />
+                  <span className="text-[32px] text-wb-grey-01 leading-none">0</span>
+                </button>
               </div>
             </div>
 
             {/* ── 버튼 영역 ──────────────────────────────── */}
-            <div className="flex flex-col gap-[15px] px-[25px] mt-[50px]">
+            <div className="flex flex-col gap-[16px] px-[32px]">
               <button
                 type="button"
                 onClick={() => setLogoutModalVisible(true)}
-                className="h-[46px] bg-[#353535] rounded-[4px] text-[20px] text-white leading-[28px]"
+                className="h-[44px] bg-wb-dark-05 rounded-[4px] text-[18px] text-white leading-[28px]"
               >
                 로그아웃
               </button>
               <button
                 type="button"
-                className="h-[46px] bg-[#353535] rounded-[4px] text-[20px] text-white leading-[28px]"
+                onClick={() => router.push('/cs/info')}
+                className="h-[44px] bg-wb-dark-05 rounded-[4px] text-[18px] text-white leading-[28px]"
+              >
+                서비스 정보
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreparingModalVisible(true)}
+                className="h-[44px] bg-wb-dark-05 rounded-[4px] text-[18px] text-white leading-[28px]"
+              >
+                피드백하기
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreparingModalVisible(true)}
+                className="h-[44px] bg-wb-dark-05 rounded-[4px] text-[18px] text-white leading-[28px]"
               >
                 회원탈퇴
               </button>
             </div>
-          </>
+          </div>
         )}
       </MainContent>
 
@@ -181,6 +209,12 @@ export default function MyPage() {
         cancelLabel="취소"
         onConfirm={handleLogout}
         onCancel={() => setLogoutModalVisible(false)}
+      />
+
+      <Modal
+        visible={preparingModalVisible}
+        variant="preparing"
+        onConfirm={() => setPreparingModalVisible(false)}
       />
 
       <Toast

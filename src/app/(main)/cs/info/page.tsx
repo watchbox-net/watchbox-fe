@@ -14,9 +14,9 @@ const INFO_ITEMS: { label: string; value: React.ReactNode }[] = [
       </>
     ),
   },
-  { label: '버전', value: <p>v1.0.0</p> },
+  { label: '버전', value: <p>v1.0.0-beta</p> },
   { label: '이메일', value: <p>watchboxnet@gmail.net</p> },
-  { label: '제작자', value: <p>줄타</p> },
+  { label: '제작자', value: <p>최현</p> },
 ];
 
 export default function ServiceInfoPage() {

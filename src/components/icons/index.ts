@@ -94,7 +94,7 @@ export const ChevronRightOutline = ((props: React.ComponentProps<typeof _Chevron
 
 // ChevronDown 기본 strokeWidth=0.5
 export const ChevronDownOutline = ((props: React.ComponentProps<typeof _ChevronDownIcon>) =>
-  React.createElement(_ChevronDownIcon, { strokeWidth: 0.5, ...props })) as typeof _ChevronDownIcon;
+  React.createElement(_ChevronDownIcon, { strokeWidth: 1.7, ...props })) as typeof _ChevronDownIcon;
 
 // ─── Solid (24x24 fill) ─────────────────────────────────────
 export {

@@ -36,7 +36,7 @@ export default function MemberInfo({ variant, publishers, className }: MemberInf
   // publisher
   return (
     <p className={`text-[10px] text-wb-primary whitespace-nowrap ${className ?? ''}`}>
-      공유: {publishers?.join(', ') ?? ''}
+      {publishers?.join(', ') ?? ''}
     </p>
   );
 }

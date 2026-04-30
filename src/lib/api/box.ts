@@ -49,10 +49,25 @@ export async function deleteBox(boxId: number): Promise<void> {
   await privateApi.delete(`/boxes/${boxId}`);
 }
 
-/** 박스 컨텐츠 리스트 조회 */
-export async function fetchBoxContents(boxId: number): Promise<ContentPageResponse> {
+// ─── 박스 컨텐츠 페이지 조회 파라미터 ─────────────────────────
+export type ContentMediaTypeFilter = 'MOVIE_TV' | 'MOVIE' | 'TV' | 'PERSON';
+export type BoxContentSortOrder = 'RECENT_SAVED' | 'OLDEST_SAVED' | 'RECENT_YEAR' | 'OLDEST_YEAR';
+export type BoxWatchStatusFilter = 'ALL' | 'COMPLETED' | 'WATCHING' | 'PLANNED' | 'PAUSED' | 'NONE';
+
+export interface BoxContentRecordQueryParams {
+  contentMediaTypeFilter?: ContentMediaTypeFilter;
+  sort?: BoxContentSortOrder;
+  watchStatusFilter?: BoxWatchStatusFilter;
+}
+
+/** 박스 컨텐츠 리스트 조회 - 정렬/필터/미디어타입 */
+export async function fetchBoxContents(
+  boxId: number,
+  params: BoxContentRecordQueryParams = {},
+): Promise<ContentPageResponse> {
   const { data } = await privateApi.get<ApiResponse<ContentPageResponse>>(
     `/boxes/${boxId}/contents`,
+    { params },
   );
   return data.data;
 }

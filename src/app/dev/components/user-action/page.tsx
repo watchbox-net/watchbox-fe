@@ -23,7 +23,7 @@ const MODAL_DEMOS: { variant: ModalVariant; title: string; body: string; confirm
 export default function UserActionComponentsPage() {
   const [activeModal, setActiveModal] = useState<ModalVariant | null>(null);
   const [boxContentFilter, setBoxContentFilter] = useState<WatchStatusFilter>('PLANNED');
-  const [contentRecordFilter, setContentRecordFilter] = useState<WatchStatusFilter>('LIKE');
+  const [contentRecordFilter, setContentRecordFilter] = useState<WatchStatusFilter>('LIKED');
 
   const activeDemo = MODAL_DEMOS.find((d) => d.variant === activeModal);
 

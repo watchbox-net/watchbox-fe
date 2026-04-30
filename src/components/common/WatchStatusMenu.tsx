@@ -18,7 +18,7 @@ export type WatchStatusFilter =
   | 'PLANNED'
   | 'PAUSED'
   | 'NONE'
-  | 'LIKE';
+  | 'LIKED';
 
 export interface WatchStatusMenuProps {
   variant?: WatchStatusMenuVariant;
@@ -51,7 +51,7 @@ const CONTENT_RECORD_ITEMS: FilterItem[] = [
   { filter: 'WATCHING',  label: '시청중'    },
   { filter: 'PLANNED',   label: '시청 예정' },
   { filter: 'PAUSED',    label: '시청 중단' },
-  { filter: 'LIKE',      label: '좋아요'    },
+  { filter: 'LIKED',      label: '좋아요'    },
 ];
 
 const STATUS_ITEMS: { status: WatchStatus; label: string }[] = [
@@ -66,7 +66,7 @@ function FilterIcon({ filter }: { filter: WatchStatusFilter }) {
   switch (filter) {
     case 'ALL':
       return <EyeSolid className="size-[24px] text-wb-white-02 shrink-0" />;
-    case 'LIKE':
+    case 'LIKED':
       return <LikeIcon active size="medium" />;
     case 'NONE':
       return <WatchStatusIcon status="none" size="medium" />;

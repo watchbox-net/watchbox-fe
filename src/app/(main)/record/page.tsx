@@ -9,67 +9,100 @@ import TabNav from '@/components/common/TabNav';
 import ContentItem from '@/components/list/ContentItem';
 import ContentList from '@/components/list/ContentList';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
+import PlainContextMenu from '@/components/common/PlainContextMenu';
 import Toast from '@/components/common/Toast';
 import MainContent from '@/components/common/MainContent';
-import { fetchWatchStatusList } from '@/lib/api/record';
+import { ChevronDownOutline } from '@/components/icons';
+import {
+  fetchMyRecordedContentPage,
+  type WatchMediaTypeFilter,
+  type RecordSortOrder,
+  type WatchRecordFilter,
+} from '@/lib/api/record';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
 import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
-import type { ContentItem as ContentItemData, WatchStatus } from '@/types/content-summary';
+import type { ContentItem as ContentItemData, WatchStatus, ContentPageResponse } from '@/types/content-summary';
 import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
 
-const TABS = [
-  { key: 'all', label: '전체' },
-  { key: 'movie', label: '영화' },
-  { key: 'tv', label: '시리즈' },
-] as const;
+// ── 탭 → 미디어타입 필터 매핑 ────────────────────────────────
+const TABS: { key: WatchMediaTypeFilter; label: string }[] = [
+  { key: 'MOVIE_TV', label: '전체'   },
+  { key: 'MOVIE',    label: '영화'   },
+  { key: 'TV',       label: '시리즈' },
+];
+
+// ── 정렬 라벨 ────────────────────────────────────────────────
+const SORT_LABEL: Record<RecordSortOrder, string> = {
+  RECENT_SAVED: '최근 저장순',
+  OLDEST_SAVED: '오래된 저장순',
+  RECENT_YEAR:  '최근 연도순',
+  OLDEST_YEAR:  '오래된 연도순',
+};
+
+// ── 필터 라벨 (드롭다운 트리거 표시용; ALL은 placeholder) ────
+const FILTER_LABEL: Record<Exclude<WatchRecordFilter, 'ALL'>, string> = {
+  COMPLETED: '시청 완료',
+  WATCHING:  '시청중',
+  PLANNED:   '시청 예정',
+  PAUSED:    '시청 중단',
+  LIKED:     '좋아요',
+};
 
 export default function RecordPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [activeTabIndex, setActiveTabIndex] = useState(0);
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { showLoginModal } = useLoginModal();
+
+  // ── 쿼리 파라미터 상태 ──
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
+  const [sort, setSort] = useState<RecordSortOrder>('RECENT_SAVED');
+  const [watchRecordFilter, setWatchRecordFilter] = useState<WatchRecordFilter>('ALL');
+
+  // ── 메뉴 열림 상태 ──
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [menuDir, setMenuDir] = useState<'down' | 'up'>('down');
+  const [sortMenuOpen, setSortMenuOpen] = useState(false);
+  const [filterMenuOpen, setFilterMenuOpen] = useState(false);
+
   const [toast, setToast] = useState({ visible: false, message: '' });
   const menuRef = useRef<HTMLDivElement>(null);
+  const sortMenuRef = useRef<HTMLDivElement>(null);
+  const filterMenuRef = useRef<HTMLDivElement>(null);
 
-  const showToast = (message: string) =>
-    setToast({ visible: true, message });
+  const showToast = (message: string) => setToast({ visible: true, message });
 
   const { changeStatus, deleteStatus } = useWatchStatus({ showToast });
 
-  const { data: allItems = [], isLoading: loading, isError: error } = useQuery({
-    queryKey: ['watchStatusList'],
-    queryFn: async () => {
-      const res = await fetchWatchStatusList();
-      return res.contentItemList;
-    },
+  const watchMediaTypeFilter = TABS[activeTabIndex].key;
+  const queryKey = ['recordedContentPage', watchMediaTypeFilter, sort, watchRecordFilter] as const;
+
+  const {
+    data: pageData,
+    isLoading: loading,
+    isError: error,
+  } = useQuery({
+    queryKey,
+    queryFn: () => fetchMyRecordedContentPage({ watchMediaTypeFilter, sort, watchRecordFilter }),
     enabled: !authLoading && isAuthenticated,
-    staleTime: 0, // 항상 최신 데이터 요청
+    staleTime: 0,
   });
+
+  const items = pageData?.contentItemList ?? [];
+  const totalCount = pageData?.totalCount ?? 0;
 
   // 외부 클릭 시 메뉴 닫기
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setOpenMenuId(null);
-      }
+      const target = e.target as Node;
+      if (menuRef.current && !menuRef.current.contains(target)) setOpenMenuId(null);
+      if (sortMenuRef.current && !sortMenuRef.current.contains(target)) setSortMenuOpen(false);
+      if (filterMenuRef.current && !filterMenuRef.current.contains(target)) setFilterMenuOpen(false);
     };
-    if (openMenuId !== null) {
-      document.addEventListener('mousedown', handleMouseDown);
-    }
+    document.addEventListener('mousedown', handleMouseDown);
     return () => document.removeEventListener('mousedown', handleMouseDown);
-  }, [openMenuId]);
-
-  const activeTab = TABS[activeTabIndex].key;
-  const filteredItems =
-    activeTab === 'all'
-      ? allItems
-      : allItems.filter(
-          (item) => item.contentSummary.mediaType === activeTab.toUpperCase(),
-        );
+  }, []);
 
   const handleStatusSelect = async (
     item: ContentItemData,
@@ -80,14 +113,18 @@ export default function RecordPage() {
     if (summary.mediaType !== 'MOVIE' && summary.mediaType !== 'TV') return;
     const success = await changeStatus(summary.tmdbId, summary.mediaType, status);
     if (success) {
-      queryClient.setQueryData<ContentItemData[]>(['watchStatusList'], (prev) =>
-        (prev ?? []).map((i) =>
-          (i.memberRecord?.recordId ?? i.contentSummary.tmdbId) ===
-          (item.memberRecord?.recordId ?? summary.tmdbId)
-            ? { ...i, memberRecord: { recordId: i.memberRecord?.recordId ?? null, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
-            : i,
-        ),
-      );
+      queryClient.setQueryData<ContentPageResponse>(queryKey, (prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          contentItemList: prev.contentItemList.map((i) =>
+            (i.memberRecord?.recordId ?? i.contentSummary.tmdbId) ===
+            (item.memberRecord?.recordId ?? summary.tmdbId)
+              ? { ...i, memberRecord: { recordId: i.memberRecord?.recordId ?? null, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
+              : i,
+          ),
+        };
+      });
     }
   };
 
@@ -96,9 +133,13 @@ export default function RecordPage() {
     if (!item.memberRecord?.recordId) return;
     const success = await deleteStatus(item.memberRecord.recordId);
     if (success) {
-      queryClient.setQueryData<ContentItemData[]>(['watchStatusList'], (prev) =>
-        (prev ?? []).filter((i) => i.memberRecord?.recordId !== item.memberRecord?.recordId),
-      );
+      queryClient.setQueryData<ContentPageResponse>(queryKey, (prev) => {
+        if (!prev) return prev;
+        const filtered = prev.contentItemList.filter(
+          (i) => i.memberRecord?.recordId !== item.memberRecord?.recordId,
+        );
+        return { ...prev, contentItemList: filtered, totalCount: prev.totalCount - 1 };
+      });
     }
   };
 
@@ -143,13 +184,13 @@ export default function RecordPage() {
     );
   };
 
+  const filterTriggerLabel = watchRecordFilter === 'ALL'
+    ? '시청 상태'
+    : FILTER_LABEL[watchRecordFilter];
+
   return (
     <>
-      <Header
-        variant="center"
-        title="시청 기록"
-        onRightIconClick={() => {/* TODO: 추가 기능 */}}
-      />
+      <Header variant="center" title="시청 기록" />
       <TabNav
         tabs={TABS.map((t) => t.label)}
         activeIndex={activeTabIndex}
@@ -157,6 +198,64 @@ export default function RecordPage() {
       />
 
       <MainContent>
+        {/* ── 카운트 + 정렬/필터 드롭다운 행 ───────── */}
+        {!authLoading && isAuthenticated && !error && (
+          <div className="flex items-center justify-between pl-[16px] pr-[6px] pt-[13px]">
+            <span className="text-[14px] text-wb-grey-04">{totalCount}개</span>
+
+            <div className="flex items-center gap-[12px]">
+              {/* 정렬 드롭다운 */}
+              <div ref={sortMenuRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => { setSortMenuOpen((v) => !v); setFilterMenuOpen(false); }}
+                  className="flex items-center gap-[2px] text-[14px] text-wb-white-02"
+                >
+                  {SORT_LABEL[sort]}
+                  <ChevronDownOutline className="size-[16px] text-wb-white-02" />
+                </button>
+                {sortMenuOpen && (
+                  <div className="absolute right-0 top-full mt-[6px] z-40">
+                    <PlainContextMenu
+                      size="w120"
+                      items={(Object.keys(SORT_LABEL) as RecordSortOrder[]).map((key) => ({
+                        label: SORT_LABEL[key],
+                        onClick: () => { setSort(key); setSortMenuOpen(false); },
+                      }))}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* 시청 상태 필터 드롭다운 */}
+              <div ref={filterMenuRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => { setFilterMenuOpen((v) => !v); setSortMenuOpen(false); }}
+                  className="flex items-center gap-[2px] text-[14px] text-wb-white-02"
+                >
+                  {filterTriggerLabel}
+                  <ChevronDownOutline className="size-[16px] text-wb-white-02"/>
+                </button>
+                {filterMenuOpen && (
+                  <div className="absolute right-0 top-full mt-[6px] z-40">
+                    <WatchStatusMenu
+                      variant="content-record"
+                      selected={watchRecordFilter === 'ALL' ? undefined : watchRecordFilter}
+                      onFilterChange={(f) => {
+                        // WatchStatusFilter('NONE' 포함) → WatchRecordFilter 매핑
+                        if (f === 'NONE') return; // content-record variant에는 NONE 없음
+                        setWatchRecordFilter(f as WatchRecordFilter);
+                        setFilterMenuOpen(false);
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {(authLoading || loading) && (
           <p className="text-center text-neutral-500 py-8">불러오는 중...</p>
         )}
@@ -177,13 +276,13 @@ export default function RecordPage() {
             오류가 발생했습니다.
           </p>
         )}
-        {!loading && isAuthenticated && !error && filteredItems.length === 0 && (
+        {!loading && isAuthenticated && !error && items.length === 0 && (
           <p className="text-center text-neutral-500 py-8">
             시청 기록이 없습니다.
           </p>
         )}
-        {!loading && isAuthenticated && !error && filteredItems.length > 0 && (
-          <ContentList>{filteredItems.map(renderItem)}</ContentList>
+        {!loading && isAuthenticated && !error && items.length > 0 && (
+          <ContentList>{items.map(renderItem)}</ContentList>
         )}
       </MainContent>
 

@@ -5,8 +5,10 @@ import Link from 'next/link';
 import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal';
 import type { ModalVariant } from '@/components/common/Modal';
-import StatusMenu from '@/components/common/StatusMenu';
 import ContextMenu from '@/components/common/ContextMenu';
+import PlainContextMenu from '@/components/common/PlainContextMenu';
+import WatchStatusMenu from '@/components/common/WatchStatusMenu';
+import type { WatchStatusFilter } from '@/components/common/WatchStatusMenu';
 
 const MODAL_DEMOS: { variant: ModalVariant; title: string; body: string; confirmLabel?: string }[] = [
   { variant: 'confirm',   title: '사용자 검색하기',     body: '공유 박스 멤버를 초대하기 위해\n사용자 검색 화면으로 이동하시겠습니까?' },
@@ -20,6 +22,8 @@ const MODAL_DEMOS: { variant: ModalVariant; title: string; body: string; confirm
 
 export default function UserActionComponentsPage() {
   const [activeModal, setActiveModal] = useState<ModalVariant | null>(null);
+  const [boxContentFilter, setBoxContentFilter] = useState<WatchStatusFilter>('PLANNED');
+  const [contentRecordFilter, setContentRecordFilter] = useState<WatchStatusFilter>('LIKE');
 
   const activeDemo = MODAL_DEMOS.find((d) => d.variant === activeModal);
 
@@ -56,7 +60,7 @@ export default function UserActionComponentsPage() {
         </div>
 
         {/* List */}
-        <div className="mb-6">
+        <div>
           <p className="text-xs font-semibold text-neutral-500 mb-2">List (w-55, h-28)</p>
           <div className="bg-wb-dark-02 rounded-lg p-4 flex flex-wrap gap-3">
             <Button size="list" variant="accept">수락</Button>
@@ -64,22 +68,13 @@ export default function UserActionComponentsPage() {
             <Button size="list" variant="delete">삭제</Button>
           </div>
         </div>
-
-        {/* 스펙 */}
-        <div className="bg-neutral-100 rounded-lg p-4 text-sm text-neutral-700 space-y-1">
-          <p className="font-semibold text-black mb-2">디자인 스펙</p>
-          <p>Wide — h:48px, rounded:8px, wb-button-medium</p>
-          <p>Modal — w:75px, h:40px, rounded:10px, wb-button-medium</p>
-          <p>List — w:55px, h:28px, rounded:8px, wb-button-small</p>
-          <p>Shadow — 0px 1px 2px rgba(10,13,18,0.05)</p>
-        </div>
       </section>
 
       {/* ── Modal ──────────────────────────────── */}
       <section>
         <h2 className="text-xl font-bold text-black mb-4">Modal</h2>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {MODAL_DEMOS.map((demo) => (
             <button
               key={demo.variant}
@@ -89,37 +84,6 @@ export default function UserActionComponentsPage() {
               {demo.variant}
             </button>
           ))}
-        </div>
-
-        {/* 스펙 */}
-        <div className="bg-neutral-100 rounded-lg p-4 text-sm text-neutral-700 space-y-1">
-          <p className="font-semibold text-black mb-2">디자인 스펙</p>
-          <p>배경 — bg-wb-grey-04 (#b1b1b1), rounded:18px</p>
-          <p>패딩 — pt:25px, pb:18px, px:23px, w:321px</p>
-          <p>제목 — wb-modal-header (20px SemiBold), text-wb-dark-02</p>
-          <p>본문 — wb-modal-body (16px Medium), text-wb-dark-05</p>
-          <p>버튼 — Button modal 사이즈 사용, gap:10px, 우측 정렬</p>
-          <p>error — ExclamationCircleSolid 아이콘 + 제목</p>
-          <p>Overlay — fixed inset-0, bg-wb-black/50 (반투명 검정), z-50</p>
-        </div>
-      </section>
-
-      {/* ── Status Menu ─────────────────────── */}
-      <section>
-        <h2 className="text-xl font-bold text-black mb-4">Status Menu</h2>
-
-        <div className="bg-wb-dark-02 rounded-lg p-6 inline-block">
-          <StatusMenu onSelect={(action) => alert(`선택: ${action}`)} />
-        </div>
-
-        {/* 스펙 */}
-        <div className="bg-neutral-100 rounded-lg p-4 text-sm text-neutral-700 space-y-1 mt-4">
-          <p className="font-semibold text-black mb-2">디자인 스펙</p>
-          <p>배경 — bg-wb-dark-05 (#353535), rounded:15px, w:135px</p>
-          <p>아이템 — h:45px, py:5px, gap:24px</p>
-          <p>텍스트 — 14px Medium, lh:24px, text-wb-grey-04</p>
-          <p>Hover — bg-wb-grey-01 (#525252), top/bottom rounded:10px</p>
-          <p>아이콘 — WatchStatusIcon medium (24px)</p>
         </div>
       </section>
 
@@ -150,17 +114,70 @@ export default function UserActionComponentsPage() {
             />
           </div>
         </div>
+      </section>
 
-        {/* 스펙 */}
-        <div className="bg-neutral-100 rounded-lg p-4 text-sm text-neutral-700 space-y-1 mt-4">
-          <p className="font-semibold text-black mb-2">디자인 스펙</p>
-          <p>배경 — bg-wb-dark-05 (#353535), rounded:15px</p>
-          <p>사이즈 — small: min-w:110px / medium: min-w:137px</p>
-          <p>아이템 — h:45px, px:16px, gap:24px</p>
-          <p>텍스트 — 14px Medium, lh:24px, text-wb-grey-04</p>
-          <p>Hover — bg-wb-grey-01 (#525252), top/bottom rounded:10px</p>
-          <p>아이콘 — heroicons outline 24px, text-wb-grey-04</p>
-          <p>항목 — invite, edit, delete, add, help, info, notification, feedback</p>
+      {/* ── Watch Status Menu (variants) ───── */}
+      <section>
+        <h2 className="text-xl font-bold text-black mb-4">Watch Status Menu</h2>
+
+        <div className="bg-wb-dark-02 rounded-lg p-6 flex flex-wrap gap-8 items-start">
+          <div>
+            <p className="text-xs font-semibold text-neutral-500 mb-3">upsert — 시청 상태 + 기록 삭제</p>
+            <WatchStatusMenu
+              variant="upsert"
+              onSelect={(s) => alert(`상태: ${s}`)}
+              onDelete={() => alert('기록 삭제')}
+            />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-neutral-500 mb-3">box-content — 필터 (전체 / 기록 없음)</p>
+            <WatchStatusMenu
+              variant="box-content"
+              selected={boxContentFilter}
+              onFilterChange={(f) => setBoxContentFilter(f)}
+            />
+            <p className="mt-2 text-[11px] text-neutral-400">선택: {boxContentFilter}</p>
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-neutral-500 mb-3">content-record — 필터 (전체 / 좋아요)</p>
+            <WatchStatusMenu
+              variant="content-record"
+              selected={contentRecordFilter}
+              onFilterChange={(f) => setContentRecordFilter(f)}
+            />
+            <p className="mt-2 text-[11px] text-neutral-400">선택: {contentRecordFilter}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Plain Context Menu ─────────────── */}
+      <section>
+        <h2 className="text-xl font-bold text-black mb-4">Plain Context Menu</h2>
+
+        <div className="bg-wb-dark-02 rounded-lg p-6 flex gap-8">
+          <div>
+            <p className="text-xs font-semibold text-neutral-500 mb-3">w120 — 정렬 옵션</p>
+            <PlainContextMenu
+              items={[
+                { label: '최근 저장순', onClick: () => alert('최근 저장순') },
+                { label: '오래된 저장순', onClick: () => alert('오래된 저장순') },
+                { label: '최근 연도순', onClick: () => alert('최근 연도순') },
+                { label: '오래된 연도순', onClick: () => alert('오래된 연도순') },
+              ]}
+            />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-neutral-500 mb-3">w135 — 좋아요 필터</p>
+            <PlainContextMenu
+              size="w135"
+              items={[
+                { label: '모두', onClick: () => alert('모두') },
+                { label: '나의 좋아요', onClick: () => alert('나의 좋아요') },
+                { label: '다른 멤버의 좋아요', onClick: () => alert('다른 멤버의 좋아요') },
+                { label: '공통 좋아요', onClick: () => alert('공통 좋아요') },
+              ]}
+            />
+          </div>
         </div>
       </section>
 

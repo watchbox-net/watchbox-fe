@@ -47,7 +47,7 @@ export default function BottomNav({ overridePathname, disableSticky }: BottomNav
       : pathname.startsWith(href);
 
   return (
-    <nav className={`bg-wb-dark-01 flex items-center justify-between px-4 ${
+    <nav className={`bg-wb-dark-01 flex items-center justify-between px-4 h-[63px] ${
       disableSticky ? 'w-full' : 'sticky bottom-0 w-full'
     }`}>
       {TABS.map((tab) => {
@@ -57,7 +57,7 @@ export default function BottomNav({ overridePathname, disableSticky }: BottomNav
           <Link
             key={tab.href}
             href={tab.href}
-            className="flex flex-col items-center justify-center gap-2 w-16 h-[72px] pb-[10px]"
+            className="flex flex-col items-center justify-center gap-2 w-16 h-full"
           >
             <tab.icon
               className={`w-[22px] h-[22px] ${

@@ -18,7 +18,7 @@ export async function fetchMyRecordedContentPage(
   params: ContentRecordQueryParams = {},
 ): Promise<ContentPageResponse> {
   const { data } = await privateApi.get<ApiResponse<ContentPageResponse>>(
-    '/records',
+    '/records/watch',
     { params },
   );
   return data.data;
@@ -38,12 +38,12 @@ export async function upsertWatchStatus(params: {
   watchMediaType: 'MOVIE' | 'TV';
   watchStatus: Exclude<WatchStatus, 'NONE'>;
 }): Promise<void> {
-  await privateApi.post('/records/status', params);
+  await privateApi.post('/records/watch/status', params);
 }
 
 /** 시청 기록 삭제 (로그인 필요) */
 export async function deleteWatchRecord(recordId: number): Promise<void> {
-  await privateApi.delete(`/records/status/${recordId}`);
+  await privateApi.delete(`/records/${recordId}/watch/status`);
 }
 
 /** 좋아요 등록 (로그인 필요) */
@@ -61,5 +61,5 @@ export async function addLike(params: {
 
 /** 좋아요 삭제 (로그인 필요) */
 export async function deleteLike(recordId: number): Promise<void> {
-  await privateApi.delete(`/records/likes/${recordId}`);
+  await privateApi.delete(`/records/${recordId}/likes`);
 }

@@ -9,6 +9,8 @@ import ContextMenu from '@/components/common/ContextMenu';
 import PlainContextMenu from '@/components/common/PlainContextMenu';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
 import type { WatchStatusFilter } from '@/components/common/WatchStatusMenu';
+import MediaTypeButton from '@/components/common/MediaTypeButton';
+import MediaTypeSwitchButton from '@/components/common/MediaTypeSwitchButton';
 
 const MODAL_DEMOS: { variant: ModalVariant; title: string; body: string; confirmLabel?: string }[] = [
   { variant: 'confirm',   title: '사용자 검색하기',     body: '공유 박스 멤버를 초대하기 위해\n사용자 검색 화면으로 이동하시겠습니까?' },
@@ -24,6 +26,7 @@ export default function UserActionComponentsPage() {
   const [activeModal, setActiveModal] = useState<ModalVariant | null>(null);
   const [boxContentFilter, setBoxContentFilter] = useState<WatchStatusFilter>('PLANNED');
   const [contentRecordFilter, setContentRecordFilter] = useState<WatchStatusFilter>('LIKED');
+  const [mediaTypeSelected, setMediaTypeSelected] = useState<'all' | 'movie' | 'tv'>('all');
 
   const activeDemo = MODAL_DEMOS.find((d) => d.variant === activeModal);
 
@@ -146,6 +149,51 @@ export default function UserActionComponentsPage() {
               onFilterChange={(f) => setContentRecordFilter(f)}
             />
             <p className="mt-2 text-[11px] text-neutral-400">선택: {contentRecordFilter}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Media Type Button / Switch Button / Line ───── */}
+      <section>
+        <h2 className="text-xl font-bold text-black mb-4">Media Type Button & Switch</h2>
+
+        {/* Media Type Button */}
+        <div className="mb-6">
+          <p className="text-xs font-semibold text-neutral-500 mb-2">Media Type Button — selected vs not</p>
+          <div className="bg-wb-dark-02 rounded-lg p-6 flex gap-3">
+            <MediaTypeButton selected>전체</MediaTypeButton>
+            <MediaTypeButton>영화</MediaTypeButton>
+            <MediaTypeButton>시리즈</MediaTypeButton>
+          </div>
+        </div>
+
+        {/* Media Type Switch Button */}
+        <div className="mb-6">
+          <p className="text-xs font-semibold text-neutral-500 mb-2">Media Type Switch Button — person / watch-media</p>
+          <div className="bg-wb-dark-02 rounded-lg p-6 flex gap-4">
+            <MediaTypeSwitchButton variant="person" />
+            <MediaTypeSwitchButton variant="watch-media" />
+          </div>
+        </div>
+
+        {/* Content Media Type Line — 박스 컨텐츠 페이지에서 사용되는 row 조합 */}
+        <div>
+          <p className="text-xs font-semibold text-neutral-500 mb-2">Content Media Type Line — 박스 컨텐츠 페이지 row</p>
+          <div className="bg-wb-dark-02 rounded-lg py-3">
+            {/* watch-media 모드 */}
+            <div className="flex items-center justify-between pl-[16px] pr-[5px] mb-3">
+              <div className="flex items-center gap-[8px]">
+                <MediaTypeButton selected={mediaTypeSelected === 'all'} onClick={() => setMediaTypeSelected('all')}>전체</MediaTypeButton>
+                <MediaTypeButton selected={mediaTypeSelected === 'movie'} onClick={() => setMediaTypeSelected('movie')}>영화</MediaTypeButton>
+                <MediaTypeButton selected={mediaTypeSelected === 'tv'} onClick={() => setMediaTypeSelected('tv')}>시리즈</MediaTypeButton>
+              </div>
+              <MediaTypeSwitchButton variant="person" />
+            </div>
+            {/* people 모드 */}
+            <div className="flex items-center justify-between pl-[16px] pr-[5px]">
+              <MediaTypeButton selected>인물</MediaTypeButton>
+              <MediaTypeSwitchButton variant="watch-media" />
+            </div>
           </div>
         </div>
       </section>

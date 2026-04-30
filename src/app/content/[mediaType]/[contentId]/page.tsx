@@ -18,7 +18,7 @@ import BoxIcon from '@/components/icons/BoxIcon';
 import WatchStatusIcon from '@/components/icons/WatchStatusIcon';
 import { ChevronLeftOutline } from '@/components/icons';
 import { fetchContentDetail } from '@/lib/api/content';
-import { addLike } from '@/lib/api/record';
+import { addLike } from '@/lib/api/watch-record';
 import { TMDB_POSTER, TMDB_BACKDROP } from '@/lib/utils/content';
 import type {
   ContentDetailResponse,

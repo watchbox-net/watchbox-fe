@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import Header from '@/components/common/Header';
 import TabNav from '@/components/common/TabNav';
 import ContentItem from '@/components/list/ContentItem';
@@ -18,7 +18,7 @@ import {
   type WatchMediaTypeFilter,
   type RecordSortOrder,
   type WatchRecordFilter,
-} from '@/lib/api/record';
+} from '@/lib/api/watch-record';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
 import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
@@ -87,6 +87,9 @@ export default function RecordPage() {
     queryFn: () => fetchMyRecordedContentPage({ watchMediaTypeFilter, sort, watchRecordFilter }),
     enabled: !authLoading && isAuthenticated,
     staleTime: 0,
+    refetchOnMount: 'always',
+    // 정렬/필터/탭 전환 시 새 데이터 도착 전까지 이전 결과 유지 → 0개 플래시 방지
+    placeholderData: keepPreviousData,
   });
 
   const items = pageData?.contentItemList ?? [];

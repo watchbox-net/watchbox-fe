@@ -10,7 +10,7 @@ import Toast from '@/components/common/Toast';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
 import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
-import { deleteWatchRecord } from '@/lib/api/record';
+import { deleteWatchRecord } from '@/lib/api/watch-record';
 import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
 import type { ContentItem as ContentItemData, WatchStatus } from '@/types/content-summary';
 

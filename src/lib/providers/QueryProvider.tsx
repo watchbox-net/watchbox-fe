@@ -15,6 +15,9 @@ export default function QueryProvider({ children }: { children: React.ReactNode 
             gcTime: 30 * 60 * 1000,
             // 윈도우 포커스 시 자동 재요청 비활성화
             refetchOnWindowFocus: false,
+            // ⚠️ 항상 최신 데이터가 필요한 페이지는 useQuery에서 개별적으로
+            //    staleTime: 0 + refetchOnMount: 'always' 로 오버라이드할 것
+            //    (예: record / box 리스트 / 박스 컨텐츠 페이지)
           },
         },
       }),

@@ -50,6 +50,8 @@ export default function BoxContentsPage() {
       const res = await fetchBoxContents(boxId);
       return res.contentItemList;
     },
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 
   // 외부 클릭 시 메뉴 닫기

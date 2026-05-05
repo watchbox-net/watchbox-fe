@@ -239,7 +239,7 @@ export default function ContentDetailPage() {
           ) : (
             <div className="w-full h-full bg-wb-dark-03" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/20" />
+          <div className="absolute inset-0 from-black/40 via-transparent to-black/20" />
           <button
             type="button"
             onClick={() => router.back()}

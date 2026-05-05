@@ -1,8 +1,11 @@
+# syntax=docker/dockerfile:1.7
+
 # 1단계: 의존성 설치
 FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --prefer-offline --no-audit --no-fund
 
 # 2단계: 빌드
 FROM node:22-alpine AS builder

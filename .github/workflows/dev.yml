@@ -4,61 +4,33 @@ on:
   workflow_dispatch:
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ghcr.io/chyun5197/watchbox-fe
+  DOCKER_IMAGE: watchbox-fe:latest
 
 jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+  build-and-deploy:
+    runs-on: [self-hosted, dev, frontend]
 
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to GHCR
-        uses: docker/login-action@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          node-version: '22'
 
-      - name: Build and Push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          build-args: |
-            NEXT_PUBLIC_SERVER_URL=https://dev-api.watch-box.net
-          tags: |
-            ${{ env.IMAGE_NAME }}:dev
-            ${{ env.IMAGE_NAME }}:dev-${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: Install dependencies
+        run: npm ci
 
-  deploy:
-    needs: build-and-push
-    runs-on: [self-hosted, dev, frontend]
-
-    steps:
-      - name: Login to GHCR
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-      - name: Pull image
-        run: docker pull ${{ env.IMAGE_NAME }}:dev
+      - name: Build Docker image
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_SERVER_URL=https://dev-api.watch-box.net \
+            -f Dockerfile \
+            -t ${{ env.DOCKER_IMAGE }} .
 
       - name: Deploy with Docker Compose
         working-directory: /home/ubuntu/app
         run: |
           docker compose up -d --no-deps watchbox-fe
           docker image prune -f
-
-      - name: Logout from GHCR
-        if: always()
-        run: docker logout ghcr.io

@@ -264,7 +264,7 @@ export default function RecordPage() {
         )}
         {!authLoading && !loading && !isAuthenticated && (
           <div className="flex flex-col items-center gap-[16px] py-[60px]">
-            <p className="text-[16px] text-wb-grey-03">로그인이 필요한 페이지입니다.</p>
+            <p className="text-[16px] text-wb-grey-03">로그인 후 이용해 보세요.</p>
             <button
               type="button"
               onClick={() => router.push('/login')}

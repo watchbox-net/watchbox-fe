@@ -16,18 +16,14 @@ jobs:
       - name: Git Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Install dependencies
-        run: npm ci
-
       - name: Build Docker image
+        env:
+          DOCKER_BUILDKIT: 1
         run: |
           docker build \
             --build-arg NEXT_PUBLIC_SERVER_URL=https://api.watch-box.net \
+            --cache-from ${{ env.DOCKER_IMAGE }} \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
             -f Dockerfile \
             -t ${{ env.DOCKER_IMAGE }} .
 

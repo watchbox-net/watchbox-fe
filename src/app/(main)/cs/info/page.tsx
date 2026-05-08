@@ -14,7 +14,7 @@ const INFO_ITEMS: { label: string; value: React.ReactNode }[] = [
       </>
     ),
   },
-  { label: '버전', value: <p>v1.2.0-beta</p> },
+  { label: '버전', value: <p>v1.3.0-beta</p> },
   { label: '이메일', value: <p>watchboxnet@gmail.net</p> },
   { label: '제작자', value: <p>최현</p> },
 ];

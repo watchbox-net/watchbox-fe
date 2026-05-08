@@ -86,10 +86,10 @@ export default function TvDetailPage() {
   const t = detail.contentInfo as TvInfo;
   const posterUrl = t.posterPath ? `${TMDB_POSTER.md}${t.posterPath}` : null;
 
-  // 메타: "2010-2022 · 액션, 어드벤처, 드라마"
+  // 메타: "2010-2022 · 액션, 어드벤처, 드라마" (TV 장르 최대 3개)
   const metaText = [
     formatYearRange(t.firstYear, t.lastYear),
-    t.genreList?.join(', '),
+    t.genreList?.slice(0, 3).join(', '),
   ].filter(Boolean).join(' · ');
 
   // 상세 정보 행

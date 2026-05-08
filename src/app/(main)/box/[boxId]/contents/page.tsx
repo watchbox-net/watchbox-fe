@@ -23,7 +23,7 @@ import {
 import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
 import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
-import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
+import { getContentDetailPath } from '@/lib/utils/content';
 import type { ContentItem as ContentItemData, WatchStatus, ContentPageResponse } from '@/types/content-summary';
 import type { BoxType } from '@/types/box';
 
@@ -192,10 +192,6 @@ export default function BoxContentsPage() {
 
   const renderItem = (item: ContentItemData) => {
     const summary = item.contentSummary;
-    const imageUrl = getImageUrl(summary);
-    const title = getDisplayTitle(summary);
-    const year = 'year' in summary ? summary.year : null;
-    const genres = 'genreList' in summary ? summary.genreList : null;
     const watchStatus = item.memberRecord?.watchStatus ?? null;
     const itemId = item.boxContentId ?? summary.tmdbId;
     const isMenuOpen = openMenuId === itemId;
@@ -205,7 +201,7 @@ export default function BoxContentsPage() {
       ? { mode: 'shared' as const, publishers: item.publisherSummaryList?.map((p) => p.nickname) ?? [] }
       : { mode: 'my' as const, liked: item.memberRecord?.liked === true };
 
-    // PERSON 항목에는 시청상태 메뉴 없음
+    // PERSON 항목은 ContentItem 내부에서 시청 상태 아이콘 자체가 노출 X
     const menu: ReactNode = !isPerson && isMenuOpen ? (
       <div
         ref={menuRef}
@@ -221,15 +217,11 @@ export default function BoxContentsPage() {
     return (
       <ContentItem
         key={itemId}
-        posterSrc={imageUrl}
-        title={title}
-        year={year}
-        genres={genres}
+        summary={summary}
         watchStatus={watchStatus}
         boxMode={boxMode}
-        onClick={() => router.push(`/content/${summary.mediaType}/${summary.tmdbId}`)}
-        onStatusClick={(e) => {
-          if (isPerson) return; // 인물은 상태변경 불가
+        onClick={() => router.push(getContentDetailPath(summary.mediaType, summary.tmdbId))}
+        onStatusClick={isPerson ? undefined : (e) => {
           if (!authLoading && !isAuthenticated) {
             showLoginModal();
             return;

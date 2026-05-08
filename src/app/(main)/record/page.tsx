@@ -23,7 +23,7 @@ import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
 import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
 import type { ContentItem as ContentItemData, WatchStatus, ContentPageResponse } from '@/types/content-summary';
-import { getImageUrl, getDisplayTitle } from '@/lib/utils/content';
+import { getContentDetailPath } from '@/lib/utils/content';
 
 // ── 탭 → 미디어타입 필터 매핑 ────────────────────────────────
 const TABS: { key: WatchMediaTypeFilter; label: string }[] = [
@@ -148,8 +148,6 @@ export default function RecordPage() {
 
   const renderItem = (item: ContentItemData) => {
     const summary = item.contentSummary;
-    const year = 'year' in summary ? summary.year : null;
-    const genres = 'genreList' in summary ? summary.genreList : null;
     const itemId = item.memberRecord?.recordId ?? summary.tmdbId;
     const isMenuOpen = openMenuId === itemId;
 
@@ -168,13 +166,10 @@ export default function RecordPage() {
     return (
       <ContentItem
         key={itemId}
-        posterSrc={getImageUrl(summary)}
-        title={getDisplayTitle(summary)}
-        year={year}
-        genres={genres}
+        summary={summary}
         watchStatus={item.memberRecord?.watchStatus ?? null}
         boxMode={{ mode: 'my', liked: item.memberRecord?.liked === true }}
-        onClick={() => router.push(`/content/${summary.mediaType}/${summary.tmdbId}`)}
+        onClick={() => router.push(getContentDetailPath(summary.mediaType, summary.tmdbId))}
         onStatusClick={(e) => {
           if (!authLoading && !isAuthenticated) { showLoginModal(); return; }
           if (isMenuOpen) { setOpenMenuId(null); return; }

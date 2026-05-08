@@ -6,7 +6,7 @@ import type {
   ContentBoxUpdateResponse,
 } from '@/types/content-box';
 
-type ContentMediaType = 'MOVIE' | 'TV';
+type ContentMediaType = 'MOVIE' | 'TV' | 'PERSON';
 
 /**
  * 컨텐츠가 사용자의 박스들에 포함되어 있는지 조회

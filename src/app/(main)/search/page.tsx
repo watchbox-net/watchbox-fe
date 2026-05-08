@@ -6,9 +6,10 @@ import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/common/Header';
 import TabNav from '@/components/common/TabNav';
 import MainContent from '@/components/common/MainContent';
-import Image from 'next/image';
+import ContentItem from '@/components/list/ContentItem';
+import ContentList from '@/components/list/ContentList';
 import { searchMulti, searchMovies, searchTv, searchPerson } from '@/lib/api/search';
-import { getImageUrl, getDisplayTitle, getSubText } from '@/lib/utils/content';
+import { getContentDetailPath } from '@/lib/utils/content';
 
 const TABS = [
   { key: 'multi', label: '전체' },
@@ -109,42 +110,24 @@ function SearchContent() {
         )}
 
         {!isLoading && items.length > 0 && (
-          <div>
+          <>
             <p className="px-4 py-2 text-xs text-neutral-500">
               총 {totalCount.toLocaleString()}건
             </p>
-            <ul>
-              {items.map((item) => (
-                <li
-                  key={`${item.contentSummary.mediaType}-${item.contentSummary.tmdbId}`}
-                  className="flex items-center gap-3 px-4 py-3 border-b border-neutral-800 cursor-pointer"
-                  onClick={() => router.push(`/content/${item.contentSummary.mediaType}/${item.contentSummary.tmdbId}`)}
-                >
-                  {getImageUrl(item.contentSummary) ? (
-                    <Image
-                      src={getImageUrl(item.contentSummary)!}
-                      alt={getDisplayTitle(item.contentSummary)}
-                      width={64}
-                      height={88}
-                      className="w-16 h-22 rounded object-cover shrink-0 bg-neutral-800"
-                    />
-                  ) : (
-                    <div className="w-16 h-22 rounded bg-neutral-800 shrink-0 flex items-center justify-center text-neutral-600 text-xs">
-                      No img
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-wb-white truncate">
-                      {getDisplayTitle(item.contentSummary)}
-                    </p>
-                    <p className="text-xs text-neutral-500 truncate">
-                      {getSubText(item.contentSummary)}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
+            <ContentList>
+              {items.map((item) => {
+                const summary = item.contentSummary;
+                return (
+                  <ContentItem
+                    key={`${summary.mediaType}-${summary.tmdbId}`}
+                    summary={summary}
+                    watchStatus={item.memberRecord?.watchStatus ?? null}
+                    onClick={() => router.push(getContentDetailPath(summary.mediaType, summary.tmdbId))}
+                  />
+                );
+              })}
+            </ContentList>
+          </>
         )}
       </MainContent>
     </>

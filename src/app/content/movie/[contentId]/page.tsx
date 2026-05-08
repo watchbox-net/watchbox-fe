@@ -79,10 +79,10 @@ export default function MovieDetailPage() {
   const m = detail.contentInfo as MovieInfo;
   const posterUrl = m.posterPath ? `${TMDB_POSTER.md}${m.posterPath}` : null;
 
-  // 메타 텍스트: "2025 · 모험, 애니메이션 · 108분"
+  // 메타 텍스트: "2025 · 모험, 애니메이션 · 108분" (영화 장르 최대 2개)
   const metaText = [
     m.year,
-    m.genreList?.join(', '),
+    m.genreList?.slice(0, 2).join(', '),
     m.runtime ? `${m.runtime}분` : null,
   ].filter(Boolean).join(' · ');
 

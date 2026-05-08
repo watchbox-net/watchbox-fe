@@ -40,7 +40,7 @@ export default function DetailPosterTitle({
           <p className="text-[11px] text-wb-grey-04 truncate">{titleOriginal}</p>
         )}
         {metaText && (
-          <p className="text-[12px] text-wb-grey-04 mt-[2px]">{metaText}</p>
+          <p className="text-[12px] text-wb-grey-04">{metaText}</p>
         )}
       </div>
     </div>

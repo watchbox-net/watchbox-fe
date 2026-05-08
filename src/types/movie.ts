@@ -1,23 +1,33 @@
-/** 영화 상세 정보 (ContentInfo → MOVIE) */
+import type { PersonCredit } from './credit';
+
+/**
+ * 영화 상세 정보 (ContentInfo → MOVIE)
+ * BE: net.watchbox.domain.content.dto.detail.MovieInfo
+ */
 export interface MovieInfo {
   contentId: number | null;
   tmdbId: number;
+
+  // 헤더 영역
+  backdropPath: string | null;
+  posterPath: string | null;
   titleKo: string;
   titleOriginal: string | null;
-  posterPath: string | null;
   year: number | null;
   genreList: string[] | null;
-  overview: string | null;
-  backdropPath: string | null;
-  originalLanguage: string | null;
-  releaseDate: string | null;
-  adult: boolean | null;
-  status: string | null;
   runtime: number | null;
-  tagline: string | null;
-  homepage: string | null;
-  budget: number | null;
-  revenue: number | null;
+  overview: string | null;
+
+  // 상세 정보
+  /** ISO date string (YYYY-MM-DD) */
+  releaseDate: string | null;
+  originCountry: string | null;
+  // productionCompanyList: string[] | null;  // BE 보류
+
+  // append_to_response
+  personCredit: PersonCredit | null;
+  watchProviderList: string[] | null;
+  backdropPathList: string[] | null;
 }
 
 /** 영화 요약 (ContentSummary → MOVIE) */
@@ -29,8 +39,8 @@ export interface MovieSummary {
   posterPath: string | null;
   voteAverage: number | null;
   voteCount: number | null;
-  year: number | null;
-  title: string;
+  title: string;          // titleKo
   titleOriginal: string | null;
+  releaseYear: number | null;
   genreList: string[] | null;
 }

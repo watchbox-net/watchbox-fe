@@ -4,7 +4,8 @@ import type { ReactNode } from 'react';
 import Poster from '@/components/content/Poster';
 import WatchStatusIcon from '@/components/icons/WatchStatusIcon';
 import MemberInfo from '@/components/list/MemberInfo';
-import type { WatchStatus as WatchStatusType } from '@/types/content-summary';
+import { getImageUrl, getDisplayTitle, getSubText } from '@/lib/utils/content';
+import type { ContentSummary, WatchStatus as WatchStatusType } from '@/types/content-summary';
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -23,21 +24,15 @@ interface SharedBoxMode {
 type BoxMode = MyBoxMode | SharedBoxMode;
 
 interface ContentItemProps {
-  /** 포스터 이미지 URL */
-  posterSrc?: string | null;
-  /** 콘텐츠 제목 */
-  title: string;
-  /** 연도 */
-  year?: number | null;
-  /** 장르 목록 */
-  genres?: string[] | null;
-  /** 시청 상태 */
+  /** 콘텐츠 요약 (mediaType에 따라 표시 분기) */
+  summary: ContentSummary;
+  /** 시청 상태 (PERSON 변형에서는 무시됨) */
   watchStatus?: WatchStatusType | null;
   /** 박스 모드에 따른 하단 정보 */
   boxMode?: BoxMode;
   /** 클릭 시 실행 (상세 페이지 이동 등) */
   onClick?: () => void;
-  /** 시청 상태 아이콘 클릭 시 실행 (stopPropagation 처리됨) */
+  /** 시청 상태 아이콘 클릭 시 실행 (PERSON에서는 호출되지 않음) */
   onStatusClick?: (e: React.MouseEvent) => void;
   /** 아이콘 영역 relative 기준으로 absolute 배치되는 메뉴 슬롯 */
   statusMenuSlot?: ReactNode;
@@ -52,14 +47,15 @@ function toIconStatus(ws: WatchStatusType | null | undefined) {
 
 // ─── Component ──────────────────────────────────────────────
 /**
- * 박스 컨텐츠 리스트의 한 행
- * 피그마 Content Item 컴포넌트 대응
+ * 콘텐츠 리스트의 한 행 (Content Item)
+ *
+ * 피그마 Content Item 컴포넌트 셋 대응 — mediaType에 따라 3가지 variant
+ * - MOVIE:  releaseYear · 장르1, 장르2
+ * - TV:     firstAirYear-lastAirYear · 장르1, 장르2
+ * - PERSON: knownForDepartment (시청 상태 아이콘 없음)
  */
 export default function ContentItem({
-  posterSrc,
-  title,
-  year,
-  genres,
+  summary,
   watchStatus,
   boxMode,
   onClick,
@@ -67,8 +63,10 @@ export default function ContentItem({
   statusMenuSlot,
   className,
 }: ContentItemProps) {
-  // 연도 · 장르1, 장르2
-  const infoLine = [year, genres?.join(', ')].filter(Boolean).join(' · ');
+  const isPerson = summary.mediaType === 'PERSON';
+  const title = getDisplayTitle(summary);
+  const posterSrc = getImageUrl(summary);
+  const subText = getSubText(summary);
 
   // MemberInfo variant
   const memberVariant = !boxMode
@@ -89,11 +87,11 @@ export default function ContentItem({
         <Poster src={posterSrc} alt={title} size="small" />
 
         <div className="flex flex-col gap-[5px] min-w-0">
-          {/* 제목 + 연도/장르 */}
+          {/* 제목 + 부제 (variant별로 다른 형식) */}
           <div className="flex flex-col gap-[6px]">
             <p className="text-[16px] font-medium text-white truncate">{title}</p>
-            {infoLine && (
-              <p className="text-[12px] text-wb-grey-03 truncate">{infoLine}</p>
+            {subText && (
+              <p className="text-[12px] text-wb-grey-03 truncate">{subText}</p>
             )}
           </div>
 
@@ -102,16 +100,18 @@ export default function ContentItem({
         </div>
       </div>
 
-      {/* 오른쪽: 시청 상태 아이콘 */}
-      <div className="relative shrink-0 ml-[10px]">
-        <div
-          className={onStatusClick ? 'cursor-pointer' : ''}
-          onClick={onStatusClick}
-        >
-          <WatchStatusIcon status={toIconStatus(watchStatus)} size="medium" />
+      {/* 오른쪽: 시청 상태 아이콘 (PERSON은 노출 X) */}
+      {!isPerson && (
+        <div className="relative shrink-0 ml-[10px]">
+          <div
+            className={onStatusClick ? 'cursor-pointer' : ''}
+            onClick={onStatusClick}
+          >
+            <WatchStatusIcon status={toIconStatus(watchStatus)} size="medium" />
+          </div>
+          {statusMenuSlot}
         </div>
-        {statusMenuSlot}
-      </div>
+      )}
     </div>
   );
 }

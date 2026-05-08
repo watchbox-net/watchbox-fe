@@ -10,6 +10,65 @@ import HatSmall from '@/components/box/HatSmall';
 import BodyMediumEmpty from '@/components/box/BodyMediumEmpty';
 import BodySmallEmpty from '@/components/box/BodySmallEmpty';
 import Image from 'next/image';
+import type { MovieSummary } from '@/types/movie';
+import type { TvSummary } from '@/types/tv';
+import type { PersonSummary } from '@/types/person';
+
+// ─── Mock helpers ──────────────────────────────────────────
+const mockMovie = (
+  tmdbId: number,
+  title: string,
+  releaseYear: number,
+  genreList: string[],
+): MovieSummary => ({
+  contentId: null,
+  tmdbId,
+  mediaType: 'MOVIE',
+  popularity: null,
+  posterPath: null,
+  voteAverage: null,
+  voteCount: null,
+  title,
+  titleOriginal: null,
+  releaseYear,
+  genreList,
+});
+
+const mockTv = (
+  tmdbId: number,
+  name: string,
+  firstAirYear: number,
+  lastAirYear: number | null,
+  genreList: string[],
+): TvSummary => ({
+  contentId: null,
+  tmdbId,
+  mediaType: 'TV',
+  popularity: null,
+  posterPath: null,
+  voteAverage: null,
+  voteCount: null,
+  name,
+  nameOriginal: null,
+  firstAirYear,
+  lastAirYear,
+  genreList,
+});
+
+const mockPerson = (
+  tmdbId: number,
+  name: string,
+  knownForDepartment: string,
+): PersonSummary => ({
+  contentId: null,
+  tmdbId,
+  mediaType: 'PERSON',
+  popularity: null,
+  profilePath: null,
+  name,
+  nameOriginal: null,
+  knownForDepartment,
+});
 
 const SAMPLE_POSTER1 = 'https://image.tmdb.org/t/p/w185/o0d6Us9VWOW0nHhoB7ZNIwigARG.jpg'; // 더 립
 const SAMPLE_POSTER2 = 'https://image.tmdb.org/t/p/w185/ib6v6qUXzez1x2qIOLN7C0yJNPQ.jpg'; // 주토피아2
@@ -45,39 +104,53 @@ export default function ListComponentsPage() {
 
       {/* ── ContentItem ─────────────────── */}
       <section>
-        <h2 className="text-xl font-bold text-black mb-4">Content List Item</h2>
+        <h2 className="text-xl font-bold text-black mb-4">Content List Item (Movie / TV / Person)</h2>
 
-        {/* 마이 박스 예시 */}
+        {/* 영화 (releaseYear · 장르) */}
         <div className="mb-6">
-          <p className="text-sm font-semibold text-neutral-600 mb-2">마이 박스 (liked 표시)</p>
+          <p className="text-sm font-semibold text-neutral-600 mb-2">영화 — releaseYear · 장르</p>
           <div className="bg-wb-dark-02 rounded-lg">
             <ContentItem
-              title="더 립"
-              year={2025}
-              genres={['액션', '스릴러', '범죄']}
+              summary={mockMovie(1, '더 립', 2025, ['액션', '스릴러', '범죄'])}
               watchStatus="WATCHING"
               boxMode={{ mode: 'my', liked: false }}
             />
             <ContentItem
-              title="주토피아 2"
-              year={2025}
-              genres={['애니메이션', '코미디', '모험']}
-              watchStatus="WATCHING"
+              summary={mockMovie(2, '아바타: 불과 재', 2025, ['SF', '모험', '판타지'])}
+              watchStatus="PLANNED"
               boxMode={{ mode: 'my', liked: true }}
             />
+          </div>
+        </div>
+
+        {/* TV (firstAirYear-lastAirYear · 장르) */}
+        <div className="mb-6">
+          <p className="text-sm font-semibold text-neutral-600 mb-2">TV — firstAirYear-lastAirYear · 장르</p>
+          <div className="bg-wb-dark-02 rounded-lg">
             <ContentItem
-              title="아바타: 불과 재"
-              year={2025}
-              genres={['SF', '모험', '판타지']}
-              watchStatus="PLANNED"
-              boxMode={{ mode: 'my', liked: false }}
-            />
-            <ContentItem
-              title="프레데터: 죽음의 땅"
-              year={2025}
-              genres={['액션', 'SF', '모험']}
+              summary={mockTv(101, '워킹 데드', 2010, 2022, ['액션', '어드벤처'])}
               watchStatus="COMPLETED"
               boxMode={{ mode: 'my', liked: true }}
+            />
+            <ContentItem
+              summary={mockTv(102, '오징어 게임', 2021, null, ['스릴러', '드라마'])}
+              watchStatus="WATCHING"
+              boxMode={{ mode: 'my', liked: false }}
+            />
+          </div>
+        </div>
+
+        {/* 인물 (knownForDepartment, 시청 상태 아이콘 없음) */}
+        <div className="mb-6">
+          <p className="text-sm font-semibold text-neutral-600 mb-2">인물 — knownForDepartment (시청 상태 X)</p>
+          <div className="bg-wb-dark-02 rounded-lg">
+            <ContentItem
+              summary={mockPerson(201, '레오나르도 디카프리오', '배우')}
+              boxMode={{ mode: 'my', liked: true }}
+            />
+            <ContentItem
+              summary={mockPerson(202, '봉준호', '감독')}
+              boxMode={{ mode: 'shared', publishers: ['사용자A', '사용자B'] }}
             />
           </div>
         </div>
@@ -87,29 +160,17 @@ export default function ListComponentsPage() {
           <p className="text-sm font-semibold text-neutral-600 mb-2">공유 박스 (공유 멤버 표시)</p>
           <div className="bg-wb-dark-02 rounded-lg">
             <ContentItem
-              title="더 립"
-              year={2025}
-              genres={['액션', '스릴러', '범죄']}
+              summary={mockMovie(3, '더 립', 2025, ['액션', '스릴러', '범죄'])}
               watchStatus="PLANNED"
               boxMode={{ mode: 'shared', publishers: ['사용자A', '사용자B'] }}
             />
             <ContentItem
-              title="주토피아 2"
-              year={2025}
-              genres={['애니메이션', '코미디', '모험']}
+              summary={mockTv(103, '워킹 데드', 2010, 2022, ['액션', '어드벤처'])}
               watchStatus="WATCHING"
               boxMode={{ mode: 'shared', publishers: ['사용자A', '사용자B'] }}
             />
-            <ContentItem
-              title="스폰지밥 무비: 네모바지를 찾아서"
-              year={2025}
-              genres={['애니메이션', '가족', '코미디']}
-              watchStatus="PLANNED"
-              boxMode={{ mode: 'shared', publishers: ['사용자A'] }}
-            />
           </div>
         </div>
-
       </section>
 
       {/* ── Hat (TriplePosterBox 모자) ───────────── */}

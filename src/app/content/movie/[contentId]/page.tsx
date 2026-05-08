@@ -139,7 +139,7 @@ export default function MovieDetailPage() {
         />
 
         {/* 상세 정보 */}
-        <DetailCategoryTitle title="상세 정보" line className="mt-[30px]" />
+        <DetailCategoryTitle title="상세 정보" line className="mt-[35px]" />
         <InfoTable rows={infoRows} />
 
         {/* 출연/제작 */}
@@ -150,7 +150,7 @@ export default function MovieDetailPage() {
               more
               line
               onMore={() => router.push(`/content/movie/${tmdbId}/credits`)}
-              className="mt-[40px]"
+              className="mt-[45px]"
             />
             <CreditScroll
               cast={credit.castList}
@@ -168,7 +168,7 @@ export default function MovieDetailPage() {
               more
               line
               onMore={() => router.push(`/content/movie/${tmdbId}/images`)}
-              className="mt-[40px]"
+              className="mt-[45px]"
             />
             <BackdropGallery paths={m.backdropPathList} max={4} />
           </>

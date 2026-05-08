@@ -128,7 +128,7 @@ export default function ContentActionBar({
 
   return (
     <>
-      <div className="flex items-start justify-around px-[20px] py-[24px]">
+      <div className="flex items-start justify-around px-[20px] pt-[17px]">
         {/* 좋아요 */}
         <button
           type="button"

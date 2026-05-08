@@ -118,7 +118,7 @@ export default function PersonDetailPage() {
 
       <MainContent>
         {/* ── 구역 1: 프로필 (이미지 + 우측 정보 세로 중앙) ─────── */}
-        <section className="flex items-center gap-[14px] px-[16px] pt-[12px] pb-[20px]">
+        <section className="flex items-center gap-[14px] px-[16px] pt-[12px] ">
           <div className="w-[115px] h-[163px] rounded-[10px] overflow-hidden shrink-0 bg-wb-dark-03">
             {profileUrl ? (
               <Image
@@ -171,9 +171,12 @@ export default function PersonDetailPage() {
         </section>
 
         {/* ── 구역 2: 작품 ─────────────────────────────── */}
-        <section>
+        <section className="mt-[15px] ">
+          {/* 구분선 (피그마: 구역 1 ↔ 구역 2 사이 라인 — 가로 전체, dark-04, 1px) */}
+          <div className="h-px bg-wb-dark-04" />
+
           {/* 필터 탭 (전체/영화/시리즈) — 백엔드 미준비, 클릭 시 토스트 */}
-          <div className="flex items-center gap-[8px] px-[16px] pt-[8px]">
+          <div className="flex items-center gap-[8px] px-[16px] pt-[10px]">
             {FILTER_TABS.map(({ key, label }) => (
               <MediaTypeButton
                 key={key}
@@ -229,10 +232,14 @@ export default function PersonDetailPage() {
           )}
         </section>
 
+        {/* 구분선 (피그마: 구역 2 ↔ 구역 3 사이 라인 — 가로 전체, dark-04, 1px) */}
+        <div className="pt-[12px]" />
+        <div className="h-px bg-wb-dark-04" />
+
         {/* ── 구역 3: 소개 ─────────────────────────────── */}
         {p.biography && (
-          <section className="mt-[8px]">
-            <DetailCategoryTitle title="소개" line />
+          <section className="mt-[15px]">
+            <DetailCategoryTitle title="소개" />
             <BiographyBlock biography={p.biography} expanded={bioExpanded} onToggle={() => setBioExpanded((v) => !v)} />
           </section>
         )}
@@ -293,7 +300,7 @@ function BiographyBlock({
 
   return (
     <>
-      <p className="text-[13px] font-medium leading-[22px] text-wb-grey-04 px-[16px] pt-[12px] whitespace-pre-line">
+      <p className="text-[13px] font-regular leading-[22px] text-wb-white-02 px-[16px] pt-[10px] whitespace-pre-line">
         {shown}
       </p>
       {needsExpansion && (

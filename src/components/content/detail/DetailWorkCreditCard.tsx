@@ -72,19 +72,19 @@ export default function DetailWorkCreditCard({
       <TruncatedText
         text={title}
         ellipsis=".."
-        className="w-full text-[13px] font-semibold text-white text-center leading-[1.5]"
+        className="w-full text-[13px] font-medium text-wb-white-02 text-center leading-[1.5]"
       />
 
       {/* 2줄: 캐스트=캐릭터 / 크루=역할 */}
       {subText && (
-        <p className="w-full text-[11px] text-wb-grey-03 text-center truncate leading-[1.5]">
+        <p className="w-full text-[11px] font-regular text-wb-grey-03 text-center truncate leading-[1.5]">
           {subText}
         </p>
       )}
 
       {/* 3줄: 날짜 */}
       {date && (
-        <p className="w-full text-[11px] text-wb-grey-03 text-center leading-[1.5]">
+        <p className="w-full text-[11px] font-regular text-wb-grey-03 text-center leading-[1.5]">
           {date}
         </p>
       )}

@@ -21,7 +21,7 @@ export default function BackdropGallery({ paths, max = 4, className }: BackdropG
   const items = paths.slice(0, max);
 
   return (
-    <div className={`grid grid-cols-2 gap-[7px] px-[16px] py-[12px] ${className ?? ''}`}>
+    <div className={`grid grid-cols-2 gap-[7px] px-[16px] pt-[12px] ${className ?? ''}`}>
       {items.map((p, idx) => (
         <div
           key={`${p}-${idx}`}

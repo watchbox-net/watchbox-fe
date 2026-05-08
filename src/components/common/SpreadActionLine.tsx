@@ -31,20 +31,21 @@ export default function SpreadActionLine({
   return (
     <div
       className={[
-        'w-full h-[44px] flex items-center justify-center',
+        // 하단 간격 제거 — 바로 라인/다음 섹션이 붙도록 pt만 적용
+        'w-full flex items-end justify-center pt-[12px]',
         className ?? '',
       ].filter(Boolean).join(' ')}
     >
       <button
         type="button"
         onClick={onToggle}
-        className="inline-flex items-center gap-[4px] px-[8px] py-[4px] text-[14px] text-wb-white-02 cursor-pointer"
+        className="inline-flex items-center gap-[4px] px-[8px] py-[4px] text-[14px] text-wb-white-01 cursor-pointer"
       >
         <span>{expanded ? collapseLabel : expandLabel}</span>
         {expanded ? (
-          <ChevronUpOutline className="size-[16px] text-wb-white-02" />
+          <ChevronUpOutline className="size-[16px] text-wb-white-01" />
         ) : (
-          <ChevronDownOutline className="size-[16px] text-wb-white-02" />
+          <ChevronDownOutline className="size-[16px] text-wb-white-01" />
         )}
       </button>
     </div>

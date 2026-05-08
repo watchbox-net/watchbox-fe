@@ -19,7 +19,7 @@ export default function InfoTable({ rows, className }: InfoTableProps) {
   const visibleRows = rows.filter((r) => !!r.value);
 
   return (
-    <div className={`flex flex-col gap-[10px] px-[20px] pt-[20px] pb-[16px] ${className ?? ''}`}>
+    <div className={`flex flex-col gap-[10px] px-[20px] pt-[20px] ${className ?? ''}`}>
       {visibleRows.map((row) => (
         <div key={row.label} className="flex gap-[20px]">
           <span className="w-[60px] shrink-0 text-[14px] text-wb-grey-03">{row.label}</span>

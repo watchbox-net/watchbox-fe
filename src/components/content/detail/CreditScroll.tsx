@@ -32,7 +32,7 @@ export default function CreditScroll({ cast, crew, scrollKey, className }: Credi
   return (
     <HorizontalScroll scrollKey={scrollKey} className={className}>
       {/* inline-flex + flex-col → 자식 너비 max만큼 가로 확장 → 부모가 가로 스크롤 처리 */}
-      <div className="inline-flex flex-col gap-[20px] px-[16px] py-[12px]">
+      <div className="inline-flex flex-col gap-[20px] px-[16px] pt-[12px]">
         {castItems.length > 0 && (
           <div className="flex gap-[10px]">
             {castItems.map((p) => (

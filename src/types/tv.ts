@@ -1,27 +1,36 @@
-/** TV 시리즈 상세 정보 (ContentInfo → TV) */
+import type { AggregatePersonCredit } from './credit';
+
+/**
+ * TV 시리즈 상세 정보 (ContentInfo → TV)
+ * BE: net.watchbox.domain.content.dto.detail.TvInfo
+ */
 export interface TvInfo {
   contentId: number | null;
   tmdbId: number;
+
+  // 헤더 영역
+  backdropPath: string | null;
+  posterPath: string | null;
   nameKo: string;
   nameOriginal: string | null;
-  posterPath: string | null;
-  popularity: number | null;
-  year: number | null;
+  firstYear: number | null;
+  lastYear: number | null;
   genreList: string[] | null;
   overview: string | null;
-  backdropPath: string | null;
-  originalLanguage: string | null;
+
+  // 상세 정보
+  /** ISO date string (YYYY-MM-DD) */
   firstAirDate: string | null;
-  adult: boolean | null;
-  status: string | null;
-  type: string | null;
-  tagline: string | null;
-  homepage: string | null;
-  budget: number | null;
-  revenue: number | null;
-  numberOfEpisodes: number | null;
-  numberOfSeasons: number | null;
+  /** ISO date string (YYYY-MM-DD) */
   lastAirDate: string | null;
+  numberOfSeasons: number | null;
+  originCountry: string | null;
+  // productionCompanyList: string[] | null;  // BE 보류
+
+  // append_to_response
+  watchProviderList: string[] | null;
+  personCredit: AggregatePersonCredit | null;
+  backdropPathList: string[] | null;
 }
 
 /** TV 시리즈 요약 (ContentSummary → TV) */
@@ -33,8 +42,9 @@ export interface TvSummary {
   posterPath: string | null;
   voteAverage: number | null;
   voteCount: number | null;
-  year: number | null;
-  name: string;
+  name: string;           // nameKo
   nameOriginal: string | null;
+  firstAirYear: number | null;
+  lastAirYear: number | null;
   genreList: string[] | null;
 }

@@ -6,7 +6,7 @@ import ContentBoxSheet, { SheetBox, SheetContent } from '@/components/sheet/Cont
 import { fetchContentBoxSheet, updateContentBoxes } from '@/lib/api/content-box';
 import type { ContentBoxItem } from '@/types/content-box';
 
-type ContentMediaType = 'MOVIE' | 'TV';
+type ContentMediaType = 'MOVIE' | 'TV' | 'PERSON';
 
 interface ContentBoxSheetContainerProps {
   /** 시트 표시 여부 */

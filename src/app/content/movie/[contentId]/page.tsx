@@ -32,6 +32,7 @@ export default function MovieDetailPage() {
   const [liked, setLiked] = useState(false);
   const [recordId, setRecordId] = useState<number | null>(null);
   const [watchStatus, setWatchStatus] = useState<WatchStatus | null>(null);
+  const [hasAddedInbox, setHasAddedInbox] = useState(false);
 
   // BottomNav 활성 경로 — useSyncExternalStore로 hydration 안전 처리
   const lastMainPath = useLastMainPath();
@@ -47,6 +48,7 @@ export default function MovieDetailPage() {
         setLiked(res.memberRecord?.liked === true);
         setRecordId(res.memberRecord?.recordId ?? null);
         setWatchStatus(res.memberRecord?.watchStatus ?? null);
+        setHasAddedInbox(res.hasAddedInbox);
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false));
@@ -128,9 +130,11 @@ export default function MovieDetailPage() {
             year: m.year,
             genres: m.genreList,
           }}
+          hasAddedInbox={hasAddedInbox}
           onLikedChange={setLiked}
           onWatchStatusChange={setWatchStatus}
           onRecordIdRefresh={setRecordId}
+          onHasAddedInboxChange={setHasAddedInbox}
           showToast={showToast}
         />
 
@@ -162,7 +166,7 @@ export default function MovieDetailPage() {
               title="이미지"
               more
               line
-              onMore={() => {/* TODO: 전체 보기 페이지 */}}
+              onMore={() => router.push(`/content/movie/${tmdbId}/images`)}
             />
             <BackdropGallery paths={m.backdropPathList} max={4} />
           </>

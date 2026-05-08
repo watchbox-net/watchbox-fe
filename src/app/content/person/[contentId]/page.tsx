@@ -45,6 +45,7 @@ export default function PersonDetailPage() {
 
   // 박스 시트
   const [boxSheetVisible, setBoxSheetVisible] = useState(false);
+  const [hasAddedInbox, setHasAddedInbox] = useState(false);
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { showLoginModal } = useLoginModal();
 
@@ -57,7 +58,10 @@ export default function PersonDetailPage() {
 
   useEffect(() => {
     fetchContentDetail('PERSON', tmdbId)
-      .then(setDetail)
+      .then((res) => {
+        setDetail(res);
+        setHasAddedInbox(res.hasAddedInbox);
+      })
       .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, [tmdbId]);
@@ -144,7 +148,7 @@ export default function PersonDetailPage() {
                   setBoxSheetVisible(true);
                 }}
               >
-                <BoxIcon variant="none" size="medium" />
+                <BoxIcon variant={hasAddedInbox ? 'added' : 'none'} size="medium" />
               </button>
             </div>
 
@@ -247,10 +251,20 @@ export default function PersonDetailPage() {
         }}
         mediaType="PERSON"
         tmdbId={tmdbId}
-        onCompleted={({ added, removed }) => {
+        onCompleted={async ({ added, removed }) => {
           if (added > 0 && removed > 0) showToast('박스 목록을 변경했습니다.');
           else if (added > 0) showToast('박스에 추가했습니다.');
           else if (removed > 0) showToast('박스에서 제거했습니다.');
+
+          // hasAddedInbox 동기화
+          if (added > 0 && removed === 0) {
+            setHasAddedInbox(true);
+          } else {
+            try {
+              const fresh = await fetchContentDetail('PERSON', tmdbId);
+              setHasAddedInbox(fresh.hasAddedInbox);
+            } catch {/* 무시 */}
+          }
         }}
       />
       <Toast

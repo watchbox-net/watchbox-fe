@@ -41,6 +41,7 @@ export default function TvDetailPage() {
   const [liked, setLiked] = useState(false);
   const [recordId, setRecordId] = useState<number | null>(null);
   const [watchStatus, setWatchStatus] = useState<WatchStatus | null>(null);
+  const [hasAddedInbox, setHasAddedInbox] = useState(false);
 
   const lastMainPath = useLastMainPath();
 
@@ -54,6 +55,7 @@ export default function TvDetailPage() {
         setLiked(res.memberRecord?.liked === true);
         setRecordId(res.memberRecord?.recordId ?? null);
         setWatchStatus(res.memberRecord?.watchStatus ?? null);
+        setHasAddedInbox(res.hasAddedInbox);
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false));
@@ -130,9 +132,11 @@ export default function TvDetailPage() {
             year: t.firstYear,
             genres: t.genreList,
           }}
+          hasAddedInbox={hasAddedInbox}
           onLikedChange={setLiked}
           onWatchStatusChange={setWatchStatus}
           onRecordIdRefresh={setRecordId}
+          onHasAddedInboxChange={setHasAddedInbox}
           showToast={showToast}
         />
 
@@ -163,7 +167,7 @@ export default function TvDetailPage() {
               title="이미지"
               more
               line
-              onMore={() => {/* TODO: 전체 보기 */}}
+              onMore={() => router.push(`/content/tv/${tmdbId}/images`)}
             />
             <BackdropGallery paths={t.backdropPathList} max={4} />
           </>

@@ -40,6 +40,10 @@ interface ContentActionBarProps {
   onRecordIdRefresh: (recordId: number | null) => void;
   /** 시청 상태 메뉴 "삭제하기" — recordId 보유 시에만 동작 */
   recordId: number | null;
+  /** 박스 보유 여부 (BoxIcon variant 결정) */
+  hasAddedInbox: boolean;
+  /** hasAddedInbox 변경 시 페이지에 알림 */
+  onHasAddedInboxChange: (value: boolean) => void;
   /** 토스트 표시 */
   showToast: (msg: string) => void;
 }
@@ -57,9 +61,11 @@ export default function ContentActionBar({
   watchStatus,
   sheetContent,
   recordId,
+  hasAddedInbox,
   onLikedChange,
   onWatchStatusChange,
   onRecordIdRefresh,
+  onHasAddedInboxChange,
   showToast,
 }: ContentActionBarProps) {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -142,7 +148,7 @@ export default function ContentActionBar({
             setBoxSheetVisible(true);
           }}
         >
-          <BoxIcon size="xl" variant="none" />
+          <BoxIcon size="xl" variant={hasAddedInbox ? 'added' : 'none'} />
           <span className="text-[11px] text-wb-white-02">박스에 추가</span>
         </button>
 
@@ -174,10 +180,22 @@ export default function ContentActionBar({
         content={sheetContent}
         mediaType={mediaType}
         tmdbId={tmdbId}
-        onCompleted={({ added, removed }) => {
+        onCompleted={async ({ added, removed }) => {
           if (added > 0 && removed > 0) showToast('박스 목록을 변경했습니다.');
           else if (added > 0) showToast('박스에 추가했습니다.');
           else if (removed > 0) showToast('박스에서 제거했습니다.');
+
+          // hasAddedInbox 동기화
+          // - added > 0, removed === 0: 무조건 어떤 박스에 들어감 → true
+          // - 그 외 (제거 발생 시): 다른 박스에 남아있을 수 있으므로 상세 재조회로 정확한 값 사용
+          if (added > 0 && removed === 0) {
+            onHasAddedInboxChange(true);
+          } else {
+            try {
+              const fresh = await fetchContentDetail(mediaType, tmdbId);
+              onHasAddedInboxChange(fresh.hasAddedInbox);
+            } catch {/* 무시 */}
+          }
         }}
       />
     </>

@@ -140,7 +140,7 @@ export default function TvDetailPage() {
           showToast={showToast}
         />
 
-        <DetailCategoryTitle title="상세 정보" line className="mt-[30px]" />
+        <DetailCategoryTitle title="상세 정보" line className="mt-[35px]" />
         <InfoTable rows={infoRows} />
 
         {/* 역대 출연진/제작진 (시즌별 누적) */}
@@ -151,7 +151,7 @@ export default function TvDetailPage() {
               more
               line
               onMore={() => router.push(`/content/tv/${tmdbId}/credits`)}
-              className="mt-[40px]"
+              className="mt-[45px]"
             />
             <CreditScroll
               cast={credit.castList}
@@ -169,7 +169,7 @@ export default function TvDetailPage() {
               more
               line
               onMore={() => router.push(`/content/tv/${tmdbId}/images`)}
-              className="mt-[40px]"
+              className="mt-[45x]"
             />
             <BackdropGallery paths={t.backdropPathList} max={4} />
           </>

@@ -27,7 +27,7 @@ export default function DetailCategoryTitle({
 }: DetailCategoryTitleProps) {
   return (
     <div className={className}>
-      <div className="flex items-end justify-between px-[16px]">
+      <div className="flex items-end justify-between px-[16px] pb-[10px]">
         <h2 className="text-[16px] font-semibold text-wb-white-01">{title}</h2>
         {more && (
           <button

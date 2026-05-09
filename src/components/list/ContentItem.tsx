@@ -84,7 +84,12 @@ export default function ContentItem({
         className={`flex items-center gap-[17px] min-w-0 ${onClick ? 'cursor-pointer' : ''}`}
         onClick={onClick}
       >
-        <Poster src={posterSrc} alt={title} size="small" />
+        <Poster
+          src={posterSrc}
+          alt={title}
+          size="small"
+          variant={isPerson ? 'profile' : 'poster'}
+        />
 
         <div className="flex flex-col gap-[5px] min-w-0">
           {/* 제목 + 부제 (variant별로 다른 형식) */}

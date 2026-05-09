@@ -14,7 +14,7 @@ import { ChevronDownOutline, BoxIcon } from '@/components/icons';
 import DetailCategoryTitle from '@/components/list/DetailCategoryTitle';
 import SpreadActionLine from '@/components/common/SpreadActionLine';
 import DetailWorkCreditCard from '@/components/content/detail/DetailWorkCreditCard';
-import BaseCreditImage from '@/components/content/detail/BaseCreditImage';
+import EmptyProfileImage from '@/components/content/empty/EmptyProfileImage';
 import ContentBoxSheetContainer from '@/components/sheet/ContentBoxSheetContainer';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
@@ -119,7 +119,7 @@ export default function PersonDetailPage() {
       <MainContent>
         {/* ── 구역 1: 프로필 (이미지 + 우측 정보 세로 중앙) ─────── */}
         <section className="flex items-center gap-[14px] px-[16px] pt-[12px] ">
-          <div className="w-[115px] h-[163px] rounded-[10px] overflow-hidden shrink-0 bg-wb-dark-03">
+          <div className="w-[115px] h-[163px] rounded-[10px] overflow-hidden shrink-0">
             {profileUrl ? (
               <Image
                 src={profileUrl}
@@ -129,14 +129,14 @@ export default function PersonDetailPage() {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <BaseCreditImage variant="person" />
+              <EmptyProfileImage size="medium" />
             )}
           </div>
 
           <div className="flex flex-col gap-[4px] min-w-0">
             {/* 이름 + 박스 아이콘 (가로 auto layout, gap 7) */}
             <div className="flex items-center gap-[7px] min-w-0">
-              <h1 className="text-[20px] font-semibold leading-[1.3] text-white break-keep min-w-0">
+              <h1 className="text-[20px] font-semibold leading-[1.3] text-white break-keep [overflow-wrap:anywhere] min-w-0">
                 {p.nameKo}
               </h1>
               <button
@@ -153,10 +153,10 @@ export default function PersonDetailPage() {
             </div>
 
             {altNames && (
-              <p className="text-[12px] text-wb-grey-04 break-keep">{altNames}</p>
+              <p className="text-[12px] text-wb-grey-04 break-keep [overflow-wrap:anywhere]">{altNames}</p>
             )}
             {(birthLine || p.placeOfBirth || p.knownForDepartment) && (
-              <p className="text-[12px] text-wb-grey-04 break-keep mt-[2px] leading-[1.5]">
+              <p className="text-[12px] text-wb-grey-04 break-keep [overflow-wrap:anywhere] mt-[2px] leading-[1.5]">
                 {[birthLine, p.placeOfBirth, p.knownForDepartment]
                   .filter((s): s is string => !!s)
                   .map((line, i, arr) => (

@@ -1,6 +1,6 @@
 'use client';
 
-import Poster from '@/components/content/Poster';
+import Poster, { type PosterVariant } from '@/components/content/Poster';
 
 interface SheetContentItemProps {
   /** 포스터 이미지 URL */
@@ -11,6 +11,8 @@ interface SheetContentItemProps {
   year?: number | null;
   /** 장르 목록 */
   genres?: string[] | null;
+  /** 빈 이미지 fallback 종류 (default: 'poster' — 영화/TV; 인물이면 'profile') */
+  variant?: PosterVariant;
   className?: string;
 }
 
@@ -26,6 +28,7 @@ export default function SheetContentItem({
   title,
   year,
   genres,
+  variant = 'poster',
   className,
 }: SheetContentItemProps) {
   const infoLine = [year, genres?.join(', ')].filter(Boolean).join(' · ');
@@ -33,7 +36,7 @@ export default function SheetContentItem({
   return (
     <div className={`h-[90px] px-[16px] flex items-center border-b-[1.5px] border-wb-dark-03 ${className ?? ''}`}>
       <div className="flex items-center gap-[17px] min-w-0">
-        <Poster src={posterSrc} alt={title} size="xsmall" />
+        <Poster src={posterSrc} alt={title} size="xsmall" variant={variant} />
         <div className="flex flex-col gap-[6px] min-w-0">
           <p className="text-[16px] font-medium text-white truncate">{title}</p>
           {infoLine && (

@@ -1,22 +1,22 @@
 'use client';
 
-export type BaseCreditImageVariant = 'person' | 'work';
+export type EmptyCreditImageVariant = 'person' | 'work';
 
-interface BaseCreditImageProps {
+interface EmptyCreditImageProps {
   /** "person" — 인물 (사람 아이콘) / "work" — 영화·TV 작품 (필름 아이콘) */
-  variant: BaseCreditImageVariant;
+  variant: EmptyCreditImageVariant;
   className?: string;
 }
 
 /**
- * Base Credit Image — Credit/Detail에서 이미지 URL이 없을 때 사용하는 placeholder
- * 피그마: Base Credit Image (variant: person / work)
+ * Empty Credit Image — Credit/Detail에서 이미지 URL이 없을 때 사용하는 placeholder
+ * 피그마: Empty Credit Image (variant: person / work)
  *
  * 부모 컨테이너 크기를 채우는 형태이므로, 사용처에서 부모에 width/height를 지정.
  * SVG 자체에 5px 라운드 + 회색 배경 + 아이콘 hole(검정 배경 비침)이 포함되어 있음.
  * → 부모는 어두운 배경을 깔거나 자식이 그대로 보이도록 둘 것.
  */
-export default function BaseCreditImage({ variant, className }: BaseCreditImageProps) {
+export default function EmptyCreditImage({ variant, className }: EmptyCreditImageProps) {
   return (
     <div className={`w-full h-full bg-wb-dark-01 ${className ?? ''}`}>
       {variant === 'person' ? <PersonSvg /> : <WorkSvg />}

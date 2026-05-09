@@ -14,7 +14,7 @@ import { ChevronDownOutline, BoxIcon } from '@/components/icons';
 import DetailCategoryTitle from '@/components/list/DetailCategoryTitle';
 import SpreadActionLine from '@/components/common/SpreadActionLine';
 import DetailWorkCreditCard from '@/components/content/detail/DetailWorkCreditCard';
-import BaseCreditImage from '@/components/content/detail/BaseCreditImage';
+import EmptyProfileImage from '@/components/content/empty/EmptyProfileImage';
 import ContentBoxSheetContainer from '@/components/sheet/ContentBoxSheetContainer';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
@@ -119,7 +119,7 @@ export default function PersonDetailPage() {
       <MainContent>
         {/* ── 구역 1: 프로필 (이미지 + 우측 정보 세로 중앙) ─────── */}
         <section className="flex items-center gap-[14px] px-[16px] pt-[12px] ">
-          <div className="w-[115px] h-[163px] rounded-[10px] overflow-hidden shrink-0 bg-wb-dark-03">
+          <div className="w-[115px] h-[163px] rounded-[10px] overflow-hidden shrink-0">
             {profileUrl ? (
               <Image
                 src={profileUrl}
@@ -129,7 +129,7 @@ export default function PersonDetailPage() {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <BaseCreditImage variant="person" />
+              <EmptyProfileImage size="medium" />
             )}
           </div>
 

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import BaseCreditImage from '@/components/content/detail/BaseCreditImage';
+import EmptyCreditImage from '@/components/content/detail/EmptyCreditImage';
 import TruncatedText from '@/components/common/TruncatedText';
 import {
   TMDB_POSTER,
@@ -22,7 +22,7 @@ interface DetailWorkCreditCardProps {
  * Detail Work Credit Card — 인물 상세 페이지의 작품 카드
  *
  * 피그마: Detail Work Credit Card
- * - 포스터 (URL 없으면 BaseCreditImage variant="work")
+ * - 포스터 (URL 없으면 EmptyCreditImage variant="work")
  * - 1줄 title (Movie: title / TV: name)
  * - 2줄 subtitle: CAST → character / CREW → department
  * - 3줄 date (Movie: releaseDate / TV: firstAirDate, "YYYY.MM.DD")
@@ -53,7 +53,7 @@ export default function DetailWorkCreditCard({
       onClick={handleClick}
       className={`w-full flex flex-col items-center ${navigable ? 'cursor-pointer' : 'cursor-default'}`}
     >
-      {/* 포스터 — 가로 폭 100%, 비율 110:156 (BaseCreditImage native) */}
+      {/* 포스터 — 가로 폭 100%, 비율 110:156 (EmptyCreditImage native) */}
       <div className="w-full aspect-[110/156] mb-[8px] rounded-[5px] overflow-hidden">
         {posterUrl ? (
           <Image
@@ -64,7 +64,7 @@ export default function DetailWorkCreditCard({
             className="w-full h-full object-cover"
           />
         ) : (
-          <BaseCreditImage variant="work" />
+          <EmptyCreditImage variant="work" />
         )}
       </div>
 

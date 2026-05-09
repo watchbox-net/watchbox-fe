@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import BaseCreditImage from '@/components/content/detail/BaseCreditImage';
+import EmptyCreditImage from '@/components/content/detail/EmptyCreditImage';
 import { TMDB_POSTER, getContentDetailPath } from '@/lib/utils/content';
 
 interface PersonCreditItemProps {
@@ -20,7 +20,7 @@ interface PersonCreditItemProps {
  * Person Credit Item — 출연/제작 더보기 화면의 한 행
  *
  * 피그마: Person Credit Item
- * - 좌: 프로필 이미지 100×140 (URL 없으면 BaseCreditImage variant=person)
+ * - 좌: 프로필 이미지 100×140 (URL 없으면 EmptyCreditImage variant=person)
  * - 우: name(굵게) + subText(보조)
  * - 클릭 시 인물 상세 페이지로 이동
  */
@@ -55,7 +55,7 @@ export default function PersonCreditItem({
             className="w-full h-full object-cover"
           />
         ) : (
-          <BaseCreditImage variant="person" />
+          <EmptyCreditImage variant="person" />
         )}
       </div>
 

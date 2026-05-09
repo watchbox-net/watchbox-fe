@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import EmptyPosterImage from '@/components/content/empty/EmptyPosterImage';
 import { TMDB_POSTER } from '@/lib/utils/content';
 
 interface DetailPosterTitleProps {
@@ -25,11 +26,11 @@ export default function DetailPosterTitle({
 
   return (
     <div className="flex gap-[14px] px-[17px] mt-[16px]">
-      <div className="w-[115px] h-[163px] rounded-[10px] overflow-hidden shrink-0 bg-wb-dark-03">
+      <div className="w-[115px] h-[163px] rounded-[10px] overflow-hidden shrink-0">
         {posterUrl ? (
           <Image src={posterUrl} alt={titleKo} width={115} height={163} className="w-full h-full object-cover" />
         ) : (
-          <div className="w-full h-full bg-wb-dark-05" />
+          <EmptyPosterImage size="medium" />
         )}
       </div>
       <div className="flex flex-col justify-center gap-[4px] min-w-0 pt-[4px]">

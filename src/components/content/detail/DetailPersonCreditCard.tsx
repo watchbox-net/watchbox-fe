@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { TMDB_POSTER, getContentDetailPath } from '@/lib/utils/content';
-import BaseCreditImage from '@/components/content/detail/BaseCreditImage';
+import EmptyCreditImage from '@/components/content/detail/EmptyCreditImage';
 import TruncatedText from '@/components/common/TruncatedText';
 
 interface DetailPersonCreditCardProps {
@@ -61,7 +61,7 @@ export default function DetailPersonCreditCard({
             className="w-full h-full object-cover"
           />
         ) : (
-          <BaseCreditImage variant="person" />
+          <EmptyCreditImage variant="person" />
         )}
       </div>
 

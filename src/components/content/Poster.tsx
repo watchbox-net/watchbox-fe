@@ -1,15 +1,25 @@
 'use client';
 
 import Image from 'next/image';
+import EmptyPosterImage from '@/components/content/empty/EmptyPosterImage';
+import EmptyProfileImage from '@/components/content/empty/EmptyProfileImage';
 
 // ─── Types ──────────────────────────────────────────────────
 export type PosterSize = 'large' | 'medium' | 'small' | 'xsmall';
+/**
+ * Empty fallback variant
+ * - 'poster' (default): 영화/TV — 필름 아이콘
+ * - 'profile':           인물    — 사람 아이콘
+ */
+export type PosterVariant = 'poster' | 'profile';
 
 interface PosterProps {
-  /** 포스터 이미지 URL (없으면 placeholder) */
+  /** 이미지 URL (없으면 variant에 맞는 Empty 이미지 사용) */
   src?: string | null;
   alt?: string;
   size?: PosterSize;
+  /** 빈 이미지 fallback 종류 (default: 'poster') */
+  variant?: PosterVariant;
   className?: string;
 }
 
@@ -26,13 +36,14 @@ export default function Poster({
   src,
   alt,
   size = 'large',
+  variant = 'poster',
   className,
 }: PosterProps) {
   const { width, height, radius } = SIZE_MAP[size];
 
   return (
     <div
-      className={`shrink-0 ${className ?? ''}`}
+      className={`shrink-0 overflow-hidden ${radius} ${className ?? ''}`}
       style={{ width, height }}
     >
       {src ? (
@@ -41,10 +52,12 @@ export default function Poster({
           alt={alt ?? 'poster'}
           width={width}
           height={height}
-          className={`w-full h-full object-cover ${radius}`}
+          className="w-full h-full object-cover"
         />
+      ) : variant === 'profile' ? (
+        <EmptyProfileImage size={size} />
       ) : (
-        <div className={`w-full h-full bg-neutral-700 ${radius}`} />
+        <EmptyPosterImage size={size} />
       )}
     </div>
   );

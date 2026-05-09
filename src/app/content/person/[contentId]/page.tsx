@@ -136,7 +136,7 @@ export default function PersonDetailPage() {
           <div className="flex flex-col gap-[4px] min-w-0">
             {/* 이름 + 박스 아이콘 (가로 auto layout, gap 7) */}
             <div className="flex items-center gap-[7px] min-w-0">
-              <h1 className="text-[20px] font-semibold leading-[1.3] text-white break-keep min-w-0">
+              <h1 className="text-[20px] font-semibold leading-[1.3] text-white break-keep [overflow-wrap:anywhere] min-w-0">
                 {p.nameKo}
               </h1>
               <button
@@ -153,10 +153,10 @@ export default function PersonDetailPage() {
             </div>
 
             {altNames && (
-              <p className="text-[12px] text-wb-grey-04 break-keep">{altNames}</p>
+              <p className="text-[12px] text-wb-grey-04 break-keep [overflow-wrap:anywhere]">{altNames}</p>
             )}
             {(birthLine || p.placeOfBirth || p.knownForDepartment) && (
-              <p className="text-[12px] text-wb-grey-04 break-keep mt-[2px] leading-[1.5]">
+              <p className="text-[12px] text-wb-grey-04 break-keep [overflow-wrap:anywhere] mt-[2px] leading-[1.5]">
                 {[birthLine, p.placeOfBirth, p.knownForDepartment]
                   .filter((s): s is string => !!s)
                   .map((line, i, arr) => (

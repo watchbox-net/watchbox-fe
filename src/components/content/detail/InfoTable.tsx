@@ -23,7 +23,7 @@ export default function InfoTable({ rows, className }: InfoTableProps) {
       {visibleRows.map((row) => (
         <div key={row.label} className="flex gap-[20px]">
           <span className="w-[60px] shrink-0 text-[14px] text-wb-grey-03">{row.label}</span>
-          <span className="text-[14px] text-wb-white-02 break-keep">{row.value}</span>
+          <span className="text-[14px] text-wb-white-02 break-keep [overflow-wrap:anywhere]">{row.value}</span>
         </div>
       ))}
     </div>

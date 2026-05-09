@@ -34,7 +34,7 @@ export default function DetailPosterTitle({
         )}
       </div>
       <div className="flex flex-col justify-center gap-[4px] min-w-0 pt-[4px]">
-        <h1 className="text-[24px] font-semibold leading-[1.3] text-wb-white-01 break-keep">
+        <h1 className="text-[24px] font-semibold leading-[1.3] text-wb-white-01 break-keep [overflow-wrap:anywhere]">
           {titleKo}
         </h1>
         {titleOriginal && (

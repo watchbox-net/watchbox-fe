@@ -1,5 +1,10 @@
+import type { Metadata } from 'next';
 import Header from '@/components/common/Header';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: '탐색',
+};
 
 const DISCOVER_LINKS = [
   { href: '/discover/popular/movie', label: '인기 영화' },

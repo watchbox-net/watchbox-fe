@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 
+import type { Metadata } from 'next';
 import Header from '@/components/common/Header';
 import MainContent from '@/components/common/MainContent';
 import ListTitle from '@/components/list/ListTitle';

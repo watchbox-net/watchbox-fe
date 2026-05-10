@@ -10,8 +10,11 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-    title: 'WatchBox',
-    description: '...',
+    title: {
+        default: 'WatchBox',
+        template: '%s | WatchBox',
+    },
+    description: '영화와 시리즈를 기록하고 공유하는 왓치박스',
 }
 
 export default function RootLayout({

@@ -88,9 +88,9 @@ export const PlusOutline = ((props: React.ComponentProps<typeof _PlusIcon>) =>
 export const XMarkOutline = ((props: React.ComponentProps<typeof _XMarkIcon>) =>
   React.createElement(_XMarkIcon, { strokeWidth: 2, ...props })) as typeof _XMarkIcon;
 export const ChevronLeftOutline = ((props: React.ComponentProps<typeof _ChevronLeftIcon>) =>
-  React.createElement(_ChevronLeftIcon, { strokeWidth: 2, ...props })) as typeof _ChevronLeftIcon;
+  React.createElement(_ChevronLeftIcon, { strokeWidth: 2.5, ...props })) as typeof _ChevronLeftIcon;
 export const ChevronRightOutline = ((props: React.ComponentProps<typeof _ChevronRightIcon>) =>
-  React.createElement(_ChevronRightIcon, { strokeWidth: 2, ...props })) as typeof _ChevronRightIcon;
+  React.createElement(_ChevronRightIcon, { strokeWidth: 2.5, ...props })) as typeof _ChevronRightIcon;
 
 // ChevronDown 기본 strokeWidth=0.5
 export const ChevronDownOutline = ((props: React.ComponentProps<typeof _ChevronDownIcon>) =>

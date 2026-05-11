@@ -12,7 +12,6 @@ export async function healthCheckAction() {
         const response = await axios.get(`${SERVER_URL}/health`, {
             timeout: 5000,
         });
-
         const responseTime = Date.now() - startTime;
 
         return {

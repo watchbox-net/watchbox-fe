@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import Header from '@/components/common/Header';
+import DiscoverHeader from './DiscoverHeader';
 import DiscoverTabs from './DiscoverTabs';
 import DiscoverContentList from './DiscoverContentList';
 import MainContent from '@/components/common/MainContent';
@@ -19,7 +19,7 @@ const TITLE_MAP: Record<string, Record<string, string>> = {
   'popular': { 'movie': '인기 영화', 'tv': '인기 시리즈' },
   'top-rated': { 'movie': '높은 평점의 영화', 'tv': '높은 평점의 시리즈' },
   'now-showing': { 'movie': '현재 상영중인 영화', 'tv': '현재 방영중인 시리즈' },
-  'trending': { 'movie': '이번주 화제 영화', 'tv': '이번주 화제 시리즈' },
+  'trending': { 'movie': '이번주 트렌드 영화', 'tv': '이번주 트렌드 시리즈' },
 };
 
 type Fetcher = (token?: string) => Promise<{ contentItemList: ContentItem[] }>;
@@ -49,7 +49,7 @@ export default async function DiscoverCategoryPage({ params }: PageProps) {
 
     return (
       <>
-        <Header variant="back" title={title} />
+        <DiscoverHeader title={title} category={category} type={type} />
         <DiscoverTabs category={category} type={type} />
         <MainContent>
           {contentItems.length > 0 ? (
@@ -64,7 +64,7 @@ export default async function DiscoverCategoryPage({ params }: PageProps) {
     console.error(error);
     return (
       <>
-        <Header variant="back" title={title} />
+        <DiscoverHeader title={title} category={category} type={type} />
         <DiscoverTabs category={category} type={type} />
         <MainContent className="p-4">
           <p className="text-neutral-500">오류가 발생했습니다.</p>

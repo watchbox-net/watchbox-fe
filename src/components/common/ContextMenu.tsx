@@ -22,9 +22,21 @@ export interface ContextMenuItemConfig {
   onClick?: () => void;
 }
 
+export interface PlainContextMenuItemConfig {
+  label: string;
+  onClick?: () => void;
+}
+
 interface ContextMenuProps {
   items: ContextMenuItemConfig[];
   size?: ContextMenuSize;
+  className?: string;
+}
+
+interface PlainContextMenuProps {
+  items: PlainContextMenuItemConfig[];
+  activeIndex?: number;
+  width?: number;
   className?: string;
 }
 
@@ -84,6 +96,46 @@ export default function ContextMenu({ items, size = 'small', className }: Contex
             <Icon className="size-[24px] text-wb-grey-04 shrink-0" />
             <span className="text-[14px] font-medium leading-[24px] tracking-[0.1px] text-wb-grey-04 whitespace-nowrap">
               {label}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+export function PlainContextMenu({ items, activeIndex, width = 120, className }: PlainContextMenuProps) {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  return (
+    <div
+      className={`bg-wb-dark-05 rounded-[12px] py-[5px] flex flex-col ${className ?? ''}`}
+      style={{ width }}
+    >
+      {items.map((item, index) => {
+        const isActive = hoveredIndex === index || activeIndex === index;
+
+        const hoverRounded =
+          index === 0
+            ? 'rounded-t-[10px]'
+            : index === items.length - 1
+              ? 'rounded-b-[10px]'
+              : '';
+
+        return (
+          <button
+            key={index}
+            className={`
+              relative flex items-center h-[45px] w-full px-[16px]
+              cursor-pointer transition-colors
+              ${isActive ? `bg-wb-grey-01 ${hoverRounded}` : ''}
+            `}
+            onMouseEnter={() => setHoveredIndex(index)}
+            onMouseLeave={() => setHoveredIndex(null)}
+            onClick={item.onClick}
+          >
+            <span className="text-[14px] font-medium leading-[24px] tracking-[0.1px] text-wb-grey-04 whitespace-nowrap">
+              {item.label}
             </span>
           </button>
         );

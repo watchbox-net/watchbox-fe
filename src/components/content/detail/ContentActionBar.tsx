@@ -72,8 +72,10 @@ export default function ContentActionBar({
   const { showLoginModal } = useLoginModal();
 
   const [statusMenuOpen, setStatusMenuOpen] = useState(false);
+  const [menuAbove, setMenuAbove] = useState(false);
   const [boxSheetVisible, setBoxSheetVisible] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const statusBtnRef = useRef<HTMLButtonElement>(null);
 
   const { changeStatus, deleteStatus, requireAuth } = useWatchStatus({
     onStatusChanged: (status) => onWatchStatusChange(status),
@@ -156,15 +158,23 @@ export default function ContentActionBar({
         <div className="relative flex flex-col items-center gap-[8px]">
           <button
             type="button"
+            ref={statusBtnRef}
             className="cursor-pointer"
-            onClick={() => setStatusMenuOpen((v) => !v)}
+            onClick={() => {
+              if (!statusMenuOpen && statusBtnRef.current) {
+                const rect = statusBtnRef.current.getBoundingClientRect();
+                const menuHeight = 280; // 메뉴 대략 높이 (5항목 * 45px + 패딩)
+                setMenuAbove(window.innerHeight - rect.bottom < menuHeight);
+              }
+              setStatusMenuOpen((v) => !v);
+            }}
           >
             <WatchStatusIcon size="xl" status={toIconStatus(watchStatus)} />
           </button>
           <span className="text-[11px] text-wb-white-02">시청 상태</span>
 
           {statusMenuOpen && (
-            <div ref={menuRef} className="absolute top-full mt-1 z-50">
+            <div ref={menuRef} className={`absolute z-50 ${menuAbove ? 'bottom-full mb-1' : 'top-full mt-1'}`}>
               <WatchStatusMenu
                 onSelect={handleStatusSelect}
                 onDelete={handleStatusDelete}

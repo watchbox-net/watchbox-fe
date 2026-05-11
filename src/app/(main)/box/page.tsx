@@ -11,6 +11,7 @@ import BoxList from '@/components/box/BoxList';
 import { PlusOutline } from '@/components/icons';
 import { fetchBoxList } from '@/lib/api/box';
 import { useAuth } from '@/lib/context/AuthContext';
+import { useLoginModal } from '@/lib/context/LoginModalContext';
 import type { BoxType } from '@/types/box';
 
 type MenuTarget = { boxId: number; boxType: BoxType };
@@ -18,6 +19,7 @@ type MenuTarget = { boxId: number; boxType: BoxType };
 export default function BoxPage() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { showLoginModal } = useLoginModal();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['boxList'],
@@ -82,8 +84,18 @@ export default function BoxPage() {
       <Header
         variant="icon2"
         title="박스"
-        onAlarm={() => router.push('/box/invitations')}
-        onSearch={() => {/* TODO: 박스 검색 */}}
+        onAlarm={() => {
+          if (!isAuthenticated) { showLoginModal(); return; }
+          router.push('/box/invitations');
+        }}
+        icon2Right={
+          <button type="button" onClick={() => {
+            if (!isAuthenticated) { showLoginModal(); return; }
+            router.push('/box/create');
+          }}>
+            <PlusOutline className="size-6 text-wb-white-02" strokeWidth={2} />
+          </button>
+        }
       />
 
       <MainContent>
@@ -133,13 +145,6 @@ export default function BoxPage() {
               })}
             </BoxList>
 
-            <button
-              onClick={() => router.push('/box/create')}
-              className="flex items-center justify-center gap-2 w-full py-4 cursor-pointer rounded-[8px] hover:bg-wb-dark-05 transition-colors"
-            >
-              <PlusOutline className="size-6 text-wb-grey-04" />
-              <span className="text-lg text-wb-grey-04">새 박스 만들기</span>
-            </button>
           </>
         )}
       </MainContent>

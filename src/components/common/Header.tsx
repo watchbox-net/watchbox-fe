@@ -33,6 +33,8 @@ interface HeaderProps {
   /** icon1 / icon1-back 우측 아이콘을 커스텀할 때 사용 */
   rightIcon?: React.ReactNode;
   onRightIconClick?: () => void;
+  /** icon2 / icon2-back 두 번째(우측) 아이콘을 커스텀할 때 사용 */
+  icon2Right?: React.ReactNode;
   searchValue?: string;
   onSearchChange?: (value: string) => void;
   onSearchClear?: () => void;
@@ -53,6 +55,7 @@ export default function Header({
   onDone,
   rightIcon,
   onRightIconClick,
+  icon2Right,
   searchValue,
   onSearchChange,
   onSearchClear,
@@ -98,9 +101,11 @@ export default function Header({
               <button type="button" onClick={onAlarm}>
                 <BellSolid className="size-6 text-wb-white-02" />
               </button>
-              <button type="button" onClick={onSearch}>
-                <MagnifyingGlassOutline className="size-6 text-wb-white-02" />
-              </button>
+              {icon2Right ?? (
+                <button type="button" onClick={onSearch}>
+                  <MagnifyingGlassOutline className="size-6 text-wb-white-02" />
+                </button>
+              )}
             </div>
           )}
 

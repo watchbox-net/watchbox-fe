@@ -121,7 +121,7 @@ function SearchContent() {
                   <ContentItem
                     key={`${summary.mediaType}-${summary.tmdbId}`}
                     summary={summary}
-                    watchStatus={item.memberRecord?.watchStatus ?? null}
+                    hideStatusIcon
                     onClick={() => router.push(getContentDetailPath(summary.mediaType, summary.tmdbId))}
                   />
                 );

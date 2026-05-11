@@ -36,6 +36,8 @@ interface ContentItemProps {
   onStatusClick?: (e: React.MouseEvent) => void;
   /** 아이콘 영역 relative 기준으로 absolute 배치되는 메뉴 슬롯 */
   statusMenuSlot?: ReactNode;
+  /** 시청 상태 아이콘을 숨길지 여부 */
+  hideStatusIcon?: boolean;
   className?: string;
 }
 
@@ -61,6 +63,7 @@ export default function ContentItem({
   onClick,
   onStatusClick,
   statusMenuSlot,
+  hideStatusIcon,
   className,
 }: ContentItemProps) {
   const isPerson = summary.mediaType === 'PERSON';
@@ -106,7 +109,7 @@ export default function ContentItem({
       </div>
 
       {/* 오른쪽: 시청 상태 아이콘 (PERSON은 노출 X) */}
-      {!isPerson && (
+      {!isPerson && !hideStatusIcon && (
         <div className="relative shrink-0 ml-[10px]">
           <div
             className={onStatusClick ? 'cursor-pointer' : ''}

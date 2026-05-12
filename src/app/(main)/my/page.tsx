@@ -16,7 +16,7 @@ import {
   UserGroupSolid,
   UsersSolid,
 } from '@/components/icons';
-import { fetchMyPage } from '@/lib/api/member';
+import { fetchMyPage, deleteMember } from '@/lib/api/member';
 import { useAuth } from '@/lib/context/AuthContext';
 import type { MyPageResponse } from '@/types/mypage';
 
@@ -27,10 +27,25 @@ export default function MyPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [withdrawModalVisible, setWithdrawModalVisible] = useState(false);
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [preparingModalVisible, setPreparingModalVisible] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: '' });
 
   const showToast = (msg: string) => setToast({ visible: true, message: msg });
+
+  const handleWithdraw = async () => {
+    setWithdrawModalVisible(false);
+    setIsWithdrawing(true);
+    try {
+      await deleteMember();
+      await logout();    // logout 완료 후
+      router.push('/');  // 이동
+    } catch {
+      setIsWithdrawing(false);
+      showToast('회원탈퇴에 실패했습니다.');
+    }
+  };
 
   const handleLogout = async () => {
     setLogoutModalVisible(false);
@@ -56,10 +71,10 @@ export default function MyPage() {
       <Header variant="center" title="마이 페이지" />
 
       <MainContent>
-        {loading && (
+        {(loading || isWithdrawing) && (
           <p className="text-center text-wb-grey-03 py-8">불러오는 중...</p>
         )}
-        {!loading && !isAuthenticated && (
+        {!loading && !isWithdrawing && !isAuthenticated && (
           <div className="flex flex-col items-center gap-[16px] py-[60px]">
             <p className="text-[16px] text-wb-grey-03">로그인 후 이용해 보세요.</p>
             <button
@@ -71,12 +86,12 @@ export default function MyPage() {
             </button>
           </div>
         )}
-        {!loading && isAuthenticated && error && (
+        {!loading && !isWithdrawing && isAuthenticated && error && (
           <p className="text-center text-wb-grey-03 py-8">
             오류가 발생했습니다.
           </p>
         )}
-        {!loading && !error && data && (
+        {!loading && !isWithdrawing && !error && data && (
           <div className="flex flex-col gap-[45px] pt-[20px]">
             {/* ── 프로필 섹션 ────────────────────────────── */}
             <div className="flex items-center gap-[12px] px-[32px]">
@@ -190,7 +205,7 @@ export default function MyPage() {
               </button>
               <button
                 type="button"
-                onClick={() => setPreparingModalVisible(true)}
+                onClick={() => setWithdrawModalVisible(true)}
                 className="h-[44px] bg-wb-dark-05 rounded-[4px] text-[18px] text-white leading-[28px]"
               >
                 회원탈퇴
@@ -209,6 +224,17 @@ export default function MyPage() {
         cancelLabel="취소"
         onConfirm={handleLogout}
         onCancel={() => setLogoutModalVisible(false)}
+      />
+
+      <Modal
+        visible={withdrawModalVisible}
+        variant="confirm"
+        title="회원탈퇴"
+        body={`정말 탈퇴하시겠습니까?\n모든 데이터가 삭제됩니다.`}
+        confirmLabel="탈퇴"
+        cancelLabel="취소"
+        onConfirm={handleWithdraw}
+        onCancel={() => setWithdrawModalVisible(false)}
       />
 
       <Modal

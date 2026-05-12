@@ -70,7 +70,7 @@ export default function Modal({
                   <ExclamationCircleSolid className="size-[25px] text-wb-red" />
                   <p className="wb-modal-header text-wb-dark-02">{resolvedTitle}</p>
                 </div>
-                {resolvedBody && <p className="wb-modal-body text-wb-dark-05">{resolvedBody}</p>}
+                {resolvedBody && <p className="wb-modal-body text-wb-dark-05 whitespace-pre-line">{resolvedBody}</p>}
               </div>
             ) : (
               <>

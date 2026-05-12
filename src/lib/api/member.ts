@@ -74,6 +74,11 @@ export async function deleteInvitation(requestId: number): Promise<void> {
   );
 }
 
+/** 회원 탈퇴 */
+export async function deleteMember(): Promise<void> {
+  await privateApi.delete('/members/me');
+}
+
 /** 회원 검색 (boxId 기준 초대 상태 포함) */
 export async function searchMembers(keyword: string, boxId: number): Promise<MemberSearchPageResponse> {
   const { data } = await privateApi.get<ApiResponse<MemberSearchPageResponse>>(

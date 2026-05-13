@@ -9,8 +9,8 @@ const INFO_ITEMS: { label: string; value: React.ReactNode }[] = [
     label: '서비스 소개',
     value: (
       <>
-        <p>영화, 시리즈, 인물 정보를 탐색하고</p>
-        <p>간편하게 기록 및 사용자들끼리 공유하는 서비스</p>
+        <p>영화·시리즈 시청 상태를 편리하게 관리하고</p>
+        <p>사람들과 취향을 공유하는 서비스</p>
       </>
     ),
   },

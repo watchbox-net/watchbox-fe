@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/common/Header';
 import { ChevronDownOutline } from '@/components/icons';
@@ -31,6 +31,23 @@ export default function BoxForm({
   const [description, setDescription] = useState(initialDescription);
   const [boxType, setBoxType] = useState<BoxType>(initialBoxType);
   const [submitting, setSubmitting] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    if (dropdownOpen) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [dropdownOpen]);
+
+  const BOX_TYPE_OPTIONS: { value: BoxType; label: string }[] = [
+    { value: 'MY', label: '마이 박스' },
+    { value: 'SHARED', label: '공유 박스' },
+  ];
 
   const isCreate = mode === 'create';
   const title = isCreate ? '박스 만들기' : '박스 수정';
@@ -102,22 +119,46 @@ export default function BoxForm({
           <label className="block text-[14px] font-medium text-wb-grey-04 mb-[5px]">
             박스 유형
           </label>
-          <div className="py-[5px] relative">
-            <select
-              value={boxType}
-              onChange={(e) => setBoxType(e.target.value as BoxType)}
+          <div className="py-[5px] relative" ref={dropdownRef}>
+            <button
+              type="button"
+              onClick={() => !boxTypeDisabled && setDropdownOpen((v) => !v)}
               disabled={boxTypeDisabled}
-              className={`w-full h-[48px] border-[0.5px] rounded-[8px] px-[15px] pr-[40px] text-[15px] font-medium outline-none appearance-none ${
+              className={`w-full h-[48px] border-[0.5px] rounded-[8px] px-[15px] pr-[40px] text-[15px] font-medium text-left outline-none ${
                 boxTypeDisabled
                   ? 'bg-wb-dark-03 border-wb-dark-05 text-wb-grey-01 cursor-not-allowed'
                   : 'bg-wb-dark-03 border-wb-dark-05 text-wb-white cursor-pointer'
               }`}
             >
-              <option value="MY">마이 박스</option>
-              <option value="SHARED">공유 박스</option>
-            </select>
+              {BOX_TYPE_OPTIONS.find((o) => o.value === boxType)?.label}
+            </button>
             {!boxTypeDisabled && (
-              <ChevronDownOutline className="absolute right-[15px] top-1/2 -translate-y-1/2 size-[22px] text-wb-white-02 pointer-events-none" />
+              <ChevronDownOutline
+                className={`absolute right-[15px] top-1/2 -translate-y-1/2 size-[22px] text-wb-white-02 pointer-events-none transition-transform duration-150 ${
+                  dropdownOpen ? 'rotate-180' : ''
+                }`}
+              />
+            )}
+            {dropdownOpen && !boxTypeDisabled && (
+              <div className="absolute top-full left-0 w-full z-10 mt-[2px] bg-wb-dark-03 border-[0.5px] border-wb-dark-05 rounded-[8px] overflow-hidden">
+                {BOX_TYPE_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => {
+                      setBoxType(option.value);
+                      setDropdownOpen(false);
+                    }}
+                    className={`w-full h-[48px] px-[15px] text-[15px] font-medium text-left transition-colors ${
+                      boxType === option.value
+                        ? 'text-wb-white bg-wb-dark-05'
+                        : 'text-wb-grey-02 hover:bg-wb-dark-05'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
             )}
           </div>
         </div>

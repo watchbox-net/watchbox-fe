@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/common/Header';
 import MainContent from '@/components/common/MainContent';
@@ -31,33 +31,33 @@ export default function MyPage() {
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [preparingModalVisible, setPreparingModalVisible] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: '' });
+  const isLeavingRef = useRef(false);
 
   const showToast = (msg: string) => setToast({ visible: true, message: msg });
 
   const handleWithdraw = async () => {
     setWithdrawModalVisible(false);
-    setIsWithdrawing(true);
+    isLeavingRef.current = true;
+    setLoading(true);
     try {
       await deleteMember();
-      await logout();    // logout 완료 후
-      router.push('/');  // 이동
-    } catch {
-      setIsWithdrawing(false);
-      showToast('회원탈퇴에 실패했습니다.');
-    }
+      await logout();
+    } catch { /* ignore */ }
+    router.replace('/');
   };
 
   const handleLogout = async () => {
     setLogoutModalVisible(false);
+    isLeavingRef.current = true;
+    setLoading(true);
     try {
       await logout();
-      router.push('/');
-    } catch {
-      showToast('로그아웃에 실패했습니다.');
-    }
+    } catch { /* ignore */ }
+    router.replace('/');
   };
 
   useEffect(() => {
+    if (isLeavingRef.current) return;
     if (authLoading) return;
     if (!isAuthenticated) { setLoading(false); return; }
     fetchMyPage()

@@ -2,14 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import Header from '@/components/common/Header';
 import MainContent from '@/components/common/MainContent';
+import Modal from '@/components/common/Modal';
 import ContextMenu from '@/components/common/ContextMenu';
 import BoxItem from '@/components/box/BoxItem';
 import BoxList from '@/components/box/BoxList';
 import { PlusOutline } from '@/components/icons';
-import { fetchBoxList } from '@/lib/api/box';
+import { fetchBoxList, deleteBox } from '@/lib/api/box';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
 import type { BoxType } from '@/types/box';
@@ -18,8 +20,13 @@ type MenuTarget = { boxId: number; boxType: BoxType };
 
 export default function BoxPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { showLoginModal } = useLoginModal();
+
+  // 삭제 모달 상태
+  const [deleteTarget, setDeleteTarget] = useState<{ boxId: number; name: string } | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['boxList'],
@@ -49,6 +56,20 @@ export default function BoxPage() {
     setOpenMenu((prev) => (prev?.boxId === boxId ? null : { boxId, boxType }));
   };
 
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    try {
+      await deleteBox(deleteTarget.boxId);
+      setDeleteTarget(null);
+      queryClient.invalidateQueries({ queryKey: ['boxList'] });
+    } catch (err) {
+      setDeleteTarget(null);
+      const axiosError = err as AxiosError<{ error?: { message?: string } }>;
+      const msg = axiosError.response?.data?.error?.message ?? '박스 삭제 중 오류가 발생했습니다.';
+      setErrorMessage(msg);
+    }
+  };
+
   const goToContents = (boxId: number, boxType: BoxType, name: string) => {
     router.push(`/box/${boxId}/contents?type=${boxType}&name=${encodeURIComponent(name)}`);
   };
@@ -73,8 +94,9 @@ export default function BoxPage() {
     {
       type: 'delete' as const,
       onClick: () => {
+        const box = boxes.find((b) => b.boxId === boxId);
         setOpenMenu(null);
-        // TODO: 삭제 확인 모달
+        setDeleteTarget({ boxId, name: box?.name ?? '박스' });
       },
     },
   ];
@@ -148,6 +170,26 @@ export default function BoxPage() {
           </>
         )}
       </MainContent>
+
+      {/* 삭제 확인 모달 */}
+      <Modal
+        visible={!!deleteTarget}
+        variant="delete"
+        title={`'${deleteTarget?.name}' 박스를 삭제하시겠습니까?`}
+        body="삭제된 박스는 복구할 수 없습니다."
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={handleDeleteConfirm}
+      />
+
+      {/* 에러 모달 (백엔드 에러 메시지 표시) */}
+      <Modal
+        visible={!!errorMessage}
+        variant="error"
+        title="삭제 실패"
+        body={errorMessage ?? ''}
+        onCancel={() => setErrorMessage(null)}
+        onConfirm={() => setErrorMessage(null)}
+      />
     </>
   );
 }

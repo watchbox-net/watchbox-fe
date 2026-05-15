@@ -34,6 +34,14 @@ export default function DevPage() {
     const [authLoading, setAuthLoading] = useState(false);
     const [authError, setAuthError] = useState<string | null>(null);
 
+    // 샘플 로그인 상태
+    const SAMPLE_NICKNAMES = ['해달', '돌고래', '펭귄', 'watchbox', '너구리'];
+    const [selectedNickname, setSelectedNickname] = useState<string>(SAMPLE_NICKNAMES[0]);
+    const [nicknameInput, setNicknameInput] = useState<string>('');
+    const [sampleLoginData, setSampleLoginData] = useState<LoginResponse | null>(null);
+    const [sampleLoading, setSampleLoading] = useState(false);
+    const [sampleError, setSampleError] = useState<string | null>(null);
+
     const SPRING_BOOT_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
     const handleHealthCheck = async () => {
@@ -240,6 +248,34 @@ export default function DevPage() {
         }
     };
 
+    // 샘플 로그인 (닉네임)
+    const handleSampleLogin = async (nickname: string) => {
+        setSampleLoading(true);
+        setSampleError(null);
+        setSampleLoginData(null);
+
+        try {
+            const response = await fetch('/api/dev/login-nickname', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nickname }),
+            });
+
+            const result = await response.json();
+
+            if (!result.success) {
+                throw new Error(result.message || '로그인 실패');
+            }
+
+            setSampleLoginData(result.data);
+            await checkAuth();
+        } catch (err: any) {
+            setSampleError(err.message ?? '로그인 실패');
+        } finally {
+            setSampleLoading(false);
+        }
+    };
+
     // 회원 정보 조회 (BFF 패턴 + HttpOnly Cookie)
     const handleGetMember = async () => {
         setAuthLoading(true);
@@ -334,9 +370,7 @@ export default function DevPage() {
 
                     {loginData && (
                         <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded">
-                            <h3 className="font-semibold text-orange-800 mb-2">로그인 성공</h3>
-                            <p className="text-sm">memberId: {loginData.memberId}</p>
-                            <p className="text-xs text-gray-500 mt-1">토큰은 HttpOnly Cookie에 저장됨 (개발자 도구 → Application → Cookies에서 확인)</p>
+                            <h3 className="font-semibold text-orange-800">로그인 성공</h3>
                         </div>
                     )}
 
@@ -351,6 +385,58 @@ export default function DevPage() {
                         <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded">
                             <h3 className="font-semibold text-red-800 mb-2">오류</h3>
                             <p className="text-sm text-red-600">{authError}</p>
+                        </div>
+                    )}
+                </section>
+
+                <section className="border p-4 rounded">
+                    <h2 className="font-semibold mb-2">샘플 로그인 (닉네임)</h2>
+                    <div className="flex flex-wrap gap-2 mb-4 items-center">
+                        <select
+                            value={selectedNickname}
+                            onChange={(e) => setSelectedNickname(e.target.value)}
+                            className="border rounded px-3 py-2"
+                        >
+                            {SAMPLE_NICKNAMES.map((name) => (
+                                <option key={name} value={name}>{name}</option>
+                            ))}
+                        </select>
+                        <button
+                            onClick={() => handleSampleLogin(selectedNickname)}
+                            disabled={sampleLoading}
+                            className="bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600 disabled:bg-gray-400"
+                        >
+                            {sampleLoading ? '처리 중...' : '로그인'}
+                        </button>
+                    </div>
+                    <div className="flex flex-wrap gap-2 items-center">
+                        <input
+                            type="text"
+                            value={nicknameInput}
+                            onChange={(e) => setNicknameInput(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && nicknameInput.trim() && handleSampleLogin(nicknameInput.trim())}
+                            placeholder="닉네임 직접 입력"
+                            className="border rounded px-3 py-2 w-[160px]"
+                        />
+                        <button
+                            onClick={() => nicknameInput.trim() && handleSampleLogin(nicknameInput.trim())}
+                            disabled={sampleLoading || !nicknameInput.trim()}
+                            className="bg-amber-700 text-white px-4 py-2 rounded hover:bg-amber-800 disabled:bg-gray-400"
+                        >
+                            {sampleLoading ? '처리 중...' : '입력 로그인'}
+                        </button>
+                    </div>
+
+                    {sampleLoginData && (
+                        <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded">
+                            <h3 className="font-semibold text-amber-800">로그인 성공</h3>
+                        </div>
+                    )}
+
+                    {sampleError && (
+                        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded">
+                            <h3 className="font-semibold text-red-800 mb-2">오류</h3>
+                            <p className="text-sm text-red-600">{sampleError}</p>
                         </div>
                     )}
                 </section>

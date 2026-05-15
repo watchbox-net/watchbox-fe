@@ -76,11 +76,11 @@ export default function MyPage() {
         )}
         {!loading && !isWithdrawing && !isAuthenticated && (
           <div className="flex flex-col items-center gap-[16px] py-[60px]">
-            <p className="text-[16px] text-wb-grey-03">로그인 후 이용해 보세요.</p>
+            <p className="text-[16px] text-wb-grey-03">로그인하여 시작해 보세요</p>
             <button
               type="button"
               onClick={() => router.push('/login')}
-              className="h-[40px] px-[24px] bg-wb-green rounded-[8px] text-[14px] font-bold text-wb-white-01"
+              className="h-[40px] px-[24px] bg-wb-primary rounded-[8px] text-[14px] font-bold text-wb-white-01"
             >
               로그인
             </button>

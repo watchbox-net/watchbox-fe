@@ -6,7 +6,7 @@ import MainContent from '@/components/common/MainContent';
 import { fetchPopularMovieList, fetchTopRatedMovieList, fetchNowShowingMovieList, fetchTrendingMovieList } from '@/api/movie';
 import { fetchPopularTvList, fetchTopRatedTvList, fetchNowShowingTvList, fetchTrendingTvList } from '@/api/tv';
 import { notFound } from 'next/navigation';
-import type { ContentItem } from '@/types/content-summary';
+import type { ContentPageResponse } from '@/types/content-summary';
 
 interface PageProps {
   params: Promise<{
@@ -22,7 +22,7 @@ const TITLE_MAP: Record<string, Record<string, string>> = {
   'trending': { 'movie': '이번주 트렌드 영화', 'tv': '이번주 트렌드 시리즈' },
 };
 
-type Fetcher = (token?: string) => Promise<{ contentItemList: ContentItem[] }>;
+type Fetcher = (token?: string, page?: number) => Promise<ContentPageResponse>;
 
 const FETCH_MAP: Record<string, Record<string, Fetcher>> = {
   'popular': { 'movie': fetchPopularMovieList, 'tv': fetchPopularTvList },
@@ -42,18 +42,26 @@ export default async function DiscoverCategoryPage({ params }: PageProps) {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('accessToken')?.value;
+    const isAuthenticated = !!token;
 
     const fetcher = FETCH_MAP[category]?.[type];
-    const response = fetcher ? await fetcher(token) : { contentItemList: [] };
-    const contentItems: ContentItem[] = response.contentItemList;
+    if (!fetcher) notFound();
+
+    // 서버에서 page 1 SSR — 클라이언트 무한스크롤이 이 데이터로 시작
+    const initialResponse = await fetcher(token, 1);
 
     return (
       <>
         <DiscoverHeader title={title} category={category} type={type} />
         <DiscoverTabs category={category} type={type} />
         <MainContent>
-          {contentItems.length > 0 ? (
-            <DiscoverContentList items={contentItems} />
+          {initialResponse.contentItemList.length > 0 ? (
+            <DiscoverContentList
+              category={category}
+              type={type}
+              initialResponse={initialResponse}
+              isAuthenticated={isAuthenticated}
+            />
           ) : (
             <p className="text-center text-neutral-500 py-8">컨텐츠가 없습니다.</p>
           )}

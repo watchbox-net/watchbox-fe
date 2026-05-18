@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { useQuery, useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import Header from '@/components/common/Header';
 import TabNav from '@/components/common/TabNav';
 import ContentItem from '@/components/list/ContentItem';
@@ -12,17 +12,28 @@ import WatchStatusMenu from '@/components/common/WatchStatusMenu';
 import PlainContextMenu from '@/components/common/PlainContextMenu';
 import Toast from '@/components/common/Toast';
 import MainContent from '@/components/common/MainContent';
+import PreviewOverlay from '@/components/preview/PreviewOverlay';
 import { ChevronDownOutline } from '@/components/icons';
 import {
   fetchMyRecordedContentPage,
+  fetchMyRecordedContentCount,
   type WatchMediaTypeFilter,
   type RecordSortOrder,
   type WatchRecordFilter,
 } from '@/lib/api/watch-record';
+import {
+  fetchPreviewRecordedContentPage,
+  fetchPreviewRecordedContentCount,
+} from '@/lib/api/preview';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
 import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
-import type { ContentItem as ContentItemData, WatchStatus, ContentPageResponse } from '@/types/content-summary';
+import { useInfiniteList } from '@/lib/hooks/useInfiniteList';
+import type {
+  ContentItem as ContentItemData,
+  WatchStatus,
+  ContentCursorPageResponse,
+} from '@/types/content-summary';
 import { getContentDetailPath } from '@/lib/utils/content';
 
 // ── 탭 → 미디어타입 필터 매핑 ────────────────────────────────
@@ -34,10 +45,10 @@ const TABS: { key: WatchMediaTypeFilter; label: string }[] = [
 
 // ── 정렬 라벨 ────────────────────────────────────────────────
 const SORT_LABEL: Record<RecordSortOrder, string> = {
-  RECENT_SAVED: '최근 저장순',
-  OLDEST_SAVED: '오래된 저장순',
-  RECENT_YEAR:  '최근 연도순',
-  OLDEST_YEAR:  '오래된 연도순',
+  RECENT_UPDATED: '최근 기록순',
+  OLDEST_UPDATED: '오래된 기록순',
+  RECENT_YEAR:    '최근 연도순',
+  OLDEST_YEAR:    '오래된 연도순',
 };
 
 // ── 필터 라벨 (드롭다운 트리거 표시용; ALL은 placeholder) ────
@@ -55,9 +66,11 @@ export default function RecordPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { showLoginModal } = useLoginModal();
 
+  const isPreview = !authLoading && !isAuthenticated;
+
   // ── 쿼리 파라미터 상태 ──
   const [activeTabIndex, setActiveTabIndex] = useState(0);
-  const [sort, setSort] = useState<RecordSortOrder>('RECENT_SAVED');
+  const [sort, setSort] = useState<RecordSortOrder>('RECENT_UPDATED');
   const [watchRecordFilter, setWatchRecordFilter] = useState<WatchRecordFilter>('ALL');
 
   // ── 메뉴 열림 상태 ──
@@ -76,24 +89,51 @@ export default function RecordPage() {
   const { changeStatus, deleteStatus } = useWatchStatus({ showToast });
 
   const watchMediaTypeFilter = TABS[activeTabIndex].key;
-  const queryKey = ['recordedContentPage', watchMediaTypeFilter, sort, watchRecordFilter] as const;
+  const queryParams = { watchMediaTypeFilter, sort, watchRecordFilter };
 
+  const queryKey = [
+    'recordedContentPage',
+    watchMediaTypeFilter,
+    sort,
+    watchRecordFilter,
+    isPreview ? 'preview' : 'auth',
+  ] as const;
+
+  // ── 시청 기록 무한 스크롤 (cursor 기반) ──
   const {
-    data: pageData,
+    items,
+    sentinelRef,
     isLoading: loading,
     isError: error,
-  } = useQuery({
+    isFetchingNextPage,
+    hasNextPage,
+  } = useInfiniteList<ContentCursorPageResponse, string | null, ContentItemData>({
     queryKey,
-    queryFn: () => fetchMyRecordedContentPage({ watchMediaTypeFilter, sort, watchRecordFilter }),
-    enabled: !authLoading && isAuthenticated,
-    staleTime: 0,
-    refetchOnMount: 'always',
-    // 정렬/필터/탭 전환 시 새 데이터 도착 전까지 이전 결과 유지 → 0개 플래시 방지
-    placeholderData: keepPreviousData,
+    queryFn: (cursor) =>
+      isPreview
+        ? fetchPreviewRecordedContentPage(queryParams, cursor)
+        : fetchMyRecordedContentPage(queryParams, cursor),
+    initialPageParam: null,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNext ? lastPage.nextCursor : undefined,
+    getItems: (page) => page.contentItemList,
+    // 안전망 dedup — recordId가 있으면 그걸로, 없으면 mediaType+tmdbId
+    getItemKey: (item) =>
+      item.memberRecord?.recordId != null
+        ? `r:${item.memberRecord.recordId}`
+        : `t:${item.contentSummary.mediaType}:${item.contentSummary.tmdbId}`,
+    enabled: !authLoading,
+    staleTime: isPreview ? 1000 * 60 * 5 : 0,
   });
 
-  const items = pageData?.contentItemList ?? [];
-  const totalCount = pageData?.totalCount ?? 0;
+  // ── 시청 기록 총 개수 (필터 미적용 전체 — 첫 진입 시 1회) ──
+  const { data: totalCount = 0 } = useQuery({
+    queryKey: ['recordedContentCount', isPreview ? 'preview' : 'auth'],
+    queryFn: () =>
+      isPreview ? fetchPreviewRecordedContentCount() : fetchMyRecordedContentCount(),
+    enabled: !authLoading,
+    staleTime: 1000 * 60 * 5,
+  });
 
   // 외부 클릭 시 메뉴 닫기
   useEffect(() => {
@@ -107,6 +147,48 @@ export default function RecordPage() {
     return () => document.removeEventListener('mousedown', handleMouseDown);
   }, []);
 
+  // 낙관적 업데이트: InfiniteData 구조의 각 page를 순회하며 항목 갱신
+  const updateItemInCache = (
+    matchId: number,
+    updater: (item: ContentItemData) => ContentItemData,
+  ) => {
+    queryClient.setQueryData<InfiniteData<ContentCursorPageResponse, string | null>>(
+      queryKey,
+      (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          pages: old.pages.map((page) => ({
+            ...page,
+            contentItemList: page.contentItemList.map((i) =>
+              (i.memberRecord?.recordId ?? i.contentSummary.tmdbId) === matchId
+                ? updater(i)
+                : i,
+            ),
+          })),
+        };
+      },
+    );
+  };
+
+  const removeItemFromCache = (recordId: number) => {
+    queryClient.setQueryData<InfiniteData<ContentCursorPageResponse, string | null>>(
+      queryKey,
+      (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          pages: old.pages.map((page) => ({
+            ...page,
+            contentItemList: page.contentItemList.filter(
+              (i) => i.memberRecord?.recordId !== recordId,
+            ),
+          })),
+        };
+      },
+    );
+  };
+
   const handleStatusSelect = async (
     item: ContentItemData,
     status: Exclude<WatchStatus, 'NONE'>,
@@ -116,18 +198,15 @@ export default function RecordPage() {
     if (summary.mediaType !== 'MOVIE' && summary.mediaType !== 'TV') return;
     const success = await changeStatus(summary.tmdbId, summary.mediaType, status);
     if (success) {
-      queryClient.setQueryData<ContentPageResponse>(queryKey, (prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          contentItemList: prev.contentItemList.map((i) =>
-            (i.memberRecord?.recordId ?? i.contentSummary.tmdbId) ===
-            (item.memberRecord?.recordId ?? summary.tmdbId)
-              ? { ...i, memberRecord: { recordId: i.memberRecord?.recordId ?? null, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
-              : i,
-          ),
-        };
-      });
+      const matchId = item.memberRecord?.recordId ?? summary.tmdbId;
+      updateItemInCache(matchId, (i) => ({
+        ...i,
+        memberRecord: {
+          recordId: i.memberRecord?.recordId ?? null,
+          liked: i.memberRecord?.liked ?? null,
+          watchStatus: status,
+        },
+      }));
     }
   };
 
@@ -136,13 +215,12 @@ export default function RecordPage() {
     if (!item.memberRecord?.recordId) return;
     const success = await deleteStatus(item.memberRecord.recordId);
     if (success) {
-      queryClient.setQueryData<ContentPageResponse>(queryKey, (prev) => {
-        if (!prev) return prev;
-        const filtered = prev.contentItemList.filter(
-          (i) => i.memberRecord?.recordId !== item.memberRecord?.recordId,
-        );
-        return { ...prev, contentItemList: filtered, totalCount: prev.totalCount - 1 };
-      });
+      removeItemFromCache(item.memberRecord.recordId);
+      // 총 개수도 감소 (별도 캐시이므로 직접 갱신)
+      queryClient.setQueryData<number>(
+        ['recordedContentCount', isPreview ? 'preview' : 'auth'],
+        (prev) => (typeof prev === 'number' ? Math.max(0, prev - 1) : prev),
+      );
     }
   };
 
@@ -171,6 +249,8 @@ export default function RecordPage() {
         boxMode={{ mode: 'my', liked: item.memberRecord?.liked === true }}
         onClick={() => router.push(getContentDetailPath(summary.mediaType, summary.tmdbId))}
         onStatusClick={(e) => {
+          // Preview 모드: 시청 상태 변경 차단 → 로그인 모달
+          if (isPreview) { showLoginModal(); return; }
           if (!authLoading && !isAuthenticated) { showLoginModal(); return; }
           if (isMenuOpen) { setOpenMenuId(null); return; }
           const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
@@ -195,9 +275,9 @@ export default function RecordPage() {
         onChange={setActiveTabIndex}
       />
 
-      <MainContent>
+      <MainContent className="relative">
         {/* ── 카운트 + 정렬/필터 드롭다운 행 ───────── */}
-        {!authLoading && isAuthenticated && !error && (
+        {!loading && !error && (
           <div className="flex items-center justify-between pl-[16px] pr-[6px] pt-[13px]">
             <span className="text-[14px] text-wb-grey-04">{totalCount}개</span>
 
@@ -241,8 +321,7 @@ export default function RecordPage() {
                       variant="content-record"
                       selected={watchRecordFilter === 'ALL' ? undefined : watchRecordFilter}
                       onFilterChange={(f) => {
-                        // WatchStatusFilter('NONE' 포함) → WatchRecordFilter 매핑
-                        if (f === 'NONE') return; // content-record variant에는 NONE 없음
+                        if (f === 'NONE') return;
                         setWatchRecordFilter(f as WatchRecordFilter);
                         setFilterMenuOpen(false);
                       }}
@@ -254,34 +333,34 @@ export default function RecordPage() {
           </div>
         )}
 
-        {(authLoading || loading) && (
+        {loading && (
           <p className="text-center text-neutral-500 py-8">불러오는 중...</p>
         )}
-        {!authLoading && !loading && !isAuthenticated && (
-          <div className="flex flex-col items-center gap-[16px] py-[60px]">
-            <p className="text-[16px] text-wb-grey-03">로그인 후 이용해 보세요.</p>
-            <button
-              type="button"
-              onClick={() => router.push('/login')}
-              className="h-[40px] px-[24px] bg-wb-green rounded-[8px] text-[14px] font-bold text-wb-white-01"
-            >
-              로그인
-            </button>
-          </div>
-        )}
-        {!loading && isAuthenticated && error && (
+        {!loading && error && (
           <p className="text-center text-neutral-500 py-8">
             오류가 발생했습니다.
           </p>
         )}
-        {!loading && isAuthenticated && !error && items.length === 0 && (
+        {!loading && !error && items.length === 0 && (
           <p className="text-center text-neutral-500 py-8">
             시청 기록이 없습니다.
           </p>
         )}
-        {!loading && isAuthenticated && !error && items.length > 0 && (
-          <ContentList>{items.map(renderItem)}</ContentList>
+        {!loading && !error && items.length > 0 && (
+          <>
+            <ContentList>{items.map(renderItem)}</ContentList>
+
+            {/* 무한 스크롤 sentinel — 바닥 200px 전에 다음 페이지 요청 */}
+            {hasNextPage && <div ref={sentinelRef} className="h-px" />}
+
+            {isFetchingNextPage && (
+              <p className="text-center text-wb-grey-03 py-4">불러오는 중...</p>
+            )}
+          </>
         )}
+
+        {/* Preview 오버레이 */}
+        {isPreview && !loading && items.length > 0 && <PreviewOverlay />}
       </MainContent>
 
       <Toast

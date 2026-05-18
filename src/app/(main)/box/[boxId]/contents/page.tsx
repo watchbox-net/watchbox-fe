@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { useQuery, useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import Header from '@/components/common/Header';
 import ContentItem from '@/components/list/ContentItem';
 import ContentList from '@/components/list/ContentList';
@@ -12,19 +12,30 @@ import PlainContextMenu from '@/components/common/PlainContextMenu';
 import MediaTypeButton from '@/components/common/MediaTypeButton';
 import MediaTypeSwitchButton from '@/components/common/MediaTypeSwitchButton';
 import Toast from '@/components/common/Toast';
+import PreviewOverlay from '@/components/preview/PreviewOverlay';
 import { PlusOutline, ChevronDownOutline } from '@/components/icons';
 import MainContent from '@/components/common/MainContent';
 import {
   fetchBoxContents,
+  fetchBoxContentCount,
   type ContentMediaTypeFilter,
   type BoxContentSortOrder,
   type BoxWatchStatusFilter,
 } from '@/lib/api/box';
+import {
+  fetchPreviewBoxContents,
+  fetchPreviewBoxContentCount,
+} from '@/lib/api/preview';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
 import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
+import { useInfiniteList } from '@/lib/hooks/useInfiniteList';
 import { getContentDetailPath } from '@/lib/utils/content';
-import type { ContentItem as ContentItemData, WatchStatus, ContentPageResponse } from '@/types/content-summary';
+import type {
+  ContentItem as ContentItemData,
+  WatchStatus,
+  ContentCursorPageResponse,
+} from '@/types/content-summary';
 import type { BoxType } from '@/types/box';
 
 // ── 미디어 타입 (영화/시리즈 모드 내부 탭) ───────────────────
@@ -68,6 +79,7 @@ export default function BoxContentsPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { showLoginModal } = useLoginModal();
 
+  const isPreview = !authLoading && !isAuthenticated;
   const isShared = boxType === 'SHARED';
 
   // ── 모드 / 필터 / 정렬 상태 ──
@@ -107,36 +119,48 @@ export default function BoxContentsPage() {
     contentMediaTypeFilter,
     sort,
     effectiveWatchStatusFilter,
+    isPreview ? 'preview' : 'auth',
   ] as const;
 
+  const queryParams = {
+    contentMediaTypeFilter,
+    sort,
+    ...(viewMode === 'media' ? { watchStatusFilter } : {}),
+  };
+
+  // ── 박스 컨텐츠 무한 스크롤 (cursor 기반) ──
   const {
-    data: pageData,
+    items,
+    sentinelRef,
     isLoading: loading,
     isError: error,
-  } = useQuery({
+    isFetchingNextPage,
+    hasNextPage,
+  } = useInfiniteList<ContentCursorPageResponse, string | null, ContentItemData>({
     queryKey,
-    queryFn: async () => {
-      console.log('[box-contents] queryFn called with', { boxId, contentMediaTypeFilter, sort, watchStatusFilter, viewMode });
-      const res = await fetchBoxContents(boxId, {
-        contentMediaTypeFilter,
-        sort,
-        ...(viewMode === 'media' ? { watchStatusFilter } : {}),
-      });
-      console.log('[box-contents] response:', res.contentItemList?.length, 'items, first item:', res.contentItemList?.[0]?.contentSummary);
-      return res;
-    },
-    staleTime: 0,
-    refetchOnMount: 'always',
-    placeholderData: keepPreviousData,
+    queryFn: (cursor) =>
+      isPreview
+        ? fetchPreviewBoxContents(boxId, queryParams, cursor)
+        : fetchBoxContents(boxId, queryParams, cursor),
+    initialPageParam: null,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNext ? lastPage.nextCursor : undefined,
+    getItems: (page) => page.contentItemList,
+    // 안전망 dedup — boxContentId가 항상 unique함
+    getItemKey: (item) =>
+      item.boxContentId ?? `t:${item.contentSummary.mediaType}:${item.contentSummary.tmdbId}`,
+    enabled: !authLoading && !Number.isNaN(boxId),
+    staleTime: isPreview ? 1000 * 60 * 5 : 0,
   });
 
-  // pageData 변경 추적용
-  useEffect(() => {
-    console.log('[box-contents] pageData changed:', pageData?.contentItemList?.length, 'items, first:', pageData?.contentItemList?.[0]?.contentSummary?.tmdbId);
-  }, [pageData]);
-
-  const items = pageData?.contentItemList ?? [];
-  const totalCount = pageData?.totalCount ?? 0;
+  // ── 박스 컨텐츠 총 개수 (필터 미적용 전체 — 첫 진입 시 1회) ──
+  const { data: totalCount = 0 } = useQuery({
+    queryKey: ['boxContentCount', boxId, isPreview ? 'preview' : 'auth'],
+    queryFn: () =>
+      isPreview ? fetchPreviewBoxContentCount(boxId) : fetchBoxContentCount(boxId),
+    enabled: !authLoading && !Number.isNaN(boxId),
+    staleTime: 1000 * 60 * 5,
+  });
 
   // 외부 클릭 시 모든 드롭다운/메뉴 닫기
   useEffect(() => {
@@ -159,31 +183,36 @@ export default function BoxContentsPage() {
     if (summary.mediaType !== 'MOVIE' && summary.mediaType !== 'TV') return;
     const success = await changeStatus(summary.tmdbId, summary.mediaType, status);
     if (success) {
-      queryClient.setQueryData<ContentPageResponse>(queryKey, (prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          contentItemList: prev.contentItemList.map((i) =>
-            i.contentSummary.tmdbId === summary.tmdbId
-              ? {
-                  ...i,
-                  memberRecord: {
-                    recordId: i.memberRecord?.recordId ?? null,
-                    liked: i.memberRecord?.liked ?? null,
-                    watchStatus: status,
-                  },
-                }
-              : i,
-          ),
-        };
-      });
+      queryClient.setQueryData<InfiniteData<ContentCursorPageResponse, string | null>>(
+        queryKey,
+        (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            pages: old.pages.map((page) => ({
+              ...page,
+              contentItemList: page.contentItemList.map((i) =>
+                i.contentSummary.tmdbId === summary.tmdbId
+                  ? {
+                      ...i,
+                      memberRecord: {
+                        recordId: i.memberRecord?.recordId ?? null,
+                        liked: i.memberRecord?.liked ?? null,
+                        watchStatus: status,
+                      },
+                    }
+                  : i,
+              ),
+            })),
+          };
+        },
+      );
     }
   };
 
   // ── 인물/영화시리즈 전환 (스위치 버튼) ──
   const toggleViewMode = () => {
     setViewMode((m) => (m === 'media' ? 'people' : 'media'));
-    // 모드 전환 시 정렬은 양쪽이 공유하는 RECENT_SAVED로 리셋, 시청상태도 ALL로
     setSort('RECENT_SAVED');
     setWatchStatusFilter('ALL');
     setSortMenuOpen(false);
@@ -222,10 +251,9 @@ export default function BoxContentsPage() {
         boxMode={boxMode}
         onClick={() => router.push(getContentDetailPath(summary.mediaType, summary.tmdbId))}
         onStatusClick={isPerson ? undefined : (e) => {
-          if (!authLoading && !isAuthenticated) {
-            showLoginModal();
-            return;
-          }
+          // Preview 모드: 시청 상태 변경 차단 → 로그인 모달
+          if (isPreview) { showLoginModal(); return; }
+          if (!authLoading && !isAuthenticated) { showLoginModal(); return; }
           if (isMenuOpen) { setOpenMenuId(null); return; }
           const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
           setMenuDir(window.innerHeight - rect.bottom < 220 ? 'up' : 'down');
@@ -248,10 +276,13 @@ export default function BoxContentsPage() {
         variant="icon1-back"
         title={boxName}
         rightIcon={<PlusOutline className="size-6 text-wb-white-02" />}
-        onRightIconClick={() => {/* TODO: 컨텐츠 추가 */}}
+        onRightIconClick={() => {
+          if (isPreview) { showLoginModal(); return; }
+          /* TODO: 컨텐츠 추가 */
+        }}
       />
 
-      <MainContent>
+      <MainContent className="relative">
         {/* ── Content Media Type Line ───────────── */}
         <div className="flex items-center justify-between pl-[16px] pr-[5px] pt-[12px]">
           {viewMode === 'media' ? (
@@ -276,7 +307,7 @@ export default function BoxContentsPage() {
         </div>
 
         {/* ── 카운트 + 정렬/필터 드롭다운 행 ──── */}
-        {!authLoading && isAuthenticated && !error && (
+        {!loading && !error && (
           <div className="flex items-center justify-between pl-[16px] pr-[6px] pt-[13px]">
             <span className="text-[14px] text-wb-grey-04">{totalCount}개</span>
 
@@ -321,7 +352,7 @@ export default function BoxContentsPage() {
                         variant="box-content"
                         selected={watchStatusFilter === 'ALL' ? undefined : watchStatusFilter}
                         onFilterChange={(f) => {
-                          if (f === 'LIKED') return; // box-content variant에는 LIKED 없음
+                          if (f === 'LIKED') return;
                           setWatchStatusFilter(f as BoxWatchStatusFilter);
                           setFilterMenuOpen(false);
                         }}
@@ -348,8 +379,20 @@ export default function BoxContentsPage() {
           </p>
         )}
         {!loading && !error && items.length > 0 && (
-          <ContentList>{items.map(renderItem)}</ContentList>
+          <>
+            <ContentList>{items.map(renderItem)}</ContentList>
+
+            {/* 무한 스크롤 sentinel — 바닥 200px 전에 다음 페이지 요청 */}
+            {hasNextPage && <div ref={sentinelRef} className="h-px" />}
+
+            {isFetchingNextPage && (
+              <p className="text-center text-wb-grey-03 py-4">불러오는 중...</p>
+            )}
+          </>
         )}
+
+        {/* Preview 오버레이 */}
+        {isPreview && !loading && items.length > 0 && <PreviewOverlay />}
       </MainContent>
 
       <Toast

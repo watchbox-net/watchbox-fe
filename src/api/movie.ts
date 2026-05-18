@@ -6,6 +6,7 @@ const BACKEND_API_URL = process.env.BACKEND_API_URL;
 
 async function fetchMovies(
   endpoint: string,
+  page: number,
   accessToken?: string,
 ): Promise<ContentPageResponse<MovieSummary>> {
   const withRecord = !!accessToken;
@@ -13,7 +14,7 @@ async function fetchMovies(
   if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
 
   const response = await fetch(
-    `${BACKEND_API_URL}/discover/${endpoint}?page=1&withRecord=${withRecord}`,
+    `${BACKEND_API_URL}/discover/${endpoint}?page=${page}&withRecord=${withRecord}`,
     { headers },
   );
   if (!response.ok) {
@@ -23,14 +24,14 @@ async function fetchMovies(
   return result.data;
 }
 
-export const fetchPopularMovieList = (token?: string) =>
-  fetchMovies('popular/movies', token);
+export const fetchPopularMovieList = (token?: string, page = 1) =>
+  fetchMovies('popular/movies', page, token);
 
-export const fetchTopRatedMovieList = (token?: string) =>
-  fetchMovies('top-rated/movies', token);
+export const fetchTopRatedMovieList = (token?: string, page = 1) =>
+  fetchMovies('top-rated/movies', page, token);
 
-export const fetchNowShowingMovieList = (token?: string) =>
-  fetchMovies('now-showing/movies', token);
+export const fetchNowShowingMovieList = (token?: string, page = 1) =>
+  fetchMovies('now-showing/movies', page, token);
 
-export const fetchTrendingMovieList = (token?: string) =>
-  fetchMovies('trending/movies', token);
+export const fetchTrendingMovieList = (token?: string, page = 1) =>
+  fetchMovies('trending/movies', page, token);

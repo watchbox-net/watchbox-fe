@@ -2,14 +2,18 @@
 
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/common/Header';
 import TabNav from '@/components/common/TabNav';
 import MainContent from '@/components/common/MainContent';
 import ContentItem from '@/components/list/ContentItem';
 import ContentList from '@/components/list/ContentList';
 import { searchMulti, searchMovies, searchTv, searchPerson } from '@/lib/api/search';
+import { useInfiniteList } from '@/lib/hooks/useInfiniteList';
 import { getContentDetailPath } from '@/lib/utils/content';
+import type {
+  ContentItem as ContentItemData,
+  ContentPageResponse,
+} from '@/types/content-summary';
 
 const TABS = [
   { key: 'multi', label: '전체' },
@@ -39,15 +43,30 @@ function SearchContent() {
   const [query, setQuery] = useState(urlQuery);
   const [isSearchActive, setIsSearchActive] = useState(!!urlQuery);
 
-  // React Query로 검색 결과 캐싱
-  const { data, isLoading } = useQuery({
+  // 무한 스크롤 (offset 기반) — urlTab/urlQuery 바뀌면 자동 새 캐시
+  const {
+    items,
+    sentinelRef,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    firstPage,
+  } = useInfiniteList<ContentPageResponse, number, ContentItemData>({
     queryKey: ['search', urlTab, urlQuery],
-    queryFn: () => searchByTab[urlTab](urlQuery, 1),
+    queryFn: (page) => searchByTab[urlTab](urlQuery, page),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.currentPage < lastPage.totalPages
+        ? lastPage.currentPage + 1
+        : undefined,
+    getItems: (page) => page.contentItemList,
+    // multi 탭에서 mediaType 다른 동일 tmdbId가 있을 수 있으므로 mediaType 포함
+    getItemKey: (item) =>
+      `${item.contentSummary.mediaType}-${item.contentSummary.tmdbId}`,
     enabled: !!urlQuery,
   });
 
-  const items = data?.contentItemList ?? [];
-  const totalCount = data?.totalCount ?? 0;
+  const totalCount = firstPage?.totalCount ?? 0;
   const searched = !!urlQuery;
 
   // URL 파라미터 갱신
@@ -127,6 +146,13 @@ function SearchContent() {
                 );
               })}
             </ContentList>
+
+            {/* 무한 스크롤 sentinel — 바닥 200px 전에 다음 페이지 요청 */}
+            {hasNextPage && <div ref={sentinelRef} className="h-px" />}
+
+            {isFetchingNextPage && (
+              <p className="text-center text-wb-grey-03 py-4">불러오는 중...</p>
+            )}
           </>
         )}
       </MainContent>

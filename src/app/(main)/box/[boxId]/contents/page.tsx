@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { useQuery, useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import Header from '@/components/common/Header';
 import ContentItem from '@/components/list/ContentItem';
 import ContentList from '@/components/list/ContentList';
@@ -17,16 +17,25 @@ import { PlusOutline, ChevronDownOutline } from '@/components/icons';
 import MainContent from '@/components/common/MainContent';
 import {
   fetchBoxContents,
+  fetchBoxContentCount,
   type ContentMediaTypeFilter,
   type BoxContentSortOrder,
   type BoxWatchStatusFilter,
 } from '@/lib/api/box';
-import { fetchPreviewBoxContents } from '@/lib/api/preview';
+import {
+  fetchPreviewBoxContents,
+  fetchPreviewBoxContentCount,
+} from '@/lib/api/preview';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
 import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
+import { useInfiniteList } from '@/lib/hooks/useInfiniteList';
 import { getContentDetailPath } from '@/lib/utils/content';
-import type { ContentItem as ContentItemData, WatchStatus, ContentPageResponse } from '@/types/content-summary';
+import type {
+  ContentItem as ContentItemData,
+  WatchStatus,
+  ContentCursorPageResponse,
+} from '@/types/content-summary';
 import type { BoxType } from '@/types/box';
 
 // ── 미디어 타입 (영화/시리즈 모드 내부 탭) ───────────────────
@@ -119,24 +128,39 @@ export default function BoxContentsPage() {
     ...(viewMode === 'media' ? { watchStatusFilter } : {}),
   };
 
+  // ── 박스 컨텐츠 무한 스크롤 (cursor 기반) ──
   const {
-    data: pageData,
+    items,
+    sentinelRef,
     isLoading: loading,
     isError: error,
-  } = useQuery({
+    isFetchingNextPage,
+    hasNextPage,
+  } = useInfiniteList<ContentCursorPageResponse, string | null, ContentItemData>({
     queryKey,
-    queryFn: () =>
+    queryFn: (cursor) =>
       isPreview
-        ? fetchPreviewBoxContents(boxId, queryParams)
-        : fetchBoxContents(boxId, queryParams),
-    enabled: !authLoading,
-    staleTime: 0,
-    refetchOnMount: 'always',
-    placeholderData: keepPreviousData,
+        ? fetchPreviewBoxContents(boxId, queryParams, cursor)
+        : fetchBoxContents(boxId, queryParams, cursor),
+    initialPageParam: null,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNext ? lastPage.nextCursor : undefined,
+    getItems: (page) => page.contentItemList,
+    // 안전망 dedup — boxContentId가 항상 unique함
+    getItemKey: (item) =>
+      item.boxContentId ?? `t:${item.contentSummary.mediaType}:${item.contentSummary.tmdbId}`,
+    enabled: !authLoading && !Number.isNaN(boxId),
+    staleTime: isPreview ? 1000 * 60 * 5 : 0,
   });
 
-  const items = pageData?.contentItemList ?? [];
-  const totalCount = pageData?.totalCount ?? 0;
+  // ── 박스 컨텐츠 총 개수 (필터 미적용 전체 — 첫 진입 시 1회) ──
+  const { data: totalCount = 0 } = useQuery({
+    queryKey: ['boxContentCount', boxId, isPreview ? 'preview' : 'auth'],
+    queryFn: () =>
+      isPreview ? fetchPreviewBoxContentCount(boxId) : fetchBoxContentCount(boxId),
+    enabled: !authLoading && !Number.isNaN(boxId),
+    staleTime: 1000 * 60 * 5,
+  });
 
   // 외부 클릭 시 모든 드롭다운/메뉴 닫기
   useEffect(() => {
@@ -159,24 +183,30 @@ export default function BoxContentsPage() {
     if (summary.mediaType !== 'MOVIE' && summary.mediaType !== 'TV') return;
     const success = await changeStatus(summary.tmdbId, summary.mediaType, status);
     if (success) {
-      queryClient.setQueryData<ContentPageResponse>(queryKey, (prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          contentItemList: prev.contentItemList.map((i) =>
-            i.contentSummary.tmdbId === summary.tmdbId
-              ? {
-                  ...i,
-                  memberRecord: {
-                    recordId: i.memberRecord?.recordId ?? null,
-                    liked: i.memberRecord?.liked ?? null,
-                    watchStatus: status,
-                  },
-                }
-              : i,
-          ),
-        };
-      });
+      queryClient.setQueryData<InfiniteData<ContentCursorPageResponse, string | null>>(
+        queryKey,
+        (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            pages: old.pages.map((page) => ({
+              ...page,
+              contentItemList: page.contentItemList.map((i) =>
+                i.contentSummary.tmdbId === summary.tmdbId
+                  ? {
+                      ...i,
+                      memberRecord: {
+                        recordId: i.memberRecord?.recordId ?? null,
+                        liked: i.memberRecord?.liked ?? null,
+                        watchStatus: status,
+                      },
+                    }
+                  : i,
+              ),
+            })),
+          };
+        },
+      );
     }
   };
 
@@ -349,7 +379,16 @@ export default function BoxContentsPage() {
           </p>
         )}
         {!loading && !error && items.length > 0 && (
-          <ContentList>{items.map(renderItem)}</ContentList>
+          <>
+            <ContentList>{items.map(renderItem)}</ContentList>
+
+            {/* 무한 스크롤 sentinel — 바닥 200px 전에 다음 페이지 요청 */}
+            {hasNextPage && <div ref={sentinelRef} className="h-px" />}
+
+            {isFetchingNextPage && (
+              <p className="text-center text-wb-grey-03 py-4">불러오는 중...</p>
+            )}
+          </>
         )}
 
         {/* Preview 오버레이 */}

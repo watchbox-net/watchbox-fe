@@ -7,7 +7,7 @@ import type {
   BoxUpdateRequest,
   BoxUpdateResponse,
 } from '@/types/box';
-import type { ContentPageResponse } from '@/types/content-summary';
+import type { ContentCursorPageResponse, CountResponse } from '@/types/content-summary';
 import type { ApiResponse } from '@/types/api';
 
 /** 박스 리스트 조회 (마이 + 공유 통합) */
@@ -60,14 +60,29 @@ export interface BoxContentRecordQueryParams {
   watchStatusFilter?: BoxWatchStatusFilter;
 }
 
-/** 박스 컨텐츠 리스트 조회 - 정렬/필터/미디어타입 */
+/**
+ * 박스 컨텐츠 리스트 조회 - 커서 기반 무한스크롤
+ * 첫 페이지 요청은 cursor 생략 또는 null. 이후 응답의 nextCursor 그대로 전달.
+ */
 export async function fetchBoxContents(
   boxId: number,
   params: BoxContentRecordQueryParams = {},
-): Promise<ContentPageResponse> {
-  const { data } = await privateApi.get<ApiResponse<ContentPageResponse>>(
+  cursor: string | null = null,
+): Promise<ContentCursorPageResponse> {
+  const queryParams: Record<string, unknown> = { ...params };
+  if (cursor) queryParams.cursor = cursor;
+
+  const { data } = await privateApi.get<ApiResponse<ContentCursorPageResponse>>(
     `/boxes/${boxId}/contents`,
-    { params },
+    { params: queryParams },
   );
   return data.data;
+}
+
+/** 박스 컨텐츠 총 개수 (필터 미적용) */
+export async function fetchBoxContentCount(boxId: number): Promise<number> {
+  const { data } = await privateApi.get<ApiResponse<CountResponse>>(
+    `/boxes/${boxId}/contents/count`,
+  );
+  return data.data.totalCount;
 }

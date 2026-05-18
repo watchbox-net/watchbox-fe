@@ -62,11 +62,34 @@ export interface ContentItem<T extends ContentSummary = ContentSummary> {
 // 페이지 응답
 // ============================================================
 
-/** 콘텐츠 페이지 응답 - responseMeta.contentType으로 타입이 결정되므로 제네릭으로 한번에 확정 */
+/**
+ * 콘텐츠 페이지 응답 (offset 기반)
+ * - discover, search 등에서 사용
+ * - responseMeta.contentType으로 타입이 결정되므로 제네릭으로 한번에 확정
+ */
 export interface ContentPageResponse<T extends ContentSummary = ContentSummary> {
   contentItemList: ContentItem<T>[];
   totalCount: number;
   totalPages: number;
   currentPage: number;
   responseMeta: ResponseMeta;
+}
+
+/**
+ * 콘텐츠 페이지 응답 (cursor 기반)
+ * - 시청 기록, 박스 컨텐츠 등에서 사용
+ * - 총 개수가 필요하면 별도 count 엔드포인트 호출
+ */
+export interface ContentCursorPageResponse<T extends ContentSummary = ContentSummary> {
+  contentItemList: ContentItem<T>[];
+  /** 다음 페이지 요청 시 그대로 cursor 파라미터에 실음. 끝이면 null */
+  nextCursor: string | null;
+  /** 다음 페이지 존재 여부 */
+  hasNext: boolean;
+  responseMeta?: ResponseMeta;
+}
+
+/** 카운트 응답 (필터 미적용 전체 개수) */
+export interface CountResponse {
+  totalCount: number;
 }

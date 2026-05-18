@@ -25,11 +25,22 @@ interface HomeSectionsProps {
   };
 }
 
+// 값의 타입을 기반으로 Movie/Tv 키만 각각 추출 (키 이름 패턴이 아닌 값 타입으로 분류)
+type MovieKey = {
+  [K in keyof HomeSectionsProps['data']]:
+    HomeSectionsProps['data'][K] extends ContentItem<MovieSummary>[] ? K : never;
+}[keyof HomeSectionsProps['data']];
+
+type TvKey = {
+  [K in keyof HomeSectionsProps['data']]:
+    HomeSectionsProps['data'][K] extends ContentItem<TvSummary>[] ? K : never;
+}[keyof HomeSectionsProps['data']];
+
 interface SectionConfig {
   title: string;
   tvTitle?: string;
-  movieKey: keyof HomeSectionsProps['data'];
-  tvKey: keyof HomeSectionsProps['data'];
+  movieKey: MovieKey;
+  tvKey: TvKey;
   movieHref: string;
   tvHref: string;
 }
@@ -103,10 +114,14 @@ function ToggleSection({
 }) {
   const [media, setMedia] = useState<MediaType>('movie');
 
-  const items = data[media === 'movie' ? config.movieKey : config.tvKey];
   const href = media === 'movie' ? config.movieHref : config.tvHref;
   const title = media === 'tv' && config.tvTitle ? config.tvTitle : config.title;
   const scrollKey = `${config.movieKey}-${media}`;
+
+  // media 분기를 JSX 레벨로 분리하면 TS가 각 분기에서 ContentItem 타입을 정확히 좁힐 수 있음
+  const movieItems = data[config.movieKey];
+  const tvItems = data[config.tvKey];
+  const hasItems = media === 'movie' ? movieItems.length > 0 : tvItems.length > 0;
 
   return (
     <section className="mb-6">
@@ -117,8 +132,12 @@ function ToggleSection({
         toggleSlot={<WatchMediaToggle value={media} onChange={setMedia} />}
         className="py-[12px]"
       />
-      {items.length > 0 ? (
-        <CardScroll items={items} scrollKey={scrollKey} />
+      {hasItems ? (
+        media === 'movie' ? (
+          <CardScroll items={movieItems} scrollKey={scrollKey} />
+        ) : (
+          <CardScroll items={tvItems} scrollKey={scrollKey} />
+        )
       ) : (
         <p className="text-sm text-wb-grey-03 px-[16px]">불러올 수 없습니다</p>
       )}

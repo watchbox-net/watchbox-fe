@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { useQuery, useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import Header from '@/components/common/Header';
 import TabNav from '@/components/common/TabNav';
 import ContentItem from '@/components/list/ContentItem';
@@ -16,15 +16,24 @@ import PreviewOverlay from '@/components/preview/PreviewOverlay';
 import { ChevronDownOutline } from '@/components/icons';
 import {
   fetchMyRecordedContentPage,
+  fetchMyRecordedContentCount,
   type WatchMediaTypeFilter,
   type RecordSortOrder,
   type WatchRecordFilter,
 } from '@/lib/api/watch-record';
-import { fetchPreviewRecordedContentPage } from '@/lib/api/preview';
+import {
+  fetchPreviewRecordedContentPage,
+  fetchPreviewRecordedContentCount,
+} from '@/lib/api/preview';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
 import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
-import type { ContentItem as ContentItemData, WatchStatus, ContentPageResponse } from '@/types/content-summary';
+import { useInfiniteList } from '@/lib/hooks/useInfiniteList';
+import type {
+  ContentItem as ContentItemData,
+  WatchStatus,
+  ContentCursorPageResponse,
+} from '@/types/content-summary';
 import { getContentDetailPath } from '@/lib/utils/content';
 
 // ── 탭 → 미디어타입 필터 매핑 ────────────────────────────────
@@ -90,24 +99,41 @@ export default function RecordPage() {
     isPreview ? 'preview' : 'auth',
   ] as const;
 
+  // ── 시청 기록 무한 스크롤 (cursor 기반) ──
   const {
-    data: pageData,
+    items,
+    sentinelRef,
     isLoading: loading,
     isError: error,
-  } = useQuery({
+    isFetchingNextPage,
+    hasNextPage,
+  } = useInfiniteList<ContentCursorPageResponse, string | null, ContentItemData>({
     queryKey,
-    queryFn: () =>
+    queryFn: (cursor) =>
       isPreview
-        ? fetchPreviewRecordedContentPage(queryParams)
-        : fetchMyRecordedContentPage(queryParams),
+        ? fetchPreviewRecordedContentPage(queryParams, cursor)
+        : fetchMyRecordedContentPage(queryParams, cursor),
+    initialPageParam: null,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNext ? lastPage.nextCursor : undefined,
+    getItems: (page) => page.contentItemList,
+    // 안전망 dedup — recordId가 있으면 그걸로, 없으면 mediaType+tmdbId
+    getItemKey: (item) =>
+      item.memberRecord?.recordId != null
+        ? `r:${item.memberRecord.recordId}`
+        : `t:${item.contentSummary.mediaType}:${item.contentSummary.tmdbId}`,
     enabled: !authLoading,
     staleTime: isPreview ? 1000 * 60 * 5 : 0,
-    refetchOnMount: 'always',
-    placeholderData: keepPreviousData,
   });
 
-  const items = pageData?.contentItemList ?? [];
-  const totalCount = pageData?.totalCount ?? 0;
+  // ── 시청 기록 총 개수 (필터 미적용 전체 — 첫 진입 시 1회) ──
+  const { data: totalCount = 0 } = useQuery({
+    queryKey: ['recordedContentCount', isPreview ? 'preview' : 'auth'],
+    queryFn: () =>
+      isPreview ? fetchPreviewRecordedContentCount() : fetchMyRecordedContentCount(),
+    enabled: !authLoading,
+    staleTime: 1000 * 60 * 5,
+  });
 
   // 외부 클릭 시 메뉴 닫기
   useEffect(() => {
@@ -121,6 +147,48 @@ export default function RecordPage() {
     return () => document.removeEventListener('mousedown', handleMouseDown);
   }, []);
 
+  // 낙관적 업데이트: InfiniteData 구조의 각 page를 순회하며 항목 갱신
+  const updateItemInCache = (
+    matchId: number,
+    updater: (item: ContentItemData) => ContentItemData,
+  ) => {
+    queryClient.setQueryData<InfiniteData<ContentCursorPageResponse, string | null>>(
+      queryKey,
+      (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          pages: old.pages.map((page) => ({
+            ...page,
+            contentItemList: page.contentItemList.map((i) =>
+              (i.memberRecord?.recordId ?? i.contentSummary.tmdbId) === matchId
+                ? updater(i)
+                : i,
+            ),
+          })),
+        };
+      },
+    );
+  };
+
+  const removeItemFromCache = (recordId: number) => {
+    queryClient.setQueryData<InfiniteData<ContentCursorPageResponse, string | null>>(
+      queryKey,
+      (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          pages: old.pages.map((page) => ({
+            ...page,
+            contentItemList: page.contentItemList.filter(
+              (i) => i.memberRecord?.recordId !== recordId,
+            ),
+          })),
+        };
+      },
+    );
+  };
+
   const handleStatusSelect = async (
     item: ContentItemData,
     status: Exclude<WatchStatus, 'NONE'>,
@@ -130,18 +198,15 @@ export default function RecordPage() {
     if (summary.mediaType !== 'MOVIE' && summary.mediaType !== 'TV') return;
     const success = await changeStatus(summary.tmdbId, summary.mediaType, status);
     if (success) {
-      queryClient.setQueryData<ContentPageResponse>(queryKey, (prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          contentItemList: prev.contentItemList.map((i) =>
-            (i.memberRecord?.recordId ?? i.contentSummary.tmdbId) ===
-            (item.memberRecord?.recordId ?? summary.tmdbId)
-              ? { ...i, memberRecord: { recordId: i.memberRecord?.recordId ?? null, liked: i.memberRecord?.liked ?? null, watchStatus: status } }
-              : i,
-          ),
-        };
-      });
+      const matchId = item.memberRecord?.recordId ?? summary.tmdbId;
+      updateItemInCache(matchId, (i) => ({
+        ...i,
+        memberRecord: {
+          recordId: i.memberRecord?.recordId ?? null,
+          liked: i.memberRecord?.liked ?? null,
+          watchStatus: status,
+        },
+      }));
     }
   };
 
@@ -150,13 +215,12 @@ export default function RecordPage() {
     if (!item.memberRecord?.recordId) return;
     const success = await deleteStatus(item.memberRecord.recordId);
     if (success) {
-      queryClient.setQueryData<ContentPageResponse>(queryKey, (prev) => {
-        if (!prev) return prev;
-        const filtered = prev.contentItemList.filter(
-          (i) => i.memberRecord?.recordId !== item.memberRecord?.recordId,
-        );
-        return { ...prev, contentItemList: filtered, totalCount: prev.totalCount - 1 };
-      });
+      removeItemFromCache(item.memberRecord.recordId);
+      // 총 개수도 감소 (별도 캐시이므로 직접 갱신)
+      queryClient.setQueryData<number>(
+        ['recordedContentCount', isPreview ? 'preview' : 'auth'],
+        (prev) => (typeof prev === 'number' ? Math.max(0, prev - 1) : prev),
+      );
     }
   };
 
@@ -283,7 +347,16 @@ export default function RecordPage() {
           </p>
         )}
         {!loading && !error && items.length > 0 && (
-          <ContentList>{items.map(renderItem)}</ContentList>
+          <>
+            <ContentList>{items.map(renderItem)}</ContentList>
+
+            {/* 무한 스크롤 sentinel — 바닥 200px 전에 다음 페이지 요청 */}
+            {hasNextPage && <div ref={sentinelRef} className="h-px" />}
+
+            {isFetchingNextPage && (
+              <p className="text-center text-wb-grey-03 py-4">불러오는 중...</p>
+            )}
+          </>
         )}
 
         {/* Preview 오버레이 */}

@@ -34,10 +34,10 @@ const TABS: { key: WatchMediaTypeFilter; label: string }[] = [
 
 // ── 정렬 라벨 ────────────────────────────────────────────────
 const SORT_LABEL: Record<RecordSortOrder, string> = {
-  RECENT_SAVED: '최근 저장순',
-  OLDEST_SAVED: '오래된 저장순',
-  RECENT_YEAR:  '최근 연도순',
-  OLDEST_YEAR:  '오래된 연도순',
+  RECENT_UPDATED: '최근 기록순',
+  OLDEST_UPDATED: '오래된 기록순',
+  RECENT_YEAR:    '최근 연도순',
+  OLDEST_YEAR:    '오래된 연도순',
 };
 
 // ── 필터 라벨 (드롭다운 트리거 표시용; ALL은 placeholder) ────
@@ -57,7 +57,7 @@ export default function RecordPage() {
 
   // ── 쿼리 파라미터 상태 ──
   const [activeTabIndex, setActiveTabIndex] = useState(0);
-  const [sort, setSort] = useState<RecordSortOrder>('RECENT_SAVED');
+  const [sort, setSort] = useState<RecordSortOrder>('RECENT_UPDATED');
   const [watchRecordFilter, setWatchRecordFilter] = useState<WatchRecordFilter>('ALL');
 
   // ── 메뉴 열림 상태 ──

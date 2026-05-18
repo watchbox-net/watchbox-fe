@@ -4,7 +4,7 @@ import type { ApiResponse } from '@/types/api';
 
 // ─── 시청 기록 페이지 조회 파라미터 ───────────────────────────
 export type WatchMediaTypeFilter = 'MOVIE_TV' | 'MOVIE' | 'TV';
-export type RecordSortOrder = 'RECENT_SAVED' | 'OLDEST_SAVED' | 'RECENT_YEAR' | 'OLDEST_YEAR';
+export type RecordSortOrder = 'RECENT_UPDATED' | 'OLDEST_UPDATED' | 'RECENT_YEAR' | 'OLDEST_YEAR';
 export type WatchRecordFilter = 'ALL' | 'COMPLETED' | 'WATCHING' | 'PLANNED' | 'PAUSED' | 'LIKED';
 
 export interface ContentRecordQueryParams {

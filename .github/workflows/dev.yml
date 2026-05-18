@@ -19,6 +19,7 @@ jobs:
           DOCKER_BUILDKIT: 1
         run: |
           docker build \
+            --build-arg NEXT_PUBLIC_ENV=dev \
             --build-arg NEXT_PUBLIC_SERVER_URL=https://dev-api.watch-box.net \
             --cache-from ${{ env.DOCKER_IMAGE }} \
             --build-arg BUILDKIT_INLINE_CACHE=1 \

@@ -12,6 +12,7 @@ import WatchStatusMenu from '@/components/common/WatchStatusMenu';
 import PlainContextMenu from '@/components/common/PlainContextMenu';
 import Toast from '@/components/common/Toast';
 import MainContent from '@/components/common/MainContent';
+import PreviewOverlay from '@/components/preview/PreviewOverlay';
 import { ChevronDownOutline } from '@/components/icons';
 import {
   fetchMyRecordedContentPage,
@@ -19,6 +20,7 @@ import {
   type RecordSortOrder,
   type WatchRecordFilter,
 } from '@/lib/api/watch-record';
+import { fetchPreviewRecordedContentPage } from '@/lib/api/preview';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
 import { useWatchStatus } from '@/lib/hooks/useWatchStatus';
@@ -55,6 +57,8 @@ export default function RecordPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { showLoginModal } = useLoginModal();
 
+  const isPreview = !authLoading && !isAuthenticated;
+
   // ── 쿼리 파라미터 상태 ──
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [sort, setSort] = useState<RecordSortOrder>('RECENT_UPDATED');
@@ -76,7 +80,15 @@ export default function RecordPage() {
   const { changeStatus, deleteStatus } = useWatchStatus({ showToast });
 
   const watchMediaTypeFilter = TABS[activeTabIndex].key;
-  const queryKey = ['recordedContentPage', watchMediaTypeFilter, sort, watchRecordFilter] as const;
+  const queryParams = { watchMediaTypeFilter, sort, watchRecordFilter };
+
+  const queryKey = [
+    'recordedContentPage',
+    watchMediaTypeFilter,
+    sort,
+    watchRecordFilter,
+    isPreview ? 'preview' : 'auth',
+  ] as const;
 
   const {
     data: pageData,
@@ -84,11 +96,13 @@ export default function RecordPage() {
     isError: error,
   } = useQuery({
     queryKey,
-    queryFn: () => fetchMyRecordedContentPage({ watchMediaTypeFilter, sort, watchRecordFilter }),
-    enabled: !authLoading && isAuthenticated,
-    staleTime: 0,
+    queryFn: () =>
+      isPreview
+        ? fetchPreviewRecordedContentPage(queryParams)
+        : fetchMyRecordedContentPage(queryParams),
+    enabled: !authLoading,
+    staleTime: isPreview ? 1000 * 60 * 5 : 0,
     refetchOnMount: 'always',
-    // 정렬/필터/탭 전환 시 새 데이터 도착 전까지 이전 결과 유지 → 0개 플래시 방지
     placeholderData: keepPreviousData,
   });
 
@@ -171,6 +185,8 @@ export default function RecordPage() {
         boxMode={{ mode: 'my', liked: item.memberRecord?.liked === true }}
         onClick={() => router.push(getContentDetailPath(summary.mediaType, summary.tmdbId))}
         onStatusClick={(e) => {
+          // Preview 모드: 시청 상태 변경 차단 → 로그인 모달
+          if (isPreview) { showLoginModal(); return; }
           if (!authLoading && !isAuthenticated) { showLoginModal(); return; }
           if (isMenuOpen) { setOpenMenuId(null); return; }
           const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
@@ -195,9 +211,9 @@ export default function RecordPage() {
         onChange={setActiveTabIndex}
       />
 
-      <MainContent>
+      <MainContent className="relative">
         {/* ── 카운트 + 정렬/필터 드롭다운 행 ───────── */}
-        {!authLoading && isAuthenticated && !error && (
+        {!loading && !error && (
           <div className="flex items-center justify-between pl-[16px] pr-[6px] pt-[13px]">
             <span className="text-[14px] text-wb-grey-04">{totalCount}개</span>
 
@@ -241,8 +257,7 @@ export default function RecordPage() {
                       variant="content-record"
                       selected={watchRecordFilter === 'ALL' ? undefined : watchRecordFilter}
                       onFilterChange={(f) => {
-                        // WatchStatusFilter('NONE' 포함) → WatchRecordFilter 매핑
-                        if (f === 'NONE') return; // content-record variant에는 NONE 없음
+                        if (f === 'NONE') return;
                         setWatchRecordFilter(f as WatchRecordFilter);
                         setFilterMenuOpen(false);
                       }}
@@ -254,34 +269,25 @@ export default function RecordPage() {
           </div>
         )}
 
-        {(authLoading || loading) && (
+        {loading && (
           <p className="text-center text-neutral-500 py-8">불러오는 중...</p>
         )}
-        {!authLoading && !loading && !isAuthenticated && (
-          <div className="flex flex-col items-center gap-[16px] py-[60px]">
-            <p className="text-[16px] text-wb-grey-03">로그인 후 이용해 보세요.</p>
-            <button
-              type="button"
-              onClick={() => router.push('/login')}
-              className="h-[40px] px-[24px] bg-wb-green rounded-[8px] text-[14px] font-bold text-wb-white-01"
-            >
-              로그인
-            </button>
-          </div>
-        )}
-        {!loading && isAuthenticated && error && (
+        {!loading && error && (
           <p className="text-center text-neutral-500 py-8">
             오류가 발생했습니다.
           </p>
         )}
-        {!loading && isAuthenticated && !error && items.length === 0 && (
+        {!loading && !error && items.length === 0 && (
           <p className="text-center text-neutral-500 py-8">
             시청 기록이 없습니다.
           </p>
         )}
-        {!loading && isAuthenticated && !error && items.length > 0 && (
+        {!loading && !error && items.length > 0 && (
           <ContentList>{items.map(renderItem)}</ContentList>
         )}
+
+        {/* Preview 오버레이 */}
+        {isPreview && !loading && items.length > 0 && <PreviewOverlay />}
       </MainContent>
 
       <Toast

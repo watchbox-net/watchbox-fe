@@ -18,7 +18,7 @@ function LoginContent() {
 
     return (
         <MobileFrame>
-            <Header variant="back" title = "로그인" />
+            <Header variant="back" title = "로그인하기" />
 
             <div className="flex-1 flex flex-col items-center justify-center">
                 {/* 로고 */}

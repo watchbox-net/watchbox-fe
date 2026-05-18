@@ -10,8 +10,10 @@ import Modal from '@/components/common/Modal';
 import ContextMenu from '@/components/common/ContextMenu';
 import BoxItem from '@/components/box/BoxItem';
 import BoxList from '@/components/box/BoxList';
+import PreviewOverlay from '@/components/preview/PreviewOverlay';
 import { PlusOutline } from '@/components/icons';
 import { fetchBoxList, deleteBox } from '@/lib/api/box';
+import { fetchPreviewBoxList } from '@/lib/api/preview';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
 import type { BoxType } from '@/types/box';
@@ -24,10 +26,13 @@ export default function BoxPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { showLoginModal } = useLoginModal();
 
+  const isPreview = !authLoading && !isAuthenticated;
+
   // 삭제 모달 상태
   const [deleteTarget, setDeleteTarget] = useState<{ boxId: number; name: string } | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // ── 인증된 사용자: 일반 API ──
   const { data, isLoading, isError } = useQuery({
     queryKey: ['boxList'],
     queryFn: fetchBoxList,
@@ -35,7 +40,16 @@ export default function BoxPage() {
     staleTime: 0,
   });
 
-  const boxes = data?.boxItemList ?? [];
+  // ── 비인증 사용자: Preview API ──
+  const { data: previewData, isLoading: previewLoading } = useQuery({
+    queryKey: ['previewBoxList'],
+    queryFn: fetchPreviewBoxList,
+    enabled: isPreview,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const boxes = isAuthenticated ? (data?.boxItemList ?? []) : (previewData?.boxItemList ?? []);
+  const loading = authLoading || (isAuthenticated ? isLoading : previewLoading);
 
   // 컨텍스트 메뉴 상태
   const [openMenu, setOpenMenu] = useState<MenuTarget | null>(null);
@@ -71,7 +85,11 @@ export default function BoxPage() {
   };
 
   const goToContents = (boxId: number, boxType: BoxType, name: string) => {
-    router.push(`/box/${boxId}/contents?type=${boxType}&name=${encodeURIComponent(name)}`);
+    if (isPreview) {
+      router.push(`/box/${boxId}/contents?type=${boxType}&name=${encodeURIComponent(name)}&preview=true`);
+    } else {
+      router.push(`/box/${boxId}/contents?type=${boxType}&name=${encodeURIComponent(name)}`);
+    }
   };
 
   const buildMenuItems = (boxId: number, boxType: BoxType) => [
@@ -120,29 +138,16 @@ export default function BoxPage() {
         }
       />
 
-      <MainContent>
-        {(authLoading || isLoading) && (
+      <MainContent className="relative">
+        {loading && (
           <p className="text-center text-neutral-500 py-8">불러오는 중...</p>
-        )}
-
-        {!authLoading && !isAuthenticated && (
-          <div className="flex flex-col items-center gap-[16px] py-[60px]">
-            <p className="text-[16px] text-wb-grey-03">로그인 후 이용해 보세요.</p>
-            <button
-              type="button"
-              onClick={() => router.push('/login')}
-              className="h-[40px] px-[24px] bg-wb-green rounded-[8px] text-[14px] font-bold text-wb-white-01"
-            >
-              로그인
-            </button>
-          </div>
         )}
 
         {!authLoading && isAuthenticated && isError && (
           <p className="text-center text-neutral-500 py-8">오류가 발생했습니다.</p>
         )}
 
-        {!authLoading && isAuthenticated && !isError && !isLoading && (
+        {!loading && boxes.length > 0 && (
           <>
             <BoxList>
               {boxes.map((box) => {
@@ -156,7 +161,10 @@ export default function BoxPage() {
                     posters={box.previewPosterList}
                     memberNames={box.memberList?.map((m) => m.boxMemberName)}
                     onClick={() => goToContents(box.boxId, box.boxType, box.name)}
-                    onMenuClick={() => toggleMenu(box.boxId, box.boxType)}
+                    onMenuClick={() => {
+                      if (isPreview) { showLoginModal(); return; }
+                      toggleMenu(box.boxId, box.boxType);
+                    }}
                     menuSlot={isMenuOpen ? (
                       <div ref={menuRef} className="absolute right-[5px] top-full z-50 mt-1">
                         <ContextMenu items={buildMenuItems(box.boxId, box.boxType)} />
@@ -166,9 +174,11 @@ export default function BoxPage() {
                 );
               })}
             </BoxList>
-
           </>
         )}
+
+        {/* Preview 오버레이 */}
+        {isPreview && !previewLoading && boxes.length > 0 && <PreviewOverlay />}
       </MainContent>
 
       {/* 삭제 확인 모달 */}

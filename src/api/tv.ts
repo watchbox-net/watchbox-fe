@@ -6,6 +6,7 @@ const BACKEND_API_URL = process.env.BACKEND_API_URL;
 
 async function fetchTv(
   endpoint: string,
+  page: number,
   accessToken?: string,
 ): Promise<ContentPageResponse<TvSummary>> {
   const withRecord = !!accessToken;
@@ -13,7 +14,7 @@ async function fetchTv(
   if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
 
   const response = await fetch(
-    `${BACKEND_API_URL}/discover/${endpoint}?page=1&withRecord=${withRecord}`,
+    `${BACKEND_API_URL}/discover/${endpoint}?page=${page}&withRecord=${withRecord}`,
     { headers },
   );
   if (!response.ok) {
@@ -23,14 +24,14 @@ async function fetchTv(
   return result.data;
 }
 
-export const fetchPopularTvList = (token?: string) =>
-  fetchTv('popular/tv', token);
+export const fetchPopularTvList = (token?: string, page = 1) =>
+  fetchTv('popular/tv', page, token);
 
-export const fetchTopRatedTvList = (token?: string) =>
-  fetchTv('top-rated/tv', token);
+export const fetchTopRatedTvList = (token?: string, page = 1) =>
+  fetchTv('top-rated/tv', page, token);
 
-export const fetchNowShowingTvList = (token?: string) =>
-  fetchTv('now-showing/tv', token);
+export const fetchNowShowingTvList = (token?: string, page = 1) =>
+  fetchTv('now-showing/tv', page, token);
 
-export const fetchTrendingTvList = (token?: string) =>
-  fetchTv('trending/tv', token);
+export const fetchTrendingTvList = (token?: string, page = 1) =>
+  fetchTv('trending/tv', page, token);

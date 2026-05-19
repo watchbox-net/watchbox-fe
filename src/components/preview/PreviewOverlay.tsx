@@ -12,9 +12,7 @@ export default function PreviewOverlay() {
   return (
     <div className="fixed bottom-[63px] left-1/2 -translate-x-1/2 w-full max-w-[430px] z-40 flex flex-col items-center gap-[12px] bg-wb-dark-03 px-[20px] pb-[24px] pt-[16px]">
       <p className="text-[15px] text-wb-grey-03 text-center">
-        샘플 화면입니다
-        <br />
-        로그인하여 시작해 보세요
+          로그인하고 시작해 보세요
       </p>
       <button
         type="button"

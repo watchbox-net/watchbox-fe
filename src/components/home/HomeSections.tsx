@@ -43,6 +43,8 @@ interface SectionConfig {
   tvKey: TvKey;
   movieHref: string;
   tvHref: string;
+  /** 섹션 최초 진입 시 보여줄 미디어 타입 (기본 movie) */
+  defaultMedia?: MediaType;
 }
 
 const SECTIONS: SectionConfig[] = [
@@ -52,6 +54,7 @@ const SECTIONS: SectionConfig[] = [
     tvKey: 'trendingTv',
     movieHref: '/discover/trending/movie',
     tvHref: '/discover/trending/tv',
+    defaultMedia: 'tv',
   },
   {
     title: '인기 작품',
@@ -59,6 +62,7 @@ const SECTIONS: SectionConfig[] = [
     tvKey: 'popularTv',
     movieHref: '/discover/popular/movie',
     tvHref: '/discover/popular/tv',
+    defaultMedia: 'movie',
   },
   {
     title: '현재 상영중',
@@ -67,6 +71,7 @@ const SECTIONS: SectionConfig[] = [
     tvKey: 'nowShowingTv',
     movieHref: '/discover/now-showing/movie',
     tvHref: '/discover/now-showing/tv',
+    defaultMedia: 'movie',
   },
   {
     title: '높은 평점',
@@ -74,6 +79,7 @@ const SECTIONS: SectionConfig[] = [
     tvKey: 'topRatedTv',
     movieHref: '/discover/top-rated/movie',
     tvHref: '/discover/top-rated/tv',
+    defaultMedia: 'tv',
   },
 ];
 
@@ -112,7 +118,7 @@ function ToggleSection({
   config: SectionConfig;
   data: HomeSectionsProps['data'];
 }) {
-  const [media, setMedia] = useState<MediaType>('movie');
+  const [media, setMedia] = useState<MediaType>(config.defaultMedia ?? 'movie');
 
   const href = media === 'movie' ? config.movieHref : config.tvHref;
   const title = media === 'tv' && config.tvTitle ? config.tvTitle : config.title;

@@ -4,17 +4,19 @@ import Image from 'next/image';
 import Header from '@/components/common/Header';
 import MainContent from '@/components/common/MainContent';
 
+const APP_VERSION = process.env.APP_VERSION;
+
 const INFO_ITEMS: { label: string; value: React.ReactNode }[] = [
   {
     label: '서비스 소개',
     value: (
       <>
-        <p>영화·시리즈 시청 상태를 편리하게 관리하고</p>
-        <p>사람들과 취향을 공유하는 서비스</p>
+        <p>영화·시리즈 시청 상태를 간편하게 기록하고</p>
+        <p>공유할 수 있는 서비스</p>
       </>
     ),
   },
-  { label: '버전', value: <p>v1.4.0-beta</p> },
+  { label: '버전', value: <p>{APP_VERSION}</p> },
   { label: '이메일', value: <p>watchboxnet@gmail.net</p> },
   { label: '제작자', value: <p>최현</p> },
 ];

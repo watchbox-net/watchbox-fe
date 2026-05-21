@@ -153,11 +153,13 @@ export default function BoxContentsPage() {
     staleTime: isPreview ? 1000 * 60 * 5 : 0,
   });
 
-  // ── 박스 컨텐츠 총 개수 (필터 미적용 전체 — 첫 진입 시 1회) ──
+  // ── 박스 컨텐츠 총 개수 (필터 적용 — 필터 변경 시 재호출) ──
   const { data: totalCount = 0 } = useQuery({
-    queryKey: ['boxContentCount', boxId, isPreview ? 'preview' : 'auth'],
+    queryKey: ['boxContentCount', boxId, contentMediaTypeFilter, sort, effectiveWatchStatusFilter, isPreview ? 'preview' : 'auth'],
     queryFn: () =>
-      isPreview ? fetchPreviewBoxContentCount(boxId) : fetchBoxContentCount(boxId),
+      isPreview
+        ? fetchPreviewBoxContentCount(boxId, queryParams)
+        : fetchBoxContentCount(boxId, queryParams),
     enabled: !authLoading && !Number.isNaN(boxId),
     staleTime: 1000 * 60 * 5,
   });

@@ -36,10 +36,13 @@ export async function fetchMyRecordedContentPage(
   return data.data;
 }
 
-/** 내 시청 기록 총 개수 (필터 미적용, 로그인 필요) */
-export async function fetchMyRecordedContentCount(): Promise<number> {
+/** 내 시청 기록 총 개수 (필터 적용, 로그인 필요) */
+export async function fetchMyRecordedContentCount(
+  params: ContentRecordQueryParams = {},
+): Promise<number> {
   const { data } = await privateApi.get<ApiResponse<CountResponse>>(
     '/records/watch/count',
+    { params },
   );
   return data.data.totalCount;
 }

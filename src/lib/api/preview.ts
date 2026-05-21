@@ -35,10 +35,18 @@ export async function fetchPreviewBoxContents(
   return data.data;
 }
 
-/** Preview 박스 컨텐츠 총 개수 */
-export async function fetchPreviewBoxContentCount(boxId: number): Promise<number> {
+/** Preview 박스 컨텐츠 총 개수 (필터 적용) */
+export async function fetchPreviewBoxContentCount(
+  boxId: number,
+  params: {
+    contentMediaTypeFilter?: ContentMediaTypeFilter;
+    sort?: BoxContentSortOrder;
+    watchStatusFilter?: BoxWatchStatusFilter;
+  } = {},
+): Promise<number> {
   const { data } = await publicApi.get<ApiResponse<CountResponse>>(
     `/preview/boxes/${boxId}/contents/count`,
+    { params },
   );
   return data.data.totalCount;
 }
@@ -62,10 +70,17 @@ export async function fetchPreviewRecordedContentPage(
   return data.data;
 }
 
-/** Preview 시청 기록 총 개수 */
-export async function fetchPreviewRecordedContentCount(): Promise<number> {
+/** Preview 시청 기록 총 개수 (필터 적용) */
+export async function fetchPreviewRecordedContentCount(
+  params: {
+    watchMediaTypeFilter?: WatchMediaTypeFilter;
+    sort?: RecordSortOrder;
+    watchRecordFilter?: WatchRecordFilter;
+  } = {},
+): Promise<number> {
   const { data } = await publicApi.get<ApiResponse<CountResponse>>(
     '/preview/records/watch/count',
+    { params },
   );
   return data.data.totalCount;
 }

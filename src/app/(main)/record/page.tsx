@@ -126,11 +126,13 @@ export default function RecordPage() {
     staleTime: isPreview ? 1000 * 60 * 5 : 0,
   });
 
-  // ── 시청 기록 총 개수 (필터 미적용 전체 — 첫 진입 시 1회) ──
+  // ── 시청 기록 총 개수 (필터 적용 — 필터 변경 시 재호출) ──
   const { data: totalCount = 0 } = useQuery({
-    queryKey: ['recordedContentCount', isPreview ? 'preview' : 'auth'],
+    queryKey: ['recordedContentCount', watchMediaTypeFilter, sort, watchRecordFilter, isPreview ? 'preview' : 'auth'],
     queryFn: () =>
-      isPreview ? fetchPreviewRecordedContentCount() : fetchMyRecordedContentCount(),
+      isPreview
+        ? fetchPreviewRecordedContentCount(queryParams)
+        : fetchMyRecordedContentCount(queryParams),
     enabled: !authLoading,
     staleTime: 1000 * 60 * 5,
   });

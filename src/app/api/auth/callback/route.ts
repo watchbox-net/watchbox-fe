@@ -13,6 +13,8 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 
 const FRONTEND_URL = process.env.FRONTEND_URL;
+const ACCESS_TOKEN_EXPIRY = Number(process.env.ACCESS_TOKEN_EXPIRY) || 72000;
+const REFRESH_TOKEN_EXPIRY = Number(process.env.REFRESH_TOKEN_EXPIRY) || 604800;
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -31,14 +33,14 @@ export async function GET(request: NextRequest) {
     httpOnly: true,
     sameSite: 'lax',
     path: '/',
-    maxAge: 60 * 60 * 24, // 1일 (백엔드 ACCESS_TOKEN_DURATION과 동일)
+    maxAge: ACCESS_TOKEN_EXPIRY,
   });
 
   response.cookies.set('refreshToken', refreshToken, {
     httpOnly: true,
     sameSite: 'lax',
     path: '/',
-    maxAge: 60 * 60 * 24 * 14, // 14일 (백엔드 REFRESH_TOKEN_DURATION과 동일)
+    maxAge: REFRESH_TOKEN_EXPIRY,
   });
 
   return response;

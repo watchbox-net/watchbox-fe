@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const SERVER_DEV_URL = process.env.BACKEND_DEV_URL;
+const ACCESS_TOKEN_EXPIRY = Number(process.env.ACCESS_TOKEN_EXPIRY) || 72000;
+const REFRESH_TOKEN_EXPIRY = Number(process.env.REFRESH_TOKEN_EXPIRY) || 604800;
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,14 +32,14 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 20,
+      maxAge: ACCESS_TOKEN_EXPIRY,
     });
 
     res.cookies.set('refreshToken', data.refreshToken, {
       httpOnly: true,
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge: REFRESH_TOKEN_EXPIRY,
     });
 
     return res;

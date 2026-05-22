@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const BACKEND_API_URL = process.env.BACKEND_API_URL;
+const ACCESS_TOKEN_EXPIRY = Number(process.env.ACCESS_TOKEN_EXPIRY) || 72000;
 
-// ─── 액세스토큰 쿠키 설정 (백엔드 만료시간과 동일하게) ──────
+// ─── 액세스토큰 쿠키 설정 (백엔드 만료시간과 일치) ──────────
 const ACCESS_TOKEN_COOKIE = {
   httpOnly: true,
   sameSite: 'lax' as const,
   path: '/',
-  maxAge: 60 * 60 * 20, // 20시간
+  maxAge: ACCESS_TOKEN_EXPIRY,
 };
 
 // ─── 리프레시토큰으로 액세스토큰 재발급 ──────────────────────

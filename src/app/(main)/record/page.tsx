@@ -277,64 +277,64 @@ export default function RecordPage() {
         onChange={setActiveTabIndex}
       />
 
-      <MainContent className="relative">
-        {/* ── 카운트 + 정렬/필터 드롭다운 행 ───────── */}
-        {!loading && !error && (
-          <div className="flex items-center justify-between pl-[16px] pr-[6px] pt-[13px]">
-            <span className="text-[14px] text-wb-grey-04">{totalCount}개</span>
+      {/* ── 카운트 + 정렬/필터 드롭다운 행 (고정) ───────── */}
+      {!loading && !error && (
+        <div className="flex items-center justify-between pl-[16px] pr-[6px] pt-[8px] pb-[8px]">
+          <span className="text-[14px] text-wb-grey-04">{totalCount}개</span>
 
-            <div className="flex items-center gap-[12px]">
-              {/* 정렬 드롭다운 */}
-              <div ref={sortMenuRef} className="relative">
-                <button
-                  type="button"
-                  onClick={() => { setSortMenuOpen((v) => !v); setFilterMenuOpen(false); }}
-                  className="flex items-center gap-[2px] text-[14px] text-wb-white-02"
-                >
-                  {SORT_LABEL[sort]}
-                  <ChevronDownOutline className="size-[16px] text-wb-white-02" />
-                </button>
-                {sortMenuOpen && (
-                  <div className="absolute right-0 top-full mt-[6px] z-40">
-                    <PlainContextMenu
-                      size="w120"
-                      items={(Object.keys(SORT_LABEL) as RecordSortOrder[]).map((key) => ({
-                        label: SORT_LABEL[key],
-                        onClick: () => { setSort(key); setSortMenuOpen(false); },
-                      }))}
-                    />
-                  </div>
-                )}
-              </div>
+          <div className="flex items-center gap-[12px]">
+            {/* 정렬 드롭다운 */}
+            <div ref={sortMenuRef} className="relative">
+              <button
+                type="button"
+                onClick={() => { setSortMenuOpen((v) => !v); setFilterMenuOpen(false); }}
+                className="flex items-center gap-[2px] text-[14px] text-wb-white-02"
+              >
+                {SORT_LABEL[sort]}
+                <ChevronDownOutline className="size-[16px] text-wb-white-02" />
+              </button>
+              {sortMenuOpen && (
+                <div className="absolute right-0 top-full mt-[6px] z-40">
+                  <PlainContextMenu
+                    size="w120"
+                    items={(Object.keys(SORT_LABEL) as RecordSortOrder[]).map((key) => ({
+                      label: SORT_LABEL[key],
+                      onClick: () => { setSort(key); setSortMenuOpen(false); },
+                    }))}
+                  />
+                </div>
+              )}
+            </div>
 
-              {/* 시청 상태 필터 드롭다운 */}
-              <div ref={filterMenuRef} className="relative">
-                <button
-                  type="button"
-                  onClick={() => { setFilterMenuOpen((v) => !v); setSortMenuOpen(false); }}
-                  className="flex items-center gap-[2px] text-[14px] text-wb-white-02"
-                >
-                  {filterTriggerLabel}
-                  <ChevronDownOutline className="size-[16px] text-wb-white-02"/>
-                </button>
-                {filterMenuOpen && (
-                  <div className="absolute right-0 top-full mt-[6px] z-40">
-                    <WatchStatusMenu
-                      variant="content-record"
-                      selected={watchRecordFilter === 'ALL' ? undefined : watchRecordFilter}
-                      onFilterChange={(f) => {
-                        if (f === 'NONE') return;
-                        setWatchRecordFilter(f as WatchRecordFilter);
-                        setFilterMenuOpen(false);
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
+            {/* 시청 상태 필터 드롭다운 */}
+            <div ref={filterMenuRef} className="relative">
+              <button
+                type="button"
+                onClick={() => { setFilterMenuOpen((v) => !v); setSortMenuOpen(false); }}
+                className="flex items-center gap-[2px] text-[14px] text-wb-white-02"
+              >
+                {filterTriggerLabel}
+                <ChevronDownOutline className="size-[16px] text-wb-white-02"/>
+              </button>
+              {filterMenuOpen && (
+                <div className="absolute right-0 top-full mt-[6px] z-40">
+                  <WatchStatusMenu
+                    variant="content-record"
+                    selected={watchRecordFilter === 'ALL' ? undefined : watchRecordFilter}
+                    onFilterChange={(f) => {
+                      if (f === 'NONE') return;
+                      setWatchRecordFilter(f as WatchRecordFilter);
+                      setFilterMenuOpen(false);
+                    }}
+                  />
+                </div>
+              )}
             </div>
           </div>
-        )}
+        </div>
+      )}
 
+      <MainContent className="relative">
         {loading && (
           <p className="text-center text-neutral-500 py-8">불러오는 중...</p>
         )}

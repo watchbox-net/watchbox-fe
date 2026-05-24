@@ -4,13 +4,12 @@ import Header from '@/components/common/Header';
 import MainContent from '@/components/common/MainContent';
 import { fetchPopularMovieList, fetchTopRatedMovieList, fetchNowShowingMovieList, fetchTrendingMovieList } from '@/api/movie';
 import { fetchPopularTvList, fetchTopRatedTvList, fetchNowShowingTvList, fetchTrendingTvList } from '@/api/tv';
+import { getServerTokens } from '@/api/server-fetch';
 import type { ContentPageResponse, ContentSummary } from '@/types/content-summary';
-import { cookies } from 'next/headers';
 import HomeSections from '@/components/home/HomeSections';
 
 async function loadSections() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('accessToken')?.value;
+  const tokens = await getServerTokens();
 
   const [
     popularMovieRes, popularTvRes,
@@ -18,14 +17,14 @@ async function loadSections() {
     nowShowingMovieRes, nowShowingTvRes,
     trendingMovieRes, trendingTvRes,
   ] = await Promise.allSettled([
-    fetchPopularMovieList(token),
-    fetchPopularTvList(token),
-    fetchTopRatedMovieList(token),
-    fetchTopRatedTvList(token),
-    fetchNowShowingMovieList(token),
-    fetchNowShowingTvList(token),
-    fetchTrendingMovieList(token),
-    fetchTrendingTvList(token),
+    fetchPopularMovieList(tokens),
+    fetchPopularTvList(tokens),
+    fetchTopRatedMovieList(tokens),
+    fetchTopRatedTvList(tokens),
+    fetchNowShowingMovieList(tokens),
+    fetchNowShowingTvList(tokens),
+    fetchTrendingMovieList(tokens),
+    fetchTrendingTvList(tokens),
   ]);
 
   const get = <T extends ContentSummary,>(res: PromiseSettledResult<ContentPageResponse<T>>) =>

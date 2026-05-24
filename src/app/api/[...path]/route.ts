@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const BACKEND_API_URL = process.env.BACKEND_API_URL;
+const REFRESH_TOKEN_EXPIRY = Number(process.env.REFRESH_TOKEN_EXPIRY);
 
-// ─── 액세스토큰 쿠키 설정 (백엔드 만료시간과 동일하게) ──────
-const ACCESS_TOKEN_COOKIE = {
+// ─── 토큰 쿠키 설정 (accessToken도 refreshToken 만료시간 사용) ──────────
+// 쿠키 maxAge = 브라우저 보관 기간. JWT 유효성은 백엔드가 검증.
+// accessToken 쿠키가 살아있어야 BFF가 만료된 JWT를 읽고 → 401 → 리프레시 가능.
+const TOKEN_COOKIE = {
   httpOnly: true,
   sameSite: 'lax' as const,
   path: '/',
-  maxAge: 60 * 60 * 20, // 20시간
+  maxAge: REFRESH_TOKEN_EXPIRY,
 };
 
 // ─── 리프레시토큰으로 액세스토큰 재발급 ──────────────────────
@@ -82,7 +85,7 @@ async function proxyRequest(
             'Content-Type': backendRes.headers.get('Content-Type') || 'application/json',
           },
         });
-        response.cookies.set('accessToken', newAccessToken, ACCESS_TOKEN_COOKIE);
+        response.cookies.set('accessToken', newAccessToken, TOKEN_COOKIE);
         return response;
       }
     }

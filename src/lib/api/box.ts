@@ -79,10 +79,14 @@ export async function fetchBoxContents(
   return data.data;
 }
 
-/** 박스 컨텐츠 총 개수 (필터 미적용) */
-export async function fetchBoxContentCount(boxId: number): Promise<number> {
+/** 박스 컨텐츠 총 개수 (필터 적용) */
+export async function fetchBoxContentCount(
+  boxId: number,
+  params: BoxContentRecordQueryParams = {},
+): Promise<number> {
   const { data } = await privateApi.get<ApiResponse<CountResponse>>(
     `/boxes/${boxId}/contents/count`,
+    { params },
   );
   return data.data.totalCount;
 }

@@ -1,22 +1,18 @@
 import { ApiResponse } from '@/types/api';
 import type { ContentPageResponse } from '@/types/content-summary';
 import type { TvSummary } from '@/types/tv';
+import { serverFetch, type ServerTokens } from '@/api/server-fetch';
 
 const BACKEND_API_URL = process.env.BACKEND_API_URL;
 
 async function fetchTv(
   endpoint: string,
   page: number,
-  accessToken?: string,
+  tokens: ServerTokens,
 ): Promise<ContentPageResponse<TvSummary>> {
-  const withRecord = !!accessToken;
-  const headers: Record<string, string> = {};
-  if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
-
-  const response = await fetch(
-    `${BACKEND_API_URL}/discover/${endpoint}?page=${page}&withRecord=${withRecord}`,
-    { headers },
-  );
+  const withRecord = !!tokens.accessToken;
+  const url = `${BACKEND_API_URL}/discover/${endpoint}?page=${page}&withRecord=${withRecord}`;
+  const { response } = await serverFetch(url, tokens);
   if (!response.ok) {
     throw new Error(`Failed to fetch ${endpoint}`);
   }
@@ -24,14 +20,14 @@ async function fetchTv(
   return result.data;
 }
 
-export const fetchPopularTvList = (token?: string, page = 1) =>
-  fetchTv('popular/tv', page, token);
+export const fetchPopularTvList = (tokens: ServerTokens, page = 1) =>
+  fetchTv('popular/tv', page, tokens);
 
-export const fetchTopRatedTvList = (token?: string, page = 1) =>
-  fetchTv('top-rated/tv', page, token);
+export const fetchTopRatedTvList = (tokens: ServerTokens, page = 1) =>
+  fetchTv('top-rated/tv', page, tokens);
 
-export const fetchNowShowingTvList = (token?: string, page = 1) =>
-  fetchTv('now-showing/tv', page, token);
+export const fetchNowShowingTvList = (tokens: ServerTokens, page = 1) =>
+  fetchTv('now-showing/tv', page, tokens);
 
-export const fetchTrendingTvList = (token?: string, page = 1) =>
-  fetchTv('trending/tv', page, token);
+export const fetchTrendingTvList = (tokens: ServerTokens, page = 1) =>
+  fetchTv('trending/tv', page, tokens);

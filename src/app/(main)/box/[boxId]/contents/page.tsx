@@ -153,11 +153,13 @@ export default function BoxContentsPage() {
     staleTime: isPreview ? 1000 * 60 * 5 : 0,
   });
 
-  // ── 박스 컨텐츠 총 개수 (필터 미적용 전체 — 첫 진입 시 1회) ──
+  // ── 박스 컨텐츠 총 개수 (필터 적용 — 필터 변경 시 재호출) ──
   const { data: totalCount = 0 } = useQuery({
-    queryKey: ['boxContentCount', boxId, isPreview ? 'preview' : 'auth'],
+    queryKey: ['boxContentCount', boxId, contentMediaTypeFilter, sort, effectiveWatchStatusFilter, isPreview ? 'preview' : 'auth'],
     queryFn: () =>
-      isPreview ? fetchPreviewBoxContentCount(boxId) : fetchBoxContentCount(boxId),
+      isPreview
+        ? fetchPreviewBoxContentCount(boxId, queryParams)
+        : fetchBoxContentCount(boxId, queryParams),
     enabled: !authLoading && !Number.isNaN(boxId),
     staleTime: 1000 * 60 * 5,
   });
@@ -282,89 +284,89 @@ export default function BoxContentsPage() {
         }}
       />
 
-      <MainContent className="relative">
-        {/* ── Content Media Type Line ───────────── */}
-        <div className="flex items-center justify-between pl-[16px] pr-[5px] pt-[12px]">
-          {viewMode === 'media' ? (
-            <div className="flex items-center gap-[8px]">
-              {MEDIA_TABS.map(({ key, label }) => (
-                <MediaTypeButton
-                  key={key}
-                  selected={mediaTab === key}
-                  onClick={() => setMediaTab(key)}
-                >
-                  {label}
-                </MediaTypeButton>
-              ))}
+      {/* ── Content Media Type Line (고정) ───────────── */}
+      <div className="flex items-center justify-between pl-[16px] pr-[5px] pt-[12px] pb-[4px]">
+        {viewMode === 'media' ? (
+          <div className="flex items-center gap-[8px]">
+            {MEDIA_TABS.map(({ key, label }) => (
+              <MediaTypeButton
+                key={key}
+                selected={mediaTab === key}
+                onClick={() => setMediaTab(key)}
+              >
+                {label}
+              </MediaTypeButton>
+            ))}
+          </div>
+        ) : (
+          <MediaTypeButton selected>인물</MediaTypeButton>
+        )}
+        <MediaTypeSwitchButton
+          variant={viewMode === 'media' ? 'person' : 'watch-media'}
+          onClick={toggleViewMode}
+        />
+      </div>
+
+      {/* ── 카운트 + 정렬/필터 드롭다운 행 (고정) ──── */}
+      {!loading && !error && (
+        <div className="flex items-center justify-between pl-[16px] pr-[6px] pt-[4px] pb-[8px]">
+          <span className="text-[14px] text-wb-grey-04">{totalCount}개</span>
+
+          <div className="flex items-center gap-[12px]">
+            {/* 정렬 드롭다운 */}
+            <div ref={sortMenuRef} className="relative">
+              <button
+                type="button"
+                onClick={() => { setSortMenuOpen((v) => !v); setFilterMenuOpen(false); }}
+                className="flex items-center gap-[2px] text-[14px] text-wb-white-02"
+              >
+                {SORT_LABEL[sort]}
+                <ChevronDownOutline className="size-[16px] text-wb-white-02" />
+              </button>
+              {sortMenuOpen && (
+                <div className="absolute right-0 top-full mt-[6px] z-40">
+                  <PlainContextMenu
+                    size="w120"
+                    items={sortKeys.map((key) => ({
+                      label: SORT_LABEL[key],
+                      onClick: () => { setSort(key); setSortMenuOpen(false); },
+                    }))}
+                  />
+                </div>
+              )}
             </div>
-          ) : (
-            <MediaTypeButton selected>인물</MediaTypeButton>
-          )}
-          <MediaTypeSwitchButton
-            variant={viewMode === 'media' ? 'person' : 'watch-media'}
-            onClick={toggleViewMode}
-          />
-        </div>
 
-        {/* ── 카운트 + 정렬/필터 드롭다운 행 ──── */}
-        {!loading && !error && (
-          <div className="flex items-center justify-between pl-[16px] pr-[6px] pt-[13px]">
-            <span className="text-[14px] text-wb-grey-04">{totalCount}개</span>
-
-            <div className="flex items-center gap-[12px]">
-              {/* 정렬 드롭다운 */}
-              <div ref={sortMenuRef} className="relative">
+            {/* 시청 상태 필터 드롭다운 — 영화/시리즈 모드에서만 */}
+            {viewMode === 'media' && (
+              <div ref={filterMenuRef} className="relative">
                 <button
                   type="button"
-                  onClick={() => { setSortMenuOpen((v) => !v); setFilterMenuOpen(false); }}
+                  onClick={() => { setFilterMenuOpen((v) => !v); setSortMenuOpen(false); }}
                   className="flex items-center gap-[2px] text-[14px] text-wb-white-02"
                 >
-                  {SORT_LABEL[sort]}
+                  {filterTriggerLabel}
                   <ChevronDownOutline className="size-[16px] text-wb-white-02" />
                 </button>
-                {sortMenuOpen && (
+                {filterMenuOpen && (
                   <div className="absolute right-0 top-full mt-[6px] z-40">
-                    <PlainContextMenu
-                      size="w120"
-                      items={sortKeys.map((key) => ({
-                        label: SORT_LABEL[key],
-                        onClick: () => { setSort(key); setSortMenuOpen(false); },
-                      }))}
+                    <WatchStatusMenu
+                      variant="box-content"
+                      selected={watchStatusFilter === 'ALL' ? undefined : watchStatusFilter}
+                      onFilterChange={(f) => {
+                        if (f === 'LIKED') return;
+                        setWatchStatusFilter(f as BoxWatchStatusFilter);
+                        setFilterMenuOpen(false);
+                      }}
                     />
                   </div>
                 )}
               </div>
-
-              {/* 시청 상태 필터 드롭다운 — 영화/시리즈 모드에서만 */}
-              {viewMode === 'media' && (
-                <div ref={filterMenuRef} className="relative">
-                  <button
-                    type="button"
-                    onClick={() => { setFilterMenuOpen((v) => !v); setSortMenuOpen(false); }}
-                    className="flex items-center gap-[2px] text-[14px] text-wb-white-02"
-                  >
-                    {filterTriggerLabel}
-                    <ChevronDownOutline className="size-[16px] text-wb-white-02" />
-                  </button>
-                  {filterMenuOpen && (
-                    <div className="absolute right-0 top-full mt-[6px] z-40">
-                      <WatchStatusMenu
-                        variant="box-content"
-                        selected={watchStatusFilter === 'ALL' ? undefined : watchStatusFilter}
-                        onFilterChange={(f) => {
-                          if (f === 'LIKED') return;
-                          setWatchStatusFilter(f as BoxWatchStatusFilter);
-                          setFilterMenuOpen(false);
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+            )}
           </div>
-        )}
+        </div>
+      )}
 
+      <MainContent className="relative">
         {loading && (
           <p className="text-center text-neutral-500 py-8">불러오는 중...</p>
         )}

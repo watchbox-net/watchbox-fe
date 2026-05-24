@@ -206,7 +206,7 @@ export default function PersonDetailPage() {
             <div className="grid grid-cols-3 gap-x-[10px] gap-y-[20px] px-[16px] pt-[12px]">
               {visibleCredits.map((c) => (
                 <DetailWorkCreditCard
-                  key={`${c.watchMediaType}-${c.tmdbId}-${c.creditRole}`}
+                  key={`${c.watchMediaType}-${c.tmdbId}`}
                   credit={c}
                 />
               ))}

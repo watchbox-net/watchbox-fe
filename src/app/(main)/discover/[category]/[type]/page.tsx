@@ -1,10 +1,10 @@
-import { cookies } from 'next/headers';
 import DiscoverHeader from './DiscoverHeader';
 import DiscoverTabs from './DiscoverTabs';
 import DiscoverContentList from './DiscoverContentList';
 import MainContent from '@/components/common/MainContent';
 import { fetchPopularMovieList, fetchTopRatedMovieList, fetchNowShowingMovieList, fetchTrendingMovieList } from '@/api/movie';
 import { fetchPopularTvList, fetchTopRatedTvList, fetchNowShowingTvList, fetchTrendingTvList } from '@/api/tv';
+import { getServerTokens } from '@/api/server-fetch';
 import { notFound } from 'next/navigation';
 import type { ContentPageResponse } from '@/types/content-summary';
 
@@ -22,7 +22,9 @@ const TITLE_MAP: Record<string, Record<string, string>> = {
   'trending': { 'movie': '이번주 트렌드 영화', 'tv': '이번주 트렌드 시리즈' },
 };
 
-type Fetcher = (token?: string, page?: number) => Promise<ContentPageResponse>;
+import type { ServerTokens } from '@/api/server-fetch';
+
+type Fetcher = (tokens: ServerTokens, page?: number) => Promise<ContentPageResponse>;
 
 const FETCH_MAP: Record<string, Record<string, Fetcher>> = {
   'popular': { 'movie': fetchPopularMovieList, 'tv': fetchPopularTvList },
@@ -40,15 +42,14 @@ export default async function DiscoverCategoryPage({ params }: PageProps) {
   }
 
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('accessToken')?.value;
-    const isAuthenticated = !!token;
+    const tokens = await getServerTokens();
+    const isAuthenticated = !!tokens.accessToken;
 
     const fetcher = FETCH_MAP[category]?.[type];
     if (!fetcher) notFound();
 
     // 서버에서 page 1 SSR — 클라이언트 무한스크롤이 이 데이터로 시작
-    const initialResponse = await fetcher(token, 1);
+    const initialResponse = await fetcher(tokens, 1);
 
     return (
       <>

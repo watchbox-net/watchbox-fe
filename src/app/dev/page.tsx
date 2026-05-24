@@ -35,7 +35,7 @@ export default function DevPage() {
     const [authError, setAuthError] = useState<string | null>(null);
 
     // 샘플 로그인 상태
-    const SAMPLE_NICKNAMES = ['해달', '돌고래', '펭귄', 'watchbox', '너구리'];
+    const SAMPLE_NICKNAMES = ['해달', '수달', '돌고래', 'watchbox', '너구리'];
     const [selectedNickname, setSelectedNickname] = useState<string>(SAMPLE_NICKNAMES[0]);
     const [nicknameInput, setNicknameInput] = useState<string>('');
     const [sampleLoginData, setSampleLoginData] = useState<LoginResponse | null>(null);

@@ -61,11 +61,12 @@ export type CreditRole = 'CAST' | 'CREW';
 interface BaseCombinedCredit {
   tmdbId: number;
   posterPath: string | null;
-  creditRole: CreditRole;
+  /** 한 작품에 출연+제작 동시 가능 */
+  creditRoleList: CreditRole[];
   /** CAST일 때만 채워짐 (캐릭터명) */
   character: string | null;
-  /** CREW일 때만 채워짐 (Department.koreanValue) */
-  department: string | null;
+  /** CREW일 때만 채워짐 (Department.koreanValue 리스트) */
+  departmentList: string[] | null;
   year: number | null;
   popularity: number | null;
 }

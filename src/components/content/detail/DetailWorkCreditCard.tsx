@@ -36,8 +36,14 @@ export default function DetailWorkCreditCard({
   const isMovie = credit.watchMediaType === 'MOVIE';
   const title = isMovie ? credit.title : credit.name;
   const date = formatIsoDate(isMovie ? credit.releaseDate : credit.firstAirDate);
-  const subText =
-    credit.creditRole === 'CAST' ? credit.character : credit.department;
+  const isCast = credit.creditRoleList.includes('CAST');
+  const isCrew = credit.creditRoleList.includes('CREW');
+  // CAST+CREW 겸직이면 캐릭터명 우선, 없으면 department 표시
+  const subText = isCast
+    ? credit.character
+    : isCrew
+      ? credit.departmentList?.join(' · ') ?? null
+      : null;
   const posterUrl = credit.posterPath
     ? `${TMDB_POSTER.md}${credit.posterPath}`
     : null;

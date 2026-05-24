@@ -131,7 +131,7 @@ export default function MemberInvitationItem(props: MemberInvitationItemProps) {
         onClick={() => setExpanded((v) => !v)}
       >
         <p className={`text-[14px] leading-none text-white ${expanded ? '' : 'truncate'}`}>
-          {receiverName} 님에게 {boxName} 참가 요청
+          {receiverName} 님에게 '{boxName}' 참가 요청
         </p>
         <p className="text-[11px] leading-none text-wb-grey-03 mt-[7px]">
           상태: {status === 'pending' ? '대기중' : '거절'}

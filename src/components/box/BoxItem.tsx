@@ -46,15 +46,15 @@ export default function BoxItem({
   const isShared = type === 'SHARED';
 
   return (
-    <div className={`flex items-start justify-between pl-[10px] pr-[5px] ${className ?? ''}`}>
+    <div className={`flex items-start w-full pl-[10px] pr-[5px] ${className ?? ''}`}>
       {/* 왼쪽: 포스터 + 텍스트 */}
       <div
-        className={`flex gap-[10px] items-start min-w-0 ${onClick ? 'cursor-pointer' : ''}`}
+        className={`flex flex-1 gap-[10px] items-start min-w-0 ${onClick ? 'cursor-pointer' : ''}`}
         onClick={onClick}
       >
         <TriplePosterBox posters={posters} />
-        <div className={`flex flex-col items-start min-w-0 ${isShared ? 'gap-[5px]' : 'gap-[3px]'}`}>
-          <p className="w-[180px] text-[16px] font-medium text-white leading-[18px] tracking-[0.15px] line-clamp-2">
+        <div className={`flex flex-col items-start min-w-0 flex-1 ${isShared ? 'gap-[5px]' : 'gap-[3px]'}`}>
+          <p className="w-full text-[16px] font-medium text-white leading-[18px] tracking-[0.15px] line-clamp-2">
             {name}
           </p>
           {update && lastContentAddedAt && (
@@ -63,7 +63,7 @@ export default function BoxItem({
             </p>
           )}
           {isShared && memberNames && memberNames.length > 0 && (
-            <p className="w-[180px] h-[17px] text-[13px] text-wb-primary leading-[17px] tracking-[0.25px] truncate">
+            <p className="w-full h-[17px] text-[13px] text-wb-primary leading-[17px] tracking-[0.25px] truncate">
               {memberNames.join(' · ')}
             </p>
           )}

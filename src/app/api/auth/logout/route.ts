@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { TOKEN_COOKIE_OPTIONS } from '@/lib/utils/cookie';
 
 const BACKEND_API_URL = process.env.BACKEND_API_URL;
 
@@ -26,19 +27,8 @@ export async function POST(request: NextRequest) {
 
   const response = NextResponse.json({ success: true });
 
-  response.cookies.set('accessToken', '', {
-    httpOnly: true,
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 0,
-  });
-
-  response.cookies.set('refreshToken', '', {
-    httpOnly: true,
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 0,
-  });
+  response.cookies.set('accessToken', '', { ...TOKEN_COOKIE_OPTIONS, maxAge: 0 });
+  response.cookies.set('refreshToken', '', { ...TOKEN_COOKIE_OPTIONS, maxAge: 0 });
 
   return response;
 }

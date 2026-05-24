@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { TOKEN_COOKIE_OPTIONS } from '@/lib/utils/cookie';
 
 const BACKEND_DEV_URL = process.env.BACKEND_DEV_URL;
 
@@ -22,10 +23,8 @@ export async function POST(request: NextRequest) {
     const res = NextResponse.json({ success: true });
 
     res.cookies.set('dev-auth', 'true', {
-      httpOnly: true,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60 * 60 * 24,
+      ...TOKEN_COOKIE_OPTIONS,
+      maxAge: 60 * 60 * 24, // dev-auth는 1일
     });
 
     return res;

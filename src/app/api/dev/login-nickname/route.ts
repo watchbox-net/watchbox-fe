@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { TOKEN_COOKIE_OPTIONS } from '@/lib/utils/cookie';
 
 const SERVER_DEV_URL = process.env.BACKEND_DEV_URL;
-const REFRESH_TOKEN_EXPIRY = Number(process.env.REFRESH_TOKEN_EXPIRY);
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,19 +27,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    res.cookies.set('accessToken', data.accessToken, {
-      httpOnly: true,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: REFRESH_TOKEN_EXPIRY,
-    });
-
-    res.cookies.set('refreshToken', data.refreshToken, {
-      httpOnly: true,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: REFRESH_TOKEN_EXPIRY,
-    });
+    res.cookies.set('accessToken', data.accessToken, TOKEN_COOKIE_OPTIONS);
+    res.cookies.set('refreshToken', data.refreshToken, TOKEN_COOKIE_OPTIONS);
 
     return res;
   } catch (error) {

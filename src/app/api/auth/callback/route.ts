@@ -13,8 +13,7 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 
 const FRONTEND_URL = process.env.FRONTEND_URL;
-const ACCESS_TOKEN_EXPIRY = Number(process.env.ACCESS_TOKEN_EXPIRY) || 72000;
-const REFRESH_TOKEN_EXPIRY = Number(process.env.REFRESH_TOKEN_EXPIRY) || 604800;
+const REFRESH_TOKEN_EXPIRY = Number(process.env.REFRESH_TOKEN_EXPIRY);
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -33,7 +32,7 @@ export async function GET(request: NextRequest) {
     httpOnly: true,
     sameSite: 'lax',
     path: '/',
-    maxAge: ACCESS_TOKEN_EXPIRY,
+    maxAge: REFRESH_TOKEN_EXPIRY,
   });
 
   response.cookies.set('refreshToken', refreshToken, {

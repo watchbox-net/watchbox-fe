@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { TOKEN_COOKIE_OPTIONS } from '@/lib/utils/cookie';
 
 const SERVER_DEV_URL = process.env.BACKEND_DEV_URL;
-const REFRESH_TOKEN_EXPIRY = Number(process.env.REFRESH_TOKEN_EXPIRY);
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,7 +20,6 @@ export async function POST(request: NextRequest) {
 
     const data = await response.json();
 
-    // 토큰은 HttpOnly Cookie에만 저장 (응답 body에 노출하지 않음)
     const res = NextResponse.json({
       success: true,
       data: {
@@ -28,20 +27,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // accessToken 쿠키
-    res.cookies.set('accessToken', data.accessToken, {
-      httpOnly: true,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: REFRESH_TOKEN_EXPIRY,
-    });
-
-    res.cookies.set('refreshToken', data.refreshToken, {
-      httpOnly: true,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: REFRESH_TOKEN_EXPIRY,
-    });
+    res.cookies.set('accessToken', data.accessToken, TOKEN_COOKIE_OPTIONS);
+    res.cookies.set('refreshToken', data.refreshToken, TOKEN_COOKIE_OPTIONS);
 
     return res;
   } catch (error) {
@@ -51,8 +38,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-/*
-secure: process..env.NODE_ENV === 'production'
-→ 배포 환경에서만 secure: true (HTTPS 필수)
-→ 로컬에서는 secure: false (HTTP 허용)
- */

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { TOKEN_COOKIE_OPTIONS } from '@/lib/utils/cookie';
 
 const BACKEND_API_URL = process.env.BACKEND_API_URL;
-const REFRESH_TOKEN_EXPIRY = Number(process.env.REFRESH_TOKEN_EXPIRY);
 
 /**
  * 로그인 상태 확인 API Route (BFF 패턴)
@@ -52,12 +52,7 @@ export async function GET(request: NextRequest) {
           const result = await response.json();
           const profile = result.data?.profile ?? result.profile;
           const res = NextResponse.json({ authenticated: true, member: profile });
-          res.cookies.set('accessToken', newAccessToken, {
-            httpOnly: true,
-            sameSite: 'lax',
-            path: '/',
-            maxAge: REFRESH_TOKEN_EXPIRY,
-          });
+          res.cookies.set('accessToken', newAccessToken, TOKEN_COOKIE_OPTIONS);
           return res;
         }
       }

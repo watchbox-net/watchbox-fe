@@ -163,7 +163,7 @@ export default function BoxContentsPage() {
         ? fetchPreviewBoxContentCount(boxId, queryParams)
         : fetchBoxContentCount(boxId, queryParams),
     enabled: !authLoading && !Number.isNaN(boxId),
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
   });
 
   // 외부 클릭 시 모든 드롭다운/메뉴 닫기

@@ -85,7 +85,8 @@ export default function BoxContentsPage() {
   const isShared = boxType === 'SHARED';
 
   // ── 모드 / 필터 / 정렬 상태 ──
-  const [viewMode, setViewMode] = useState<'media' | 'people'>('media'); // 영화/시리즈 vs 인물
+  const urlView = searchParams.get('view');
+  const [viewMode, setViewMode] = useState<'media' | 'people'>(urlView === 'people' ? 'people' : 'media');
   const [mediaTab, setMediaTab] = useState<MediaTab>('MOVIE_TV');
   const [sort, setSort] = useState<BoxContentSortOrder>('RECENT_SAVED');
   const [watchStatusFilter, setWatchStatusFilter] = useState<BoxWatchStatusFilter>('ALL');
@@ -216,11 +217,18 @@ export default function BoxContentsPage() {
 
   // ── 인물/영화시리즈 전환 (스위치 버튼) ──
   const toggleViewMode = () => {
-    setViewMode((m) => (m === 'media' ? 'people' : 'media'));
+    const next = viewMode === 'media' ? 'people' : 'media';
+    setViewMode(next);
     setSort('RECENT_SAVED');
     setWatchStatusFilter('ALL');
     setSortMenuOpen(false);
     setFilterMenuOpen(false);
+
+    // URL에 view 상태 반영 (뒤로가기 시 복원용)
+    const params = new URLSearchParams(searchParams.toString());
+    if (next === 'people') params.set('view', 'people');
+    else params.delete('view');
+    router.replace(`/box/${boxId}/contents?${params.toString()}`, { scroll: false });
   };
 
   const renderItem = (item: ContentItemData) => {

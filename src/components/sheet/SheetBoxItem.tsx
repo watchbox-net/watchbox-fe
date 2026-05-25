@@ -52,8 +52,7 @@ export default function SheetBoxItem({
           </p>
           {isShared ? (
             <p className="text-[13px] leading-[17px] tracking-[0.25px] truncate w-[205px]">
-              <span className="text-wb-grey-04">멤버 - </span>
-              <span className="text-wb-grey-03">{memberNames?.join(' · ')}</span>
+              <span className="text-wb-primary">멤버 - {memberNames?.join(' · ')}</span>
             </p>
           ) : (
             <p className="text-[13px] text-wb-grey-04 leading-[17px] tracking-[0.25px]">

@@ -12,7 +12,7 @@ const INFO_ITEMS: { label: string; value: React.ReactNode }[] = [
     value: (
       <>
         <p>영화·시리즈 시청 상태를 간편하게 기록하고</p>
-        <p>공유할 수 있는 서비스</p>
+        <p>사람들과 공유하는 서비스</p>
       </>
     ),
   },

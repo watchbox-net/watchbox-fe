@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomNav from '@/components/common/BottomNav';
+import { Loading } from '@/components/common/Loading';
 import { useLastMainPath } from '@/lib/hooks/useLastMainPath';
 import Toast from '@/components/common/Toast';
 import DetailBackdrop from '@/components/content/detail/DetailBackdrop';
@@ -64,9 +65,7 @@ export default function TvDetailPage() {
   if (loading) {
     return (
       <MobileFrame>
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-wb-grey-03">불러오는 중...</p>
-        </div>
+        <Loading className="flex-1" />
         <BottomNav overridePathname={lastMainPath} />
       </MobileFrame>
     );

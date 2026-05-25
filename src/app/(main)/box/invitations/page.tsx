@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Toast from '@/components/common/Toast';
+import { Loading } from '@/components/common/Loading';
 import MainContent from '@/components/common/MainContent';
 import Header from '@/components/common/Header';
 import ListTitle from '@/components/list/ListTitle';
@@ -85,9 +86,7 @@ export default function BoxInvitationsPage() {
       <Header variant="back" title="박스 초대 요청" onBack={() => router.back()} />
 
       <MainContent>
-        {loading && (
-          <p className="text-center text-wb-grey-03 py-8">불러오는 중...</p>
-        )}
+        {loading && <Loading />}
 
         {!loading && (
           <>

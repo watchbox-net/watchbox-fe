@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomNav from '@/components/common/BottomNav';
+import { Loading } from '@/components/common/Loading';
 import Header from '@/components/common/Header';
 import MainContent from '@/components/common/MainContent';
 import PersonCreditList from '@/components/content/detail/PersonCreditList';
@@ -53,9 +54,7 @@ export default function PersonCreditFullListPage({
   if (loading) {
     return (
       <MobileFrame>
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-wb-grey-03">불러오는 중...</p>
-        </div>
+        <Loading className="flex-1" />
         <BottomNav overridePathname={lastMainPath} />
       </MobileFrame>
     );

@@ -3,6 +3,8 @@
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '@/components/common/Header';
+import Spinner from '@/components/common/Loading';
+import { Loading } from '@/components/common/Loading';
 import TabNav from '@/components/common/TabNav';
 import MainContent from '@/components/common/MainContent';
 import ContentItem from '@/components/list/ContentItem';
@@ -120,9 +122,7 @@ function SearchContent() {
       />
 
       <MainContent>
-        {isLoading && (
-          <p className="text-center text-neutral-500 py-8">검색 중...</p>
-        )}
+        {isLoading && <Loading text="검색 중" />}
 
         {!isLoading && searched && items.length === 0 && (
           <p className="text-center text-neutral-500 py-8">검색 결과가 없습니다.</p>
@@ -151,7 +151,9 @@ function SearchContent() {
             {hasNextPage && <div ref={sentinelRef} className="h-px" />}
 
             {isFetchingNextPage && (
-              <p className="text-center text-wb-grey-03 py-4">불러오는 중...</p>
+              <div className="flex justify-center py-4">
+                <Spinner size={20} />
+              </div>
             )}
           </>
         )}

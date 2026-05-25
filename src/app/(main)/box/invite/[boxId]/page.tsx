@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Toast from '@/components/common/Toast';
 import Modal from '@/components/common/Modal';
+import { Loading } from '@/components/common/Loading';
 import MainContent from '@/components/common/MainContent';
 import Header from '@/components/common/Header';
 import ListTitle from '@/components/list/ListTitle';
@@ -96,9 +97,7 @@ export default function BoxInvitePage() {
 
       {/* 검색 결과 */}
       <MainContent>
-        {loading && (
-          <p className="text-center text-wb-grey-03 py-8">검색 중...</p>
-        )}
+        {loading && <Loading text="검색 중" />}
 
         {!loading && searched && results.length === 0 && (
           <p className="text-center text-wb-grey-03 py-8">검색 결과가 없습니다.</p>

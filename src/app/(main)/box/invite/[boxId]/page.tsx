@@ -130,7 +130,7 @@ export default function BoxInvitePage() {
       <Modal
         visible={!!confirmTarget}
         variant="invite"
-        body={`${confirmTarget?.nickname}님에게 ${boxName} 공유 박스로 초대하겠습니까?`}
+        body={`${confirmTarget?.nickname}님에게 '${boxName}' 공유 박스로 초대하겠습니까?`}
         confirmLabel="초대"
         onCancel={() => setConfirmTarget(null)}
         onConfirm={handleInviteConfirm}

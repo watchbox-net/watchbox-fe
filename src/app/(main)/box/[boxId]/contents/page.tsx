@@ -312,7 +312,7 @@ export default function BoxContentsPage() {
       {/* ── 카운트 + 정렬/필터 드롭다운 행 (고정) ──── */}
       {!loading && !error && (
         <div className="flex items-center justify-between pl-[16px] pr-[6px] pt-[4px] pb-[8px]">
-          <span className="text-[14px] text-wb-grey-04">{totalCount}개</span>
+          <span className="text-[14px] text-wb-grey-04">{totalCount}{viewMode === 'people' ? '명' : '개'}</span>
 
           <div className="flex items-center gap-[12px]">
             {/* 정렬 드롭다운 */}

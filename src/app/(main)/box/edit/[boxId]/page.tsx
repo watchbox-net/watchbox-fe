@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Toast from '@/components/common/Toast';
+import { Loading } from '@/components/common/Loading';
 import BoxForm from '@/components/box/BoxForm';
 import { fetchBox, updateBox } from '@/lib/api/box';
 import type { BoxType } from '@/types/box';
@@ -44,11 +45,7 @@ export default function BoxEditPage() {
 
   if (loading) {
     return (
-      <>
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-neutral-500 text-sm">불러오는 중...</p>
-        </div>
-      </>
+      <Loading className="flex-1" />
     );
   }
 

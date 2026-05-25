@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import Providers from './Providers';
+import Splash from '@/components/common/Splash';
 
 export const viewport: Viewport = {
     width: 'device-width',
@@ -23,6 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
           <Providers>
+            <Splash />
             {children}
           </Providers>
       </body>

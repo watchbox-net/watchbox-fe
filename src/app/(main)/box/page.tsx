@@ -6,6 +6,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import Header from '@/components/common/Header';
 import MainContent from '@/components/common/MainContent';
+import { Loading } from '@/components/common/Loading';
 import Modal from '@/components/common/Modal';
 import ContextMenu from '@/components/common/ContextMenu';
 import BoxItem from '@/components/box/BoxItem';
@@ -139,9 +140,7 @@ export default function BoxPage() {
       />
 
       <MainContent className="relative">
-        {loading && (
-          <p className="text-center text-neutral-500 py-8">불러오는 중...</p>
-        )}
+        {loading && <Loading />}
 
         {!authLoading && isAuthenticated && isError && (
           <p className="text-center text-neutral-500 py-8">오류가 발생했습니다.</p>

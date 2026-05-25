@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import MobileFrame from '@/components/common/MobileFrame';
 import BottomNav from '@/components/common/BottomNav';
+import { Loading } from '@/components/common/Loading';
 import Header from '@/components/common/Header';
 import MainContent from '@/components/common/MainContent';
 import MediaTypeButton from '@/components/common/MediaTypeButton';
@@ -23,7 +24,7 @@ import { TMDB_POSTER } from '@/lib/utils/content';
 import type { ContentDetailResponse, PersonInfo } from '@/types/content-detail';
 
 const INITIAL_VISIBLE = 9;
-const STEP = 9;
+const STEP = 15;
 
 const FILTER_TABS = [
   { key: 'ALL',   label: '전체' },
@@ -69,9 +70,7 @@ export default function PersonDetailPage() {
   if (loading) {
     return (
       <MobileFrame>
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-wb-grey-03">불러오는 중...</p>
-        </div>
+        <Loading className="flex-1" />
         <BottomNav overridePathname={lastMainPath} />
       </MobileFrame>
     );

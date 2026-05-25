@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import Spinner from '@/components/common/Loading';
 import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient, type InfiniteData } from '@tanstack/react-query';
@@ -175,7 +176,9 @@ export default function DiscoverContentList({
       {hasNextPage && <div ref={sentinelRef} className="h-px" />}
 
       {isFetchingNextPage && (
-        <p className="text-center text-wb-grey-03 py-4">불러오는 중...</p>
+        <div className="flex justify-center py-4">
+          <Spinner size={20} />
+        </div>
       )}
 
       <Toast

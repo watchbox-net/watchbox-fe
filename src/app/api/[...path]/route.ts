@@ -110,12 +110,20 @@ async function handleProxyRequest(
   request: NextRequest,
   context: { params: Promise<{ path: string[] }> },
 ) {
+  const start = Date.now();
   try {
-    return await proxyRequest(request, context);
+    const response = await proxyRequest(request, context);
+    const { path } = await context.params;
+    const duration = Date.now() - start;
+    logger.info(
+      { method: request.method, path: path.join('/'), status: response.status, duration },
+      'BFF proxy',
+    );
+    return response;
   } catch (error) {
     const { path } = await context.params;
     logger.error(
-      { method: request.method, path: path.join('/'), err: error },
+      { method: request.method, path: path.join('/'), duration: Date.now() - start, err: error },
       'BFF proxy request failed',
     );
     return NextResponse.json(

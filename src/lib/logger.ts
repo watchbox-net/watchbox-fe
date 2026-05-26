@@ -1,4 +1,5 @@
 import pino from 'pino';
+import { trace } from '@opentelemetry/api';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -32,21 +33,35 @@ class OtelHttpDestination {
     try {
       const { msg, level, time, pid: _pid, hostname: _h, ...attrs } = JSON.parse(data);
 
+      // 현재 active span에서 trace context 추출 → logRecord에 첨부
+      // → Grafana에서 Loki 로그 ↔ Tempo trace 자동 점프 가능
+      const spanCtx = trace.getActiveSpan()?.spanContext();
+
+      const logRecord: Record<string, unknown> = {
+        timeUnixNano: String(time * 1_000_000),
+        severityNumber: SEVERITY_NUMBER[level] ?? 9,
+        severityText: SEVERITY_TEXT[level] ?? 'INFO',
+        body: { stringValue: msg ?? '' },
+        attributes: Object.entries(attrs).map(([key, value]) => ({
+          key,
+          value: { stringValue: typeof value === 'string' ? value : JSON.stringify(value) },
+        })),
+      };
+
+      if (spanCtx) {
+        // OTLP/JSON 스펙: traceId/spanId는 hex string으로 logRecord 최상위 필드
+        // https://opentelemetry.io/docs/specs/otlp/#json-protobuf-encoding
+        logRecord.traceId = spanCtx.traceId;
+        logRecord.spanId = spanCtx.spanId;
+        logRecord.flags = spanCtx.traceFlags;
+      }
+
       const body = {
         resourceLogs: [{
           resource: { attributes: this.resource },
           scopeLogs: [{
             scope: { name: 'watchbox-next' },
-            logRecords: [{
-              timeUnixNano: String(time * 1_000_000),
-              severityNumber: SEVERITY_NUMBER[level] ?? 9,
-              severityText: SEVERITY_TEXT[level] ?? 'INFO',
-              body: { stringValue: msg ?? '' },
-              attributes: Object.entries(attrs).map(([key, value]) => ({
-                key,
-                value: { stringValue: typeof value === 'string' ? value : JSON.stringify(value) },
-              })),
-            }],
+            logRecords: [logRecord],
           }],
         }],
       };

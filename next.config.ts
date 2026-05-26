@@ -16,6 +16,8 @@ const nextConfig: NextConfig = {
         '/*': [
             './node_modules/pino-opentelemetry-transport/**/*',
             './node_modules/pino-abstract-transport/**/*',
+            './node_modules/split2/**/*',
+            './node_modules/otlp-logger/**/*',
             './node_modules/@opentelemetry/**/*',
         ],
     },

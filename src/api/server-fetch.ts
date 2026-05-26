@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { logger } from '@/lib/logger';
 
 const BACKEND_API_URL = process.env.BACKEND_API_URL;
 
@@ -21,7 +22,8 @@ async function refreshAccessToken(refreshToken: string): Promise<string | null> 
     if (!res.ok) return null;
     const data = await res.json();
     return data.accessToken ?? null;
-  } catch {
+  } catch (err) {
+    logger.error({ err }, 'server-fetch: token refresh request failed');
     return null;
   }
 }
@@ -70,6 +72,7 @@ export async function serverFetch(
   }
 
   // 3. 토큰 없거나 리프레시 실패 → 비로그인 요청
+  logger.warn({ url }, 'server-fetch: falling back to unauthenticated request');
   const response = await fetch(url, { headers: {} });
   return { response, authenticated: false };
 }

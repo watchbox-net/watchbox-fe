@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { TOKEN_COOKIE_OPTIONS } from '@/lib/utils/cookie';
+import { logger } from '@/lib/logger';
 
 const BACKEND_API_URL = process.env.BACKEND_API_URL;
 
@@ -63,6 +64,8 @@ async function proxyRequest(
       const newAccessToken = await refreshAccessToken(refreshToken);
 
       if (newAccessToken) {
+        logger.info({ method: request.method, path: pathStr }, 'access token refreshed');
+
         // 새 토큰으로 재요청
         headers['Authorization'] = `Bearer ${newAccessToken}`;
         backendRes = await fetch(backendUrl, { method: request.method, headers, body });
@@ -82,6 +85,7 @@ async function proxyRequest(
 
     // 리프레시 실패 (refreshToken 없거나 만료) → 쿠키 삭제 후 401 반환
     // 클라이언트 인터셉터가 /login으로 리다이렉트
+    logger.warn({ method: request.method, path: pathStr }, 'session expired, token refresh failed');
     const unauthorizedRes = NextResponse.json(
       { message: '인증이 만료되었습니다. 다시 로그인해주세요.' },
       { status: 401 },
@@ -110,7 +114,10 @@ async function handleProxyRequest(
     return await proxyRequest(request, context);
   } catch (error) {
     const { path } = await context.params;
-    console.error(`[BFF Proxy] ${request.method} /${path.join('/')} 실패:`, error);
+    logger.error(
+      { method: request.method, path: path.join('/'), err: error },
+      'BFF proxy request failed',
+    );
     return NextResponse.json(
       { success: false, message: '백엔드 서버에 연결할 수 없습니다.' },
       { status: 502 },

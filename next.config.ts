@@ -10,15 +10,6 @@ const nextConfig: NextConfig = {
     // Next.js 번들러가 정적 분석으로 추적하지 못함.
     // externals로 지정해야 require()로 남아 런타임에 올바르게 resolve됨.
     serverExternalPackages: ['pino', 'pino-opentelemetry-transport'],
-    // standalone 빌드 시 Next.js 파일 트레이서가 동적 문자열 transport를 추적하지 못해
-    // node_modules에서 누락됨. transport와 그 의존 패키지들을 강제로 포함시킴.
-    outputFileTracingIncludes: {
-        '/*': [
-            './node_modules/pino-opentelemetry-transport/**/*',
-            './node_modules/pino-abstract-transport/**/*',
-            './node_modules/@opentelemetry/**/*',
-        ],
-    },
     // package.json의 version을 빌드 타임에 클라이언트로 인라인 주입
     // → 사용처: process.env.APP_VERSION (클라이언트/서버 모두 접근 가능)
     env: {

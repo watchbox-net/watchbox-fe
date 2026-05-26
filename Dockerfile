@@ -28,10 +28,5 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
-# pino-opentelemetry-transport는 worker thread에서 동적으로 의존 패키지를 require함.
-# Next.js standalone 트레이서가 동적 require를 추적하지 못해 누락되므로 직접 복사.
-COPY --from=builder /app/node_modules/pino-abstract-transport ./node_modules/pino-abstract-transport
-COPY --from=builder /app/node_modules/@opentelemetry ./node_modules/@opentelemetry
-
 EXPOSE 3000
 CMD ["node", "server.js"]

@@ -60,6 +60,19 @@ class OtelHttpDestination {
   }
 }
 
-export const logger = isProduction
-  ? pino({ level: process.env.LOG_LEVEL ?? 'info' }, new OtelHttpDestination() as never)
-  : pino({ level: process.env.LOG_LEVEL ?? 'debug' });
+const appEnv = process.env.NEXT_PUBLIC_ENV ?? 'local';
+
+// local : stdout JSON (개발 로컬)
+// dev   : stdout + OTel Collector (개발 서버, docker logs로도 확인 가능)
+// prod  : OTel Collector만 (운영 서버)
+export const logger = !isProduction
+  ? pino({ level: process.env.LOG_LEVEL ?? 'debug' })
+  : appEnv === 'prod'
+    ? pino({ level: process.env.LOG_LEVEL ?? 'info' }, new OtelHttpDestination() as never)
+    : pino(
+        { level: process.env.LOG_LEVEL ?? 'info' },
+        pino.multistream([
+          { stream: process.stdout },
+          { stream: new OtelHttpDestination() as never },
+        ]),
+      );

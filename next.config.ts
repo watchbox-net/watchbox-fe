@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
             './node_modules/split2/**/*',
             './node_modules/otlp-logger/**/*',
             './node_modules/@opentelemetry/**/*',
+            './node_modules/@protobufjs/**/*',
         ],
     },
     // package.json의 version을 빌드 타임에 클라이언트로 인라인 주입

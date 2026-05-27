@@ -13,8 +13,8 @@ export async function register() {
 
   const appEnv = process.env.NEXT_PUBLIC_ENV ?? 'local';
 
-  // 부트 디버깅 — silent throw 추적용 (stderr 직접 출력)
-  process.stderr.write(`[instrumentation] register() entered, appEnv=${appEnv}\n`);
+  // 부트 디버깅 — silent throw 추적용 (Edge runtime 호환 위해 console.error 사용)
+  console.error(`[instrumentation] register() entered, appEnv=${appEnv}`);
 
   // local : trace 비활성 (개발 PC에서 OTel Collector 띄울 필요 없음)
   // dev/prod : OTLP HTTP로 OTel Collector에 trace 전송 → Tempo
@@ -30,9 +30,9 @@ export async function register() {
           'deployment.environment': appEnv,
         },
       });
-      process.stderr.write(`[instrumentation] OTel SDK registered\n`);
+      console.error(`[instrumentation] OTel SDK registered`);
     } catch (err) {
-      process.stderr.write(`[instrumentation] OTel SDK FAILED: ${err instanceof Error ? err.stack : String(err)}\n`);
+      console.error(`[instrumentation] OTel SDK FAILED: ${err instanceof Error ? err.stack : String(err)}`);
     }
   }
 
@@ -43,6 +43,6 @@ export async function register() {
       'watchbox-next server started',
     );
   } catch (err) {
-    process.stderr.write(`[instrumentation] logger import FAILED: ${err instanceof Error ? err.stack : String(err)}\n`);
+    console.error(`[instrumentation] logger import FAILED: ${err instanceof Error ? err.stack : String(err)}`);
   }
 }

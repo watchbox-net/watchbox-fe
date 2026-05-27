@@ -8,7 +8,10 @@
 //
 // CORS 회피 전략:
 // - 브라우저는 외부 호스트의 OTel Collector(:4318)에 직접 못 보냄 (CORS + 보안)
-// - 그래서 OTLP body를 Next.js의 BFF 프록시(`/api/_otel/v1/traces`) 경유 (same origin)
+// - 그래서 OTLP body를 Next.js의 BFF 프록시(`/api/otel/v1/traces`) 경유 (same origin)
+//
+// 주의: 폴더명이 `_otel` 이면 Next.js의 private folder 컨벤션에 걸려 라우팅에서 제외됨
+//      → /api/[...path] catch-all로 빠져서 백엔드까지 잘못 전달되니 반드시 underscore 빼야 함
 //
 // 환경 분기:
 // - local : 비활성 (개발 PC에서 OTel Collector 없음)
@@ -46,7 +49,7 @@ if (typeof window !== 'undefined' && appEnv !== 'local' && !globalThis.__WATCHBO
       new BatchSpanProcessor(
         new OTLPTraceExporter({
           // BFF 프록시 경유 — same origin이라 CORS 불필요
-          url: '/api/_otel/v1/traces',
+          url: '/api/otel/v1/traces',
         }),
       ),
     ],
@@ -69,7 +72,7 @@ if (typeof window !== 'undefined' && appEnv !== 'local' && !globalThis.__WATCHBO
           new RegExp(`^${window.location.origin}/api/`),
         ],
         // OTel 자체 송신 fetch는 trace 안 함 (무한 루프 방지)
-        ignoreUrls: [/\/api\/_otel\//],
+        ignoreUrls: [/\/api\/otel\//],
       }),
     ],
   });

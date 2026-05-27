@@ -1,8 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { propagation, context } from '@opentelemetry/api';
 import { TOKEN_COOKIE_OPTIONS } from '@/lib/utils/cookie';
 import { logger } from '@/lib/logger';
 
 const BACKEND_API_URL = process.env.BACKEND_API_URL;
+
+/**
+ * 현재 active span의 W3C trace context를 헤더로 직렬화.
+ * Next.js fetch wrapper가 @vercel/otel의 자동 inject를 가로채는 케이스가 있어
+ * BFF→backend 호출에는 명시적으로 박아준다 (traceparent, tracestate).
+ */
+function injectTraceHeaders(headers: Record<string, string>): Record<string, string> {
+  propagation.inject(context.active(), headers);
+  return headers;
+}
 
 // ─── 리프레시토큰으로 액세스토큰 재발급 ──────────────────────
 async function refreshAccessToken(refreshToken: string): Promise<string | null> {
@@ -53,6 +64,7 @@ async function proxyRequest(
   const accessToken = request.cookies.get('accessToken')?.value;
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+  injectTraceHeaders(headers);  // ← W3C traceparent 주입 (백엔드 trace 연결)
 
   let backendRes = await fetch(backendUrl, { method: request.method, headers, body });
 
@@ -71,6 +83,7 @@ async function proxyRequest(
 
         // 새 토큰으로 재요청
         headers['Authorization'] = `Bearer ${newAccessToken}`;
+        injectTraceHeaders(headers);  // 재요청 시점 span context로 재주입
         backendRes = await fetch(backendUrl, { method: request.method, headers, body });
 
         // 재요청 성공 → 새 accessToken 쿠키 세팅 후 응답 반환

@@ -13,9 +13,12 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# 빌드 시 환경변수 주입 (NEXT_PUBLIC_* 는 빌드 타임에 필요)
+# 빌드 시 환경변수 주입 (NEXT_PUBLIC_* 는 브라우저 번들에 빌드 타임 인라인)
+# - NEXT_PUBLIC_ENV : local/dev/prod 분기 (otel-browser, 기타 브라우저 코드에서 사용)
 ARG NEXT_PUBLIC_SERVER_URL
+ARG NEXT_PUBLIC_ENV
 ENV NEXT_PUBLIC_SERVER_URL=$NEXT_PUBLIC_SERVER_URL
+ENV NEXT_PUBLIC_ENV=$NEXT_PUBLIC_ENV
 
 RUN npm run build
 

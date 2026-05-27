@@ -28,5 +28,10 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
+# Next.js file tracer가 instrumentation.ts의 동적 의존성을 놓치므로 OTel 패키지 강제 포함
+# (@vercel/otel 내부에서 @opentelemetry/* 다수를 동적 로드 → standalone에 누락 → register() 호출 전 import 실패)
+COPY --from=builder /app/node_modules/@vercel ./node_modules/@vercel
+COPY --from=builder /app/node_modules/@opentelemetry ./node_modules/@opentelemetry
+
 EXPOSE 3000
 CMD ["node", "server.js"]

@@ -17,6 +17,18 @@ const nextConfig: NextConfig = {
         '@opentelemetry/resources',
         '@opentelemetry/exporter-trace-otlp-http',
     ],
+    // standalone 빌드에서 instrumentation.ts의 동적 의존성을 file tracer가 놓치므로 강제 포함
+    // (현상: /app/node_modules/@vercel/ 폴더 자체가 누락 → registerOTel import 실패)
+    outputFileTracingIncludes: {
+        '/instrumentation': [
+            './node_modules/@vercel/**/*',
+            './node_modules/@opentelemetry/**/*',
+        ],
+        '*': [
+            './node_modules/@vercel/**/*',
+            './node_modules/@opentelemetry/**/*',
+        ],
+    },
     // package.json의 version을 빌드 타임에 클라이언트로 인라인 주입
     // → 사용처: process.env.APP_VERSION (클라이언트/서버 모두 접근 가능)
     env: {

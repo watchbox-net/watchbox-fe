@@ -97,17 +97,28 @@ if (typeof window !== 'undefined' && appEnv !== 'local' && !globalThis.__WATCHBO
         ignoreUrls: [/\/api\/otel\//],
         // span 이름을 "HTTP GET" → "GET /api/contents/movie/101299" 형태로 재명명
         // (기본은 method만 들어가서 Tempo 목록에서 구분 불가)
-        applyCustomAttributesOnSpan: (span, request) => {
+        //
+        // URL 추출 우선순위 (안정성 순):
+        //  1. response.url  ─ 실제 fetch가 도달한 URL (가장 신뢰 가능, redirect 후 최종 URL)
+        //  2. request.url   ─ Request 객체로 호출됐을 때
+        //  3. RequestInit   ─ url 정보 없음 (fail-over)
+        applyCustomAttributesOnSpan: (span, request, response) => {
           try {
-            // request는 Request | RequestInit. 호출 형태에 따라 url 위치가 다름
-            const url =
-              request instanceof Request
-                ? request.url
-                : (request as { url?: string })?.url ?? '';
-            const method =
-              request instanceof Request
-                ? request.method
-                : (request as { method?: string })?.method ?? 'GET';
+            let url = '';
+            let method = 'GET';
+
+            if (response instanceof Response && response.url) {
+              url = response.url;
+            } else if (request instanceof Request) {
+              url = request.url;
+              method = request.method;
+            }
+
+            // RequestInit에서 method 보강
+            if (!(request instanceof Request) && request && typeof request === 'object') {
+              method = (request as { method?: string }).method ?? method;
+            }
+
             if (url) {
               const path = new URL(url, window.location.origin).pathname;
               span.updateName(`${method} ${path}`);

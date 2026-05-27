@@ -1,5 +1,6 @@
 import pino from 'pino';
-import { trace } from '@opentelemetry/api';
+import { trace, context } from '@opentelemetry/api';
+import { suppressTracing } from '@opentelemetry/core';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -66,11 +67,17 @@ class OtelHttpDestination {
         }],
       };
 
-      fetch(this.url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      }).catch(() => {});
+      // suppressTracing 컨텍스트 안에서 fetch 호출
+      // → @vercel/otel의 fetch instrumentation이 이 fetch를 무시 (trace에 안 박힘)
+      // → 로그 송신이 요청 trace의 자식 span으로 오염되는 것 방지
+      // fetch 자체는 await 안 해서 여전히 fire-and-forget (응답 시간 영향 X)
+      context.with(suppressTracing(context.active()), () => {
+        fetch(this.url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        }).catch(() => {});
+      });
     } catch {}
   }
 }

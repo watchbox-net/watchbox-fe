@@ -24,6 +24,7 @@ import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch';
+import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xml-http-request';
 import { DocumentLoadInstrumentation } from '@opentelemetry/instrumentation-document-load';
 
 const appEnv = process.env.NEXT_PUBLIC_ENV ?? 'local';
@@ -64,7 +65,28 @@ if (typeof window !== 'undefined' && appEnv !== 'local' && !globalThis.__WATCHBO
     instrumentations: [
       // 첫 페이지 로드의 navigation timing, resource timing → 페이지 로드 성능 측정
       new DocumentLoadInstrumentation(),
-      // 모든 fetch 자동 trace span 생성 + traceparent 헤더 자동 첨부
+      // axios가 브라우저에서 기본적으로 XHR을 사용하므로 별도 instrumentation 필수
+      // (fetch만 잡으면 React Query → axios 호출이 trace에서 누락됨)
+      new XMLHttpRequestInstrumentation({
+        propagateTraceHeaderCorsUrls: [
+          new RegExp(`^${window.location.origin}/api/`),
+        ],
+        ignoreUrls: [/\/api\/otel\//],
+        applyCustomAttributesOnSpan: (span, xhr) => {
+          try {
+            const xhrAny = xhr as XMLHttpRequest & { _url?: string; _method?: string };
+            const rawUrl = xhrAny.responseURL || xhrAny._url || '';
+            const method = xhrAny._method || 'GET';
+            if (rawUrl) {
+              const path = new URL(rawUrl, window.location.origin).pathname;
+              span.updateName(`${method} ${path}`);
+            }
+          } catch {
+            // 무시
+          }
+        },
+      }),
+      // Next.js의 RSC 페이로드 fetch, prefetch, 그 외 fetch() 호출 trace
       new FetchInstrumentation({
         // 같은 origin의 /api/* 만 trace context 전파
         // (TMDB 이미지 등 외부 호출에 우리 trace_id 누출 방지)

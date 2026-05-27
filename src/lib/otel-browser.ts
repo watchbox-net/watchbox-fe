@@ -73,6 +73,27 @@ if (typeof window !== 'undefined' && appEnv !== 'local' && !globalThis.__WATCHBO
         ],
         // OTel 자체 송신 fetch는 trace 안 함 (무한 루프 방지)
         ignoreUrls: [/\/api\/otel\//],
+        // span 이름을 "HTTP GET" → "GET /api/contents/movie/101299" 형태로 재명명
+        // (기본은 method만 들어가서 Tempo 목록에서 구분 불가)
+        applyCustomAttributesOnSpan: (span, request) => {
+          try {
+            // request는 Request | RequestInit. 호출 형태에 따라 url 위치가 다름
+            const url =
+              request instanceof Request
+                ? request.url
+                : (request as { url?: string })?.url ?? '';
+            const method =
+              request instanceof Request
+                ? request.method
+                : (request as { method?: string })?.method ?? 'GET';
+            if (url) {
+              const path = new URL(url, window.location.origin).pathname;
+              span.updateName(`${method} ${path}`);
+            }
+          } catch {
+            // 이름 변경 실패해도 trace 자체는 영향 X
+          }
+        },
       }),
     ],
   });

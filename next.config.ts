@@ -6,6 +6,17 @@ const nextConfig: NextConfig = {
     typescript: {
         ignoreBuildErrors: true,
     },
+    // pino : native 바인딩
+    // @opentelemetry/* + @vercel/otel : SDK가 module-level patching (global fetch, http) 수행
+    //   → bundling 시 패치 대상과 분리돼 instrumentation 미작동
+    serverExternalPackages: [
+        'pino',
+        '@vercel/otel',
+        '@opentelemetry/api',
+        '@opentelemetry/sdk-trace-node',
+        '@opentelemetry/resources',
+        '@opentelemetry/exporter-trace-otlp-http',
+    ],
     // package.json의 version을 빌드 타임에 클라이언트로 인라인 주입
     // → 사용처: process.env.APP_VERSION (클라이언트/서버 모두 접근 가능)
     env: {

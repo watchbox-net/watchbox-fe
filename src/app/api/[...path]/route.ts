@@ -1,7 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { propagation, context } from '@opentelemetry/api';
 import { TOKEN_COOKIE_OPTIONS } from '@/lib/utils/cookie';
+import { logger } from '@/lib/logger';
 
 const BACKEND_API_URL = process.env.BACKEND_API_URL;
+
+/**
+ * 현재 active span의 W3C trace context를 헤더로 직렬화.
+ * Next.js fetch wrapper가 @vercel/otel의 자동 inject를 가로채는 케이스가 있어
+ * BFF→backend 호출에는 명시적으로 박아준다 (traceparent, tracestate).
+ */
+function injectTraceHeaders(headers: Record<string, string>): Record<string, string> {
+  propagation.inject(context.active(), headers);
+  return headers;
+}
 
 // ─── 리프레시토큰으로 액세스토큰 재발급 ──────────────────────
 async function refreshAccessToken(refreshToken: string): Promise<string | null> {
@@ -52,6 +64,7 @@ async function proxyRequest(
   const accessToken = request.cookies.get('accessToken')?.value;
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+  injectTraceHeaders(headers);  // ← W3C traceparent 주입 (백엔드 trace 연결)
 
   let backendRes = await fetch(backendUrl, { method: request.method, headers, body });
 
@@ -63,8 +76,14 @@ async function proxyRequest(
       const newAccessToken = await refreshAccessToken(refreshToken);
 
       if (newAccessToken) {
+        logger.info(
+          { method: request.method, path: pathStr },
+          `${request.method} /${pathStr} access token refreshed`,
+        );
+
         // 새 토큰으로 재요청
         headers['Authorization'] = `Bearer ${newAccessToken}`;
+        injectTraceHeaders(headers);  // 재요청 시점 span context로 재주입
         backendRes = await fetch(backendUrl, { method: request.method, headers, body });
 
         // 재요청 성공 → 새 accessToken 쿠키 세팅 후 응답 반환
@@ -82,6 +101,10 @@ async function proxyRequest(
 
     // 리프레시 실패 (refreshToken 없거나 만료) → 쿠키 삭제 후 401 반환
     // 클라이언트 인터셉터가 /login으로 리다이렉트
+    logger.warn(
+      { method: request.method, path: pathStr },
+      `${request.method} /${pathStr} session expired, token refresh failed`,
+    );
     const unauthorizedRes = NextResponse.json(
       { message: '인증이 만료되었습니다. 다시 로그인해주세요.' },
       { status: 401 },
@@ -106,11 +129,24 @@ async function handleProxyRequest(
   request: NextRequest,
   context: { params: Promise<{ path: string[] }> },
 ) {
+  const start = Date.now();
   try {
-    return await proxyRequest(request, context);
+    const response = await proxyRequest(request, context);
+    const { path } = await context.params;
+    const pathStr = path.join('/');
+    const duration = Date.now() - start;
+    logger.info(
+      { method: request.method, path: pathStr, status: response.status, duration },
+      `${request.method} /${pathStr} ${response.status} (${duration}ms)`,
+    );
+    return response;
   } catch (error) {
     const { path } = await context.params;
-    console.error(`[BFF Proxy] ${request.method} /${path.join('/')} 실패:`, error);
+    const pathStr = path.join('/');
+    logger.error(
+      { method: request.method, path: pathStr, duration: Date.now() - start, err: error },
+      `${request.method} /${pathStr} failed`,
+    );
     return NextResponse.json(
       { success: false, message: '백엔드 서버에 연결할 수 없습니다.' },
       { status: 502 },

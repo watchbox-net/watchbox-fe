@@ -19,8 +19,8 @@ jobs:
           DOCKER_BUILDKIT: 1
         run: |
           docker build \
-            --build-arg NEXT_PUBLIC_ENV=dev \
             --build-arg NEXT_PUBLIC_SERVER_URL=https://dev-api.watch-box.net \
+            --build-arg NEXT_PUBLIC_ENV=dev \
             --cache-from ${{ env.DOCKER_IMAGE }} \
             --build-arg BUILDKIT_INLINE_CACHE=1 \
             -f Dockerfile \
@@ -31,3 +31,4 @@ jobs:
         run: |
           docker compose up -d --no-deps watchbox-fe
           docker image prune -f
+          docker exec nginx nginx -s reload

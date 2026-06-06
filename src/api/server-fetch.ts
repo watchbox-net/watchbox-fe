@@ -48,12 +48,12 @@ export async function serverFetch(
   tokens: ServerTokens,
 ): Promise<{ response: Response; authenticated: boolean }> {
   const { accessToken, refreshToken } = tokens;
-  const headers: Record<string, string> = {};
 
   // 1. accessToken 있으면 붙여서 요청
   if (accessToken) {
-    headers['Authorization'] = `Bearer ${accessToken}`;
-    const response = await fetch(url, { headers });
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
 
     if (response.status !== 401) {
       return { response, authenticated: true };
@@ -64,8 +64,9 @@ export async function serverFetch(
       const newAccessToken = await refreshAccessToken(refreshToken);
 
       if (newAccessToken) {
-        headers['Authorization'] = `Bearer ${newAccessToken}`;
-        const retryResponse = await fetch(url, { headers });
+        const retryResponse = await fetch(url, {
+          headers: { Authorization: `Bearer ${newAccessToken}` },
+        });
         return { response: retryResponse, authenticated: true };
       }
     }
@@ -73,6 +74,6 @@ export async function serverFetch(
 
   // 3. 토큰 없거나 리프레시 실패 → 비로그인 요청
   logger.warn({ url }, 'server-fetch: falling back to unauthenticated request');
-  const response = await fetch(url, { headers: {} });
+  const response = await fetch(url);
   return { response, authenticated: false };
 }

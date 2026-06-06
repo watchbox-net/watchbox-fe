@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { context, propagation } from '@opentelemetry/api';
 import { logger } from '@/lib/logger';
 
 const BACKEND_API_URL = process.env.BACKEND_API_URL;
@@ -42,6 +43,13 @@ export async function getServerTokens(): Promise<ServerTokens> {
   };
 }
 
+/** 현재 OTel context에서 traceparent 등 전파 헤더를 추출하여 headers에 merge */
+function injectTraceHeaders(headers: Record<string, string> = {}): Record<string, string> {
+  const carrier: Record<string, string> = { ...headers };
+  propagation.inject(context.active(), carrier);
+  return carrier;
+}
+
 /** 서버 컴포넌트용 인증 fetch — 401 시 리프레시 후 재시도, 실패 시 비로그인 fallback */
 export async function serverFetch(
   url: string,
@@ -52,7 +60,7 @@ export async function serverFetch(
   // 1. accessToken 있으면 붙여서 요청
   if (accessToken) {
     const response = await fetch(url, {
-      headers: { Authorization: `Bearer ${accessToken}` },
+      headers: injectTraceHeaders({ Authorization: `Bearer ${accessToken}` }),
     });
 
     if (response.status !== 401) {
@@ -65,7 +73,7 @@ export async function serverFetch(
 
       if (newAccessToken) {
         const retryResponse = await fetch(url, {
-          headers: { Authorization: `Bearer ${newAccessToken}` },
+          headers: injectTraceHeaders({ Authorization: `Bearer ${newAccessToken}` }),
         });
         return { response: retryResponse, authenticated: true };
       }
@@ -74,6 +82,8 @@ export async function serverFetch(
 
   // 3. 토큰 없거나 리프레시 실패 → 비로그인 요청
   logger.warn({ url }, 'server-fetch: falling back to unauthenticated request');
-  const response = await fetch(url);
+  const response = await fetch(url, {
+    headers: injectTraceHeaders(),
+  });
   return { response, authenticated: false };
 }

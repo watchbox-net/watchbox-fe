@@ -148,6 +148,9 @@ export const OutlineIcons = _Outline;
 export const SolidIcons = _Solid;
 
 // ─── Custom Icon Components (Figma Design) ──────────────────
+export { default as BellNewAlarmIcon } from './BellNewAlarmIcon';
+export { default as CircleXIcon } from './CircleXIcon';
+export { default as HistoryIcon } from './HistoryIcon';
 export { default as WatchStatusIcon } from './WatchStatusIcon';
 export { default as LikeIcon } from './LikeIcon';
 export { default as BoxIcon } from './BoxIcon';

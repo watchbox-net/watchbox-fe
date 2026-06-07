@@ -574,6 +574,7 @@ export default function DevPage() {
                                 <Link href="/dev/components/list" className="bg-purple-100 text-purple-800 px-3 py-1 rounded">List</Link>
                                 <Link href="/dev/components/invite" className="bg-purple-100 text-purple-800 px-3 py-1 rounded">Invite</Link>
                                 <Link href="/dev/components/sheet" className="bg-purple-100 text-purple-800 px-3 py-1 rounded">Sheet</Link>
+                                <Link href="/dev/components/history" className="bg-purple-100 text-purple-800 px-3 py-1 rounded">History</Link>
                                 <Link href="/dev/components/logo" className="bg-purple-100 text-purple-800 px-3 py-1 rounded">Logo</Link>
                             </div>
                         </div>

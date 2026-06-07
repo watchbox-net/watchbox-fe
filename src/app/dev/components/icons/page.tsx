@@ -8,6 +8,8 @@ import DeleteIcon from '@/components/icons/DeleteIcon';
 import AddedStatusIcon from '@/components/icons/AddedStatusIcon';
 import ProfileIcon from '@/components/icons/ProfileIcon';
 import GoogleCircleLogo from '@/components/icons/GoogleCircleLogo';
+import BellNewAlarmIcon from '@/components/icons/BellNewAlarmIcon';
+import HistoryIcon from '@/components/icons/HistoryIcon';
 
 import type { WatchStatus, WatchStatusSize } from '@/components/icons/WatchStatusIcon';
 import type { LikeIconSize } from '@/components/icons/LikeIcon';
@@ -245,6 +247,58 @@ export default function IconComponentsPage() {
           <p>edit — UserCircleSolid, 96px, text-wb-grey-04 (#B1B1B1)</p>
           <p>mypage — UserCircleSolid, 72px, text-wb-grey-04 (#B1B1B1)</p>
           <p>list — UserCircleSolid, 28px, text-wb-grey-04 (#B1B1B1)</p>
+        </div>
+      </section>
+
+      {/* ── Bell New Alarm Icon ─────────────────────── */}
+      <section>
+        <h2 className="text-xl font-bold text-black mb-4">Bell New Alarm Icon</h2>
+
+        <div className="bg-wb-dark-02 rounded-lg p-6 flex items-center gap-8 mb-4">
+          <div className="flex flex-col items-center gap-2">
+            <BellNewAlarmIcon size={32} className="text-wb-white-02" />
+            <span className="text-xs text-wb-grey-03">32px</span>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <BellNewAlarmIcon size={24} className="text-wb-white-02" />
+            <span className="text-xs text-wb-grey-03">24px (default)</span>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <BellNewAlarmIcon size={20} className="text-wb-white-02" />
+            <span className="text-xs text-wb-grey-03">20px</span>
+          </div>
+        </div>
+
+        <div className="bg-neutral-100 rounded-lg p-4 text-sm text-neutral-700 space-y-1">
+          <p className="font-semibold text-black mb-2">디자인 스펙</p>
+          <p>안 읽은 알림이 있을 때 사용하는 벨 아이콘</p>
+          <p>벨 본체: currentColor / 빨간 점: #DE4E4E 고정</p>
+        </div>
+      </section>
+
+      {/* ── History Icon ────────────────────────────── */}
+      <section>
+        <h2 className="text-xl font-bold text-black mb-4">History Icon</h2>
+
+        <div className="bg-wb-dark-02 rounded-lg p-6 flex items-center gap-8 mb-4">
+          <div className="flex flex-col items-center gap-2">
+            <HistoryIcon size={32} className="text-wb-white-02" />
+            <span className="text-xs text-wb-grey-03">32px</span>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <HistoryIcon size={24} className="text-wb-white-02" />
+            <span className="text-xs text-wb-grey-03">24px (default)</span>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <HistoryIcon size={20} className="text-wb-white-02" />
+            <span className="text-xs text-wb-grey-03">20px</span>
+          </div>
+        </div>
+
+        <div className="bg-neutral-100 rounded-lg p-4 text-sm text-neutral-700 space-y-1">
+          <p className="font-semibold text-black mb-2">디자인 스펙</p>
+          <p>헤더용 히스토리(시계 화살표) 아이콘</p>
+          <p>fill: currentColor</p>
         </div>
       </section>
 

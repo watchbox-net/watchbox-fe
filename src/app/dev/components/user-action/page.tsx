@@ -11,6 +11,9 @@ import WatchStatusMenu from '@/components/common/WatchStatusMenu';
 import type { WatchStatusFilter } from '@/components/common/WatchStatusMenu';
 import MediaTypeButton from '@/components/common/MediaTypeButton';
 import MediaTypeSwitchButton from '@/components/common/MediaTypeSwitchButton';
+import Toast from '@/components/common/Toast';
+import SnackBar from '@/components/common/SnackBar';
+import { CircleXIcon } from '@/components/icons';
 
 const MODAL_DEMOS: { variant: ModalVariant; title: string; body: string; confirmLabel?: string }[] = [
   { variant: 'confirm',   title: '사용자 검색하기',     body: '공유 박스 멤버를 초대하기 위해\n사용자 검색 화면으로 이동하시겠습니까?' },
@@ -27,6 +30,8 @@ export default function UserActionComponentsPage() {
   const [boxContentFilter, setBoxContentFilter] = useState<WatchStatusFilter>('PLANNED');
   const [contentRecordFilter, setContentRecordFilter] = useState<WatchStatusFilter>('LIKED');
   const [mediaTypeSelected, setMediaTypeSelected] = useState<'all' | 'movie' | 'tv'>('all');
+  const [toastVisible, setToastVisible] = useState(false);
+  const [snackBarVisible, setSnackBarVisible] = useState(false);
 
   const activeDemo = MODAL_DEMOS.find((d) => d.variant === activeModal);
 
@@ -36,6 +41,72 @@ export default function UserActionComponentsPage() {
         <Link href="/dev" className="text-blue-500 text-sm">← Dev</Link>
         <h1 className="text-2xl font-bold text-black">Components / User Action</h1>
       </div>
+
+      {/* ── Toast & SnackBar ─────────────────── */}
+      <section>
+        <h2 className="text-xl font-bold text-black mb-4">Toast & SnackBar</h2>
+
+        <div className="flex gap-3 mb-4">
+          <button
+            onClick={() => setToastVisible(true)}
+            className="bg-neutral-100 text-neutral-800 px-3 py-2 rounded text-sm hover:bg-neutral-200"
+          >
+            Toast 띄우기
+          </button>
+          <button
+            onClick={() => setSnackBarVisible(true)}
+            className="bg-neutral-100 text-neutral-800 px-3 py-2 rounded text-sm hover:bg-neutral-200"
+          >
+            SnackBar 띄우기
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          {/* Toast 미리보기 (인라인) */}
+          <div>
+            <p className="text-xs font-semibold text-neutral-500 mb-2">Toast — 자동 사라짐, 액션 없음</p>
+            <div className="bg-wb-dark-02 rounded-lg p-4">
+              <div className="bg-wb-dark-04 rounded-[8px] shadow-[0px_4px_6px_rgba(0,0,0,0.2)] flex items-center px-[18px] py-[11px]">
+                <p className="text-[13px] tracking-[0.25px] leading-[18px] text-wb-white-02">
+                  박스에 추가했습니다.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* SnackBar 미리보기 (인라인) — 한 줄 */}
+          <div>
+            <p className="text-xs font-semibold text-neutral-500 mb-2">SnackBar — 한 줄</p>
+            <div className="bg-wb-dark-02 rounded-lg p-4">
+              <div className="bg-wb-white-02 rounded-[8px] shadow-[0px_4px_6px_rgba(0,0,0,0.35)] flex items-center gap-[16px] px-[18px] py-[10px]">
+                <p className="flex-1 text-[13px] tracking-[0.25px] leading-[17px] text-wb-dark-01">
+                  <span className="font-semibold">강조할 텍스트</span>와 일반 텍스트 내용 알림
+                </p>
+                <div className="flex items-center gap-[16px] shrink-0">
+                  <span className="text-[13px] font-semibold tracking-[0.25px] leading-[20px] text-wb-blue">보러가기</span>
+                  <CircleXIcon size={20} className="text-[#353535]" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* SnackBar 미리보기 (인라인) — 두 줄 */}
+          <div>
+            <p className="text-xs font-semibold text-neutral-500 mb-2">SnackBar — 두 줄 (긴 텍스트)</p>
+            <div className="bg-wb-dark-02 rounded-lg p-4 max-w-[430px]">
+              <div className="bg-wb-white-02 rounded-[8px] shadow-[0px_4px_6px_rgba(0,0,0,0.35)] flex items-center gap-[16px] px-[18px] py-[10px]">
+                <p className="flex-1 text-[13px] tracking-[0.25px] leading-[17px] text-wb-dark-01">
+                  <span className="font-semibold">너구리</span>님이 회원님을 &apos;<span className="font-semibold">너구리와 해달의 즐겁고 무서운 공유 박스</span>&apos;에 초대했습니다.
+                </p>
+                <div className="flex items-center gap-[16px] shrink-0">
+                  <span className="text-[13px] font-semibold tracking-[0.25px] leading-[20px] text-wb-blue">보러가기</span>
+                  <CircleXIcon size={20} className="text-[#353535]" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ── Button ─────────────────────────────── */}
       <section>
@@ -228,6 +299,21 @@ export default function UserActionComponentsPage() {
           </div>
         </div>
       </section>
+
+      {/* Toast / SnackBar 렌더 */}
+      <Toast
+        message="박스에 추가했습니다."
+        visible={toastVisible}
+        onClose={() => setToastVisible(false)}
+      />
+      <SnackBar
+        highlight="{너구리 1}"
+        message="님으로부터 박스 초대 요청이 도착했습니다."
+        visible={snackBarVisible}
+        onClose={() => setSnackBarVisible(false)}
+        actionLabel="보러가기"
+        onAction={() => { alert('초대 페이지로 이동'); setSnackBarVisible(false); }}
+      />
 
       {/* Modal 렌더 */}
       {activeDemo && (

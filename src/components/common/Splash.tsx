@@ -4,26 +4,27 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import pkg from '../../../package.json';
 
-const SPLASH_KEY = 'splash-date';
+const SPLASH_KEY = 'splash-last-shown-at';
+const SPLASH_INTERVAL_MS = 3 * 60 * 60 * 1000; // 3시간
 const MIN_DISPLAY_MS = 1200;
 const FADE_MS = 400;
 
-/** 하루 1회 스플래시 오버레이 */
+/** 3시간마다 1회 스플래시 오버레이 */
 export default function Splash() {
   const [phase, setPhase] = useState<'hidden' | 'visible' | 'fading' | 'done'>('hidden');
 
   useEffect(() => {
-    const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-    const last = localStorage.getItem(SPLASH_KEY);
+    const now = Date.now();
+    const last = Number(localStorage.getItem(SPLASH_KEY) ?? 0);
 
-    if (last === today) {
+    if (now - last < SPLASH_INTERVAL_MS) {
       setPhase('done');
       return;
     }
 
-    // 오늘 첫 접속 → 스플래시 표시
+    // 3시간 경과 → 스플래시 표시
     setPhase('visible');
-    localStorage.setItem(SPLASH_KEY, today);
+    localStorage.setItem(SPLASH_KEY, String(now));
 
     const timer = setTimeout(() => {
       setPhase('fading');

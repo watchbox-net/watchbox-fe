@@ -24,7 +24,7 @@ export default function Toast({ message, visible, onClose, duration = 2000 }: To
 
   return (
     <div className="fixed inset-x-0 top-[20px] z-50 flex justify-center px-[16px] pointer-events-none">
-      <div className="w-full max-w-[430px] bg-wb-dark-04 rounded-[8px] shadow-[0px_4px_6px_rgba(0,0,0,0.2)] flex items-center px-[18px] py-[11px]">
+      <div className="w-[348px] bg-wb-dark-04 rounded-[8px] shadow-[0px_4px_6px_rgba(0,0,0,0.2)] flex items-center px-[18px] py-[11px]">
         <p className="text-[13px] tracking-[0.25px] leading-[18px] text-wb-white-02">
           {message}
         </p>

@@ -27,7 +27,7 @@ export default function SnackBar({
 
   return (
     <div className="fixed inset-x-0 top-[20px] z-50 flex justify-center px-[16px]">
-      <div className="w-full max-w-[430px] bg-wb-white-02 rounded-[8px] shadow-[0px_4px_6px_rgba(0,0,0,0.35)] flex items-center gap-[16px] px-[18px] py-[10px]">
+      <div className="w-[351px] bg-wb-white-02 rounded-[8px] shadow-[0px_4px_6px_rgba(0,0,0,0.35)] flex items-center gap-[16px] px-[18px] py-[10px]">
         <p className="flex-1 text-[13px] tracking-[0.25px] leading-[17px] text-wb-dark-01">
           {highlight && <span className="font-semibold">{highlight}</span>}
           {message}

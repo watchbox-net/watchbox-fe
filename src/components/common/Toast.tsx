@@ -9,6 +9,9 @@ interface ToastProps {
   duration?: number;
 }
 
+/**
+ * 토스트 — 단순 알림 (자동 사라짐, 액션 없음)
+ */
 export default function Toast({ message, visible, onClose, duration = 2000 }: ToastProps) {
   useEffect(() => {
     if (visible) {
@@ -20,9 +23,11 @@ export default function Toast({ message, visible, onClose, duration = 2000 }: To
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-x-0 top-[20px] z-50 flex justify-center pointer-events-none">
-      <div className="bg-neutral-800 text-white px-6 py-3 rounded-xl text-sm shadow-lg animate-fade-in">
-        {message}
+    <div className="fixed inset-x-0 top-[20px] z-50 flex justify-center px-[16px] pointer-events-none">
+      <div className="w-full max-w-[430px] bg-wb-dark-04 rounded-[8px] shadow-[0px_4px_6px_rgba(0,0,0,0.2)] flex items-center px-[18px] py-[11px]">
+        <p className="text-[13px] tracking-[0.25px] leading-[18px] text-wb-white-02">
+          {message}
+        </p>
       </div>
     </div>
   );

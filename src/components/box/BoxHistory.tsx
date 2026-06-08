@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import ProfileIcon from '@/components/icons/ProfileIcon';
 
-export interface BoxContentUpdateHistoryItem {
+export interface BoxHistoryItem {
   /** 멤버 프로필 이미지 URL (없으면 기본 아이콘) */
   profileImageUrl?: string | null;
   /** 백엔드로부터 받은 내용 텍스트 (예: "{사용자명}님이 {컨텐츠명}을 박스에 추가") */
@@ -10,12 +10,12 @@ export interface BoxContentUpdateHistoryItem {
   date: string;
 }
 
-interface BoxContentUpdateHistoryProps {
-  item: BoxContentUpdateHistoryItem;
+interface BoxHistoryProps {
+  item: BoxHistoryItem;
 }
 
-/** 박스 컨텐츠 변경 히스토리 — 개별 항목 (멤버 이미지 + 내용 + 날짜) */
-export default function BoxContentUpdateHistory({ item }: BoxContentUpdateHistoryProps) {
+/** 박스 히스토리 — 개별 항목 (멤버 이미지 + 내용 + 날짜) */
+export default function BoxHistory({ item }: BoxHistoryProps) {
   const { profileImageUrl, content, date } = item;
 
   return (

@@ -13,7 +13,7 @@ const WATCH_STATUS_LABEL: Record<Exclude<WatchStatus, 'none' | 'outline'>, strin
 
 export type ContentRecordHistoryType = 'status' | 'like';
 
-export interface ContentRecordUpdateHistoryItem {
+export interface ContentRecordHistoryItem {
   /** 컨텐츠(영화/시리즈) 포스터 이미지 URL */
   posterUrl?: string | null;
   /** 컨텐츠명 */
@@ -26,12 +26,12 @@ export interface ContentRecordUpdateHistoryItem {
   date: string;
 }
 
-interface ContentRecordUpdateHistoryProps {
-  item: ContentRecordUpdateHistoryItem;
+interface ContentRecordHistoryProps {
+  item: ContentRecordHistoryItem;
 }
 
-/** 시청 기록 변경 히스토리 — 개별 항목 (포스터 + 내용 + 시청상태/좋아요 아이콘) */
-export default function ContentRecordUpdateHistory({ item }: ContentRecordUpdateHistoryProps) {
+/** 시청 기록 히스토리 — 개별 항목 (포스터 + 내용 + 시청상태/좋아요 아이콘) */
+export default function ContentRecordHistory({ item }: ContentRecordHistoryProps) {
   const { posterUrl, contentTitle, type, watchStatus = 'completed', date } = item;
 
   return (

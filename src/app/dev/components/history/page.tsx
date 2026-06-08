@@ -1,27 +1,27 @@
 'use client';
 
 import Link from 'next/link';
-import BoxContentUpdateHistory from '@/components/box/BoxContentUpdateHistory';
-import BoxContentUpdateHistoryList from '@/components/box/BoxContentUpdateHistoryList';
-import type { BoxContentUpdateHistoryItem } from '@/components/box/BoxContentUpdateHistory';
-import ContentRecordUpdateHistory from '@/components/content/ContentRecordUpdateHistory';
-import ContentRecordUpdateHistoryList from '@/components/content/ContentRecordUpdateHistoryList';
-import type { ContentRecordUpdateHistoryItem } from '@/components/content/ContentRecordUpdateHistory';
+import BoxHistory from '@/components/box/BoxHistory';
+import BoxHistoryList from '@/components/box/BoxHistoryList';
+import type { BoxHistoryItem } from '@/components/box/BoxHistory';
+import ContentRecordHistory from '@/components/content/ContentRecordHistory';
+import ContentRecordHistoryList from '@/components/content/ContentRecordHistoryList';
+import type { ContentRecordHistoryItem } from '@/components/content/ContentRecordHistory';
 
-const SAMPLE_ITEM: BoxContentUpdateHistoryItem = {
+const SAMPLE_ITEM: BoxHistoryItem = {
   profileImageUrl: null,
   content: '{사용자명}님이 {컨텐츠명}을 박스에 추가',
   date: '2026-06-01',
 };
 
-const SAMPLE_LIST: BoxContentUpdateHistoryItem[] = Array.from({ length: 9 }, () => ({
+const SAMPLE_LIST: BoxHistoryItem[] = Array.from({ length: 9 }, () => ({
   profileImageUrl: null,
   content: '{사용자명}님이 {컨텐츠명}을 박스에 추가',
   date: '2026-06-01',
 }));
 
 // 시청 기록 히스토리 샘플 (시청 상태 변경 / 좋아요 등록 혼합)
-const RECORD_LIST: ContentRecordUpdateHistoryItem[] = [
+const RECORD_LIST: ContentRecordHistoryItem[] = [
   { posterUrl: null, contentTitle: '{컨텐츠명}', type: 'status', watchStatus: 'completed', date: '2026-06-01' },
   { posterUrl: null, contentTitle: '{컨텐츠명}', type: 'like', date: '2026-06-01' },
   { posterUrl: null, contentTitle: '{컨텐츠명}', type: 'status', watchStatus: 'watching', date: '2026-06-01' },
@@ -38,12 +38,12 @@ export default function BoxHistoryComponentsPage() {
         <h1 className="text-2xl font-bold text-black">Components / History</h1>
       </div>
 
-      {/* ── Box Content Update History (단일 항목) ─────────── */}
+      {/* ── Box History (단일 항목) ─────────── */}
       <section>
-        <h2 className="text-xl font-bold text-black mb-4">Box Content Update History</h2>
+        <h2 className="text-xl font-bold text-black mb-4">Box History</h2>
 
         <div className="bg-wb-dark-02 rounded-lg py-4">
-          <BoxContentUpdateHistory item={SAMPLE_ITEM} />
+          <BoxHistory item={SAMPLE_ITEM} />
         </div>
 
         <div className="bg-neutral-100 rounded-lg p-4 text-sm text-neutral-700 space-y-1 mt-4">
@@ -54,12 +54,12 @@ export default function BoxHistoryComponentsPage() {
         </div>
       </section>
 
-      {/* ── Box Content Update History List ───────────────── */}
+      {/* ── Box History List ───────────────── */}
       <section>
-        <h2 className="text-xl font-bold text-black mb-4">Box Content Update History List</h2>
+        <h2 className="text-xl font-bold text-black mb-4">Box History List</h2>
 
         <div className="bg-wb-dark-02 rounded-lg">
-          <BoxContentUpdateHistoryList items={SAMPLE_LIST} />
+          <BoxHistoryList items={SAMPLE_LIST} />
         </div>
 
         <div className="bg-neutral-100 rounded-lg p-4 text-sm text-neutral-700 space-y-1 mt-4">
@@ -68,15 +68,15 @@ export default function BoxHistoryComponentsPage() {
         </div>
       </section>
 
-      {/* ── Content Record Update History (단일 항목) ─────── */}
+      {/* ── Content Record History (단일 항목) ─────── */}
       <section>
-        <h2 className="text-xl font-bold text-black mb-4">Content Record Update History</h2>
+        <h2 className="text-xl font-bold text-black mb-4">Content Record History</h2>
 
         <div className="bg-wb-dark-02 rounded-lg py-4 space-y-4">
-          <ContentRecordUpdateHistory
+          <ContentRecordHistory
             item={{ posterUrl: null, contentTitle: '{컨텐츠명}', type: 'status', watchStatus: 'completed', date: '2026-06-01' }}
           />
-          <ContentRecordUpdateHistory
+          <ContentRecordHistory
             item={{ posterUrl: null, contentTitle: '{컨텐츠명}', type: 'like', date: '2026-06-01' }}
           />
         </div>
@@ -89,12 +89,12 @@ export default function BoxHistoryComponentsPage() {
         </div>
       </section>
 
-      {/* ── Content Record Update History List ────────────── */}
+      {/* ── Content Record History List ────────────── */}
       <section>
-        <h2 className="text-xl font-bold text-black mb-4">Content Record Update History List</h2>
+        <h2 className="text-xl font-bold text-black mb-4">Content Record History List</h2>
 
         <div className="bg-wb-dark-02 rounded-lg">
-          <ContentRecordUpdateHistoryList items={RECORD_LIST} />
+          <ContentRecordHistoryList items={RECORD_LIST} />
         </div>
 
         <div className="bg-neutral-100 rounded-lg p-4 text-sm text-neutral-700 space-y-1 mt-4">
@@ -114,7 +114,7 @@ export default function BoxHistoryComponentsPage() {
               <span className="text-white text-[16px] font-semibold">박스 컨텐츠 히스토리</span>
             </div>
             <div className="overflow-y-auto max-h-[600px]">
-              <BoxContentUpdateHistoryList items={SAMPLE_LIST} />
+              <BoxHistoryList items={SAMPLE_LIST} />
             </div>
           </div>
 
@@ -124,7 +124,7 @@ export default function BoxHistoryComponentsPage() {
               <span className="text-white text-[16px] font-semibold">시청 기록 히스토리</span>
             </div>
             <div className="overflow-y-auto max-h-[600px]">
-              <ContentRecordUpdateHistoryList items={RECORD_LIST} />
+              <ContentRecordHistoryList items={RECORD_LIST} />
             </div>
           </div>
         </div>

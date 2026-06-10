@@ -11,6 +11,7 @@ import {
 import type { ReactNode } from 'react';
 import { Fragment } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import SnackBar from '@/components/common/SnackBar';
 import { useAuth } from './AuthContext';
 import { ackSnackbarShown } from '@/lib/api/notification';
@@ -145,6 +146,7 @@ const NotificationContext = createContext<null>(null);
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { isAuthenticated } = useAuth();
 
   // 동시에 여러 알림이 와도 하나씩 순차 노출 (큐의 맨 앞이 현재 표시 항목)
@@ -155,6 +157,11 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const handleRef = useRef<(n: NotificationResponse) => void>(() => {});
 
   const handleNotification = useCallback((n: NotificationResponse) => {
+    // 받은 초대 알림 → 벨 배지 즉시 갱신 (snackbar 표시 여부/dedup과 무관하게)
+    if (n.type === 'BOX_INVITATION_RECEIVED') {
+      queryClient.invalidateQueries({ queryKey: ['hasReceivedInvitation'] });
+    }
+
     if (!n.showSnackbar) return;
     if (isAlreadyShown(n.notificationId)) return;
 
@@ -176,7 +183,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     ackSnackbarShown([n.notificationId]).catch(() => {
       /* ACK 실패해도 UX는 진행 — 최악의 경우 재구독 시 다시 옴 */
     });
-  }, []);
+  }, [queryClient]);
 
   useEffect(() => {
     handleRef.current = handleNotification;

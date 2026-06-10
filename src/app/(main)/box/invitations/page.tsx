@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import Toast from '@/components/common/Toast';
 import { Loading } from '@/components/common/Loading';
 import MainContent from '@/components/common/MainContent';
@@ -23,6 +24,7 @@ import type { InvitationReceivedResponse, InvitationSentResponse } from '@/types
 
 export default function BoxInvitationsPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [received, setReceived] = useState<InvitationReceivedResponse[]>([]);
   const [sent, setSent] = useState<InvitationSentResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,6 +44,9 @@ export default function BoxInvitationsPage() {
     try {
       await acceptInvitation(requestId);
       setReceived((prev) => prev.filter((inv) => inv.requestId !== requestId));
+      // 받은 초대가 줄었으니 벨 배지 + 박스 목록(공유박스 추가됨) 갱신
+      queryClient.invalidateQueries({ queryKey: ['hasReceivedInvitation'] });
+      queryClient.invalidateQueries({ queryKey: ['boxList'] });
       setToast('초대를 수락했습니다.');
     } catch {
       setToast('수락에 실패했습니다.');
@@ -52,6 +57,8 @@ export default function BoxInvitationsPage() {
     try {
       await rejectInvitation(requestId);
       setReceived((prev) => prev.filter((inv) => inv.requestId !== requestId));
+      // 받은 초대가 줄었으니 벨 배지 갱신
+      queryClient.invalidateQueries({ queryKey: ['hasReceivedInvitation'] });
       setToast('초대를 거절했습니다.');
     } catch {
       setToast('거절에 실패했습니다.');

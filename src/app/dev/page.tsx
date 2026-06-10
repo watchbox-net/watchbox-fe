@@ -582,6 +582,14 @@ export default function DevPage() {
                 </section>
 
                 <section className="border p-4 rounded">
+                    <h2 className="font-semibold mb-2">Web Push (POC)</h2>
+                    <p className="text-xs text-gray-500 mb-3">macOS OS 알림 확인용 — 권한 허용 + 구독 등록</p>
+                    <Link href="/dev/web-push" className="inline-block bg-indigo-100 text-indigo-800 px-3 py-1 rounded">
+                        Web Push 테스트 페이지
+                    </Link>
+                </section>
+
+                <section className="border p-4 rounded">
                     <h2 className="font-semibold mb-2">빠른 네비게이션</h2>
                     <div className="flex flex-wrap gap-2">
                         <Link href="/" className="bg-gray-200 px-3 py-1 rounded">홈</Link>

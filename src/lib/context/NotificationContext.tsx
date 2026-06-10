@@ -49,8 +49,9 @@ function markShown(id: number): void {
 
 // 초대 알림 보러가기 → 초대 화면
 const INVITATIONS_PATH = '/box/invitations';
-// 컨텐츠 추가 알림 자동 소멸 시간
-const CONTENT_TOAST_MS = 5000;
+// 자동 소멸 시간
+const CONTENT_TOAST_MS = 8000;    // 컨텐츠 추가 알림
+const INVITATION_TOAST_MS = 20000; // 초대 받음 / 수락·거절 알림
 
 // ── 스낵바 큐 항목 ────────────────────────────────────────────
 interface SnackItem {
@@ -100,6 +101,7 @@ function buildSnackItem(n: NotificationResponse): SnackItem | null {
         </Fragment>
       ),
       href: INVITATIONS_PATH,
+      autoDismissMs: INVITATION_TOAST_MS, // 20초 후 자동 소멸
     };
   }
 
@@ -120,6 +122,7 @@ function buildSnackItem(n: NotificationResponse): SnackItem | null {
         </Fragment>
       ),
       href: INVITATIONS_PATH,
+      autoDismissMs: INVITATION_TOAST_MS, // 20초 후 자동 소멸
     };
   }
 
@@ -134,7 +137,7 @@ function buildSnackItem(n: NotificationResponse): SnackItem | null {
         </Fragment>
       ),
       href: boxContentsPath(p.boxId, p.boxType, p.boxName),
-      autoDismissMs: CONTENT_TOAST_MS, // 5초 후 자동 소멸
+      autoDismissMs: CONTENT_TOAST_MS, // 8초 후 자동 소멸
       groupKey: `box:${p.boxId}`, // 같은 박스 버스트 시 최신으로 대체
     };
   }
@@ -193,9 +196,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isAuthenticated) return;
 
-    const es = new EventSource('/api/notifications/subscribe', {
-      withCredentials: true,
-    });
+    let es: EventSource | null = null;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    let closed = false;
 
     const onNotification = (e: MessageEvent) => {
       try {
@@ -206,17 +209,27 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // 'connect' 핸드셰이크 이벤트는 무시, 'notification'만 처리
-    es.addEventListener('notification', onNotification);
-
-    // EventSource는 끊기면 자동 재연결(브라우저 내장) → 별도 처리 불필요
-    es.onerror = () => {
-      /* 자동 재연결에 맡김 */
+    const connect = () => {
+      if (closed) return;
+      es = new EventSource('/api/notifications/subscribe', { withCredentials: true });
+      // 'connect' 핸드셰이크 이벤트는 무시, 'notification'만 처리
+      es.addEventListener('notification', onNotification);
+      es.onerror = () => {
+        // 네이티브 EventSource는 HTTP 에러(502 등, 백엔드 재시작 시)엔 재연결을 포기(CLOSED).
+        // 그 경우만 수동 재연결. CONNECTING이면 브라우저 자동 재연결에 맡김.
+        if (es?.readyState === EventSource.CLOSED && !closed) {
+          reconnectTimer = setTimeout(connect, 3000);
+        }
+      };
     };
 
+    connect();
+
     return () => {
-      es.removeEventListener('notification', onNotification);
-      es.close();
+      closed = true;
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      es?.removeEventListener('notification', onNotification);
+      es?.close();
     };
   }, [isAuthenticated]);
 

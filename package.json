@@ -1,6 +1,6 @@
 {
   "name": "watch-box",
-  "version": "v1.8.0-beta",
+  "version": "v1.8.1-beta",
   "private": true,
   "scripts": {
     "dev": "next dev",

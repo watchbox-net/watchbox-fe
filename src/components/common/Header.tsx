@@ -5,6 +5,7 @@ import {
   ChevronLeftOutline,
   MagnifyingGlassOutline,
   BellSolid,
+  BellNewAlarmIcon,
   XCircleSolid,
 } from '@/components/icons';
 
@@ -28,6 +29,8 @@ interface HeaderProps {
   onBack?: () => void;
   onSearch?: () => void;
   onAlarm?: () => void;
+  /** 안 읽은 알림(받은 초대 등)이 있으면 벨에 빨간 점 표시 */
+  hasNewAlarm?: boolean;
   onEdit?: () => void;
   onDone?: () => void;
   /** icon1 / icon1-back 우측 아이콘을 커스텀할 때 사용 */
@@ -51,6 +54,7 @@ export default function Header({
   onBack,
   onSearch,
   onAlarm,
+  hasNewAlarm = false,
   onEdit,
   onDone,
   rightIcon,
@@ -99,7 +103,11 @@ export default function Header({
           {(variant === 'icon2' || variant === 'icon2-back') && (
             <div className="ml-auto flex items-center gap-[15px]">
               <button type="button" onClick={onAlarm}>
-                <BellSolid className="size-6 text-wb-white-02" />
+                {hasNewAlarm ? (
+                  <BellNewAlarmIcon className="size-6 text-wb-white-02" />
+                ) : (
+                  <BellSolid className="size-6 text-wb-white-02" />
+                )}
               </button>
               {icon2Right ?? (
                 <button type="button" onClick={onSearch}>
@@ -111,7 +119,7 @@ export default function Header({
 
           {(variant === 'icon1' || variant === 'icon1-back') && (
             rightIcon ? (
-              <div className="ml-auto" onClick={onRightIconClick}>
+              <div className="ml-auto cursor-pointer" onClick={onRightIconClick}>
                 {rightIcon}
               </div>
             ) : (

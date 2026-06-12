@@ -46,6 +46,14 @@ export async function fetchReceivedInvitations(): Promise<InvitationReceivedResp
   return data.data;
 }
 
+/** 받은 PENDING 초대 존재 유무 (배지 표시용, 목록 조회보다 가벼움) */
+export async function hasReceivedInvitation(): Promise<boolean> {
+  const { data } = await privateApi.get<ApiResponse<boolean>>(
+    '/boxes/shared/invitations/received/exists',
+  );
+  return data.data;
+}
+
 /** 초대 수락 */
 export async function acceptInvitation(requestId: number): Promise<void> {
   await privateApi.patch(

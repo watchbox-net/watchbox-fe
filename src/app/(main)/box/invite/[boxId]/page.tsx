@@ -13,7 +13,21 @@ import SearchedMemberList from '@/components/invite/SearchedMemberList';
 import { MagnifyingGlassOutline, XCircleSolid } from '@/components/icons';
 import { searchMembers, inviteToBox } from '@/lib/api/member';
 import { fetchBox } from '@/lib/api/box';
-import type { MemberSearchResponse } from '@/types/member';
+import type { MemberSearchResponse, BoxInviteStatus } from '@/types/member';
+
+// 같은 멤버가 중복으로 와도 가장 강한 초대 상태만 남기고 dedup
+const STATUS_RANK: Record<BoxInviteStatus, number> = { MEMBER: 2, PENDING: 1, NONE: 0 };
+
+function dedupByMemberId(list: MemberSearchResponse[]): MemberSearchResponse[] {
+  const byId = new Map<number, MemberSearchResponse>();
+  for (const m of list) {
+    const prev = byId.get(m.memberId);
+    if (!prev || STATUS_RANK[m.boxInviteStatus] > STATUS_RANK[prev.boxInviteStatus]) {
+      byId.set(m.memberId, m);
+    }
+  }
+  return [...byId.values()];
+}
 
 export default function BoxInvitePage() {
   const params = useParams();
@@ -40,7 +54,7 @@ export default function BoxInvitePage() {
     setLoading(true);
     try {
       const res = await searchMembers(trimmed, boxId);
-      setResults(res.memberSearchList);
+      setResults(dedupByMemberId(res.memberSearchList));
     } catch {
       setResults([]);
     } finally {

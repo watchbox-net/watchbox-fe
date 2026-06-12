@@ -7,7 +7,7 @@ import type {
   BoxUpdateRequest,
   BoxUpdateResponse,
 } from '@/types/box';
-import type { ContentCursorPageResponse, CountResponse } from '@/types/content-summary';
+import type { ContentCursorPageResponse, ContentSummary, CountResponse } from '@/types/content-summary';
 import type { ApiResponse } from '@/types/api';
 
 /** 박스 리스트 조회 (마이 + 공유 통합) */
@@ -89,4 +89,59 @@ export async function fetchBoxContentCount(
     { params },
   );
   return data.data.totalCount;
+}
+
+// ─── 박스 히스토리 (멤버 공유, 커서 기반 / 숫자 cursorId) ──────
+export type BoxHistoryEventType =
+  | 'CONTENT_ADDED'
+  | 'CONTENT_DELETED'
+  | 'MEMBER_JOINED'
+  | 'MEMBER_LEFT'
+  | 'MEMBER_KICKED'
+  | 'MEMBER_NAME_CHANGED'
+  | 'BOX_NAME_CHANGED'
+  | 'BOX_DESCRIPTION_CHANGED';
+export type BoxHistorySortOrder = 'RECENT' | 'OLDEST';
+
+/** 히스토리의 행위자/대상 멤버 (탈퇴 시 null) */
+export interface BoxHistoryMemberSummary {
+  memberId: number;
+  nickname: string;
+}
+
+/** 박스 히스토리 한 건 (백엔드 응답 형태) */
+export interface BoxHistoryEntry {
+  boxHistoryId: number;
+  eventType: BoxHistoryEventType;
+  actor: BoxHistoryMemberSummary | null;        // 행위자 (탈퇴 시 null)
+  targetMember: BoxHistoryMemberSummary | null; // MEMBER_* 대상
+  content: ContentSummary | null;               // CONTENT_* 대상
+  oldValue: string | null;                      // *_CHANGED 변경 전
+  newValue: string | null;                      // *_CHANGED 변경 후
+  createdAt: string;                            // ISO datetime
+}
+
+export interface BoxHistoryPageResponse {
+  historyList: BoxHistoryEntry[];
+  nextCursor: number | null; // 다음 cursorId (숫자). null이면 끝
+  hasNext: boolean;
+}
+
+/**
+ * 박스 히스토리 조회 - 커서 기반 무한스크롤 (박스 멤버 공유).
+ * ⚠️ cursor가 숫자(cursorId). 시청 기록 히스토리(문자열 cursor)와 다름.
+ */
+export async function fetchBoxHistory(
+  boxId: number,
+  sort: BoxHistorySortOrder = 'RECENT',
+  cursorId: number | null = null,
+): Promise<BoxHistoryPageResponse> {
+  const params: Record<string, unknown> = { sort };
+  if (cursorId != null) params.cursorId = cursorId;
+
+  const { data } = await privateApi.get<ApiResponse<BoxHistoryPageResponse>>(
+    `/boxes/${boxId}/history`,
+    { params },
+  );
+  return data.data;
 }

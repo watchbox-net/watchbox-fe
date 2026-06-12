@@ -1,9 +1,11 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { CircleXIcon } from '@/components/icons';
 
 interface SnackBarProps {
-  message: string;
+  /** 본문 — 문자열 또는 일부를 굵게 강조한 ReactNode 가능 */
+  message: ReactNode;
   highlight?: string;
   visible: boolean;
   onClose: () => void;

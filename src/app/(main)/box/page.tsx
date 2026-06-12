@@ -14,6 +14,7 @@ import BoxList from '@/components/box/BoxList';
 import PreviewOverlay from '@/components/preview/PreviewOverlay';
 import { PlusOutline } from '@/components/icons';
 import { fetchBoxList, deleteBox } from '@/lib/api/box';
+import { hasReceivedInvitation } from '@/lib/api/member';
 import { fetchPreviewBoxList } from '@/lib/api/preview';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
@@ -51,6 +52,16 @@ export default function BoxPage() {
 
   const boxes = isAuthenticated ? (data?.boxItemList ?? []) : (previewData?.boxItemList ?? []);
   const loading = authLoading || (isAuthenticated ? isLoading : previewLoading);
+
+  // ── 받은 초대 존재 유무 (벨 배지용) ──
+  // SSE 실시간 갱신이 있지만, 에러로 알림이 누락될 수 있으므로
+  // staleTime 0 → 박스 화면 진입할 때마다 항상 fresh 확인 (안전망)
+  const { data: hasNewAlarm = false } = useQuery({
+    queryKey: ['hasReceivedInvitation'],
+    queryFn: hasReceivedInvitation,
+    enabled: !authLoading && isAuthenticated,
+    staleTime: 0,
+  });
 
   // 컨텍스트 메뉴 상태
   const [openMenu, setOpenMenu] = useState<MenuTarget | null>(null);
@@ -125,6 +136,7 @@ export default function BoxPage() {
       <Header
         variant="icon2"
         title="박스"
+        hasNewAlarm={hasNewAlarm}
         onAlarm={() => {
           if (!isAuthenticated) { showLoginModal(); return; }
           router.push('/box/invitations');

@@ -14,8 +14,9 @@ import PlainContextMenu from '@/components/common/PlainContextMenu';
 import MediaTypeButton from '@/components/common/MediaTypeButton';
 import MediaTypeSwitchButton from '@/components/common/MediaTypeSwitchButton';
 import Toast from '@/components/common/Toast';
+import Modal from '@/components/common/Modal';
 import PreviewOverlay from '@/components/preview/PreviewOverlay';
-import { PlusOutline, ChevronDownOutline } from '@/components/icons';
+import { PlusOutline, ChevronDownOutline, HistoryIcon } from '@/components/icons';
 import MainContent from '@/components/common/MainContent';
 import {
   fetchBoxContents,
@@ -108,6 +109,7 @@ export default function BoxContentsPage() {
   // 토스트
   const [toast, setToast] = useState({ visible: false, message: '' });
   const showToast = (message: string) => setToast({ visible: true, message });
+  const [preparingModalVisible, setPreparingModalVisible] = useState(false);
 
   const { changeStatus } = useWatchStatus({ showToast });
 
@@ -287,11 +289,28 @@ export default function BoxContentsPage() {
       <Header
         variant="icon1-back"
         title={boxName}
-        rightIcon={<PlusOutline className="size-6 text-wb-white-02" />}
-        onRightIconClick={() => {
-          if (isPreview) { showLoginModal(); return; }
-          /* TODO: 컨텐츠 추가 */
-        }}
+        rightIcon={
+          <div className="flex items-center gap-[15px]">
+            <button
+              type="button"
+              onClick={() => {
+                if (isPreview) { showLoginModal(); return; }
+                router.push(`/box/${boxId}/history`);
+              }}
+            >
+              <HistoryIcon className="size-6 text-wb-white-02" />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (isPreview) { showLoginModal(); return; }
+                setPreparingModalVisible(true); // 컨텐츠 추가 — 아직 미구현
+              }}
+            >
+              <PlusOutline className="size-6 text-wb-white-02" />
+            </button>
+          </div>
+        }
       />
 
       {/* ── Content Media Type Line (고정) ───────────── */}
@@ -411,6 +430,13 @@ export default function BoxContentsPage() {
         message={toast.message}
         visible={toast.visible}
         onClose={() => setToast((t) => ({ ...t, visible: false }))}
+      />
+
+      {/* 컨텐츠 추가 — 아직 준비중 안내 */}
+      <Modal
+        visible={preparingModalVisible}
+        variant="preparing"
+        onConfirm={() => setPreparingModalVisible(false)}
       />
     </>
   );

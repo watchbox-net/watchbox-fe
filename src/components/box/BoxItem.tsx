@@ -18,6 +18,8 @@ interface BoxItemProps {
   memberNames?: string[];
   /** 업데이트 문구 표시 여부 (기본 true) */
   update?: boolean;
+  /** 우측 케밥 메뉴 표시 여부 (기본 true) */
+  menu?: boolean;
   /** 박스 영역 클릭 */
   onClick?: () => void;
   /** 우측 케밥 아이콘 클릭 */
@@ -38,6 +40,7 @@ export default function BoxItem({
   posters = [],
   memberNames,
   update = true,
+  menu = true,
   onClick,
   onMenuClick,
   menuSlot,
@@ -71,16 +74,18 @@ export default function BoxItem({
       </div>
 
       {/* 오른쪽: 케밥 아이콘 */}
-      <div className="relative shrink-0 w-[24px] flex items-center">
-        <button
-          type="button"
-          onClick={onMenuClick}
-          className="cursor-pointer text-white"
-        >
-          <EllipsisVerticalSolid className="size-[24px]" />
-        </button>
-        {menuSlot}
-      </div>
+      {menu && (
+        <div className="relative shrink-0 w-[24px] flex items-center">
+          <button
+            type="button"
+            onClick={onMenuClick}
+            className="cursor-pointer text-white"
+          >
+            <EllipsisVerticalSolid className="size-[24px]" />
+          </button>
+          {menuSlot}
+        </div>
+      )}
     </div>
   );
 }

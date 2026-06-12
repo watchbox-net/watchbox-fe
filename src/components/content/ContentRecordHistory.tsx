@@ -11,34 +11,73 @@ const WATCH_STATUS_LABEL: Record<Exclude<WatchStatus, 'none' | 'outline'>, strin
   paused: '시청 중단',
 };
 
-export type ContentRecordHistoryType = 'status' | 'like';
+/** 시청 상태 → 텍스트 색상 (WatchStatusIcon 색상과 동일) */
+const WATCH_STATUS_COLOR: Record<Exclude<WatchStatus, 'none' | 'outline'>, string> = {
+  completed: 'text-wb-green',
+  watching: 'text-wb-orange',
+  planned: 'text-wb-purple',
+  paused: 'text-wb-grey-02',
+};
+
+/** 삭제/해제 newValue 색상 — 기록 삭제(없음) & 좋아요 취소 공통 */
+const REMOVED_COLOR = 'text-wb-grey-01';
+
+export type ContentRecordHistoryType =
+  | 'status-registered' // 시청 상태 첫 등록 (1줄, "등록 : {값}")
+  | 'status-changed'    // 등록된 상태 변경 (2줄, "{old} → {new}")
+  | 'like'
+  | 'like-removed';
+type IconStatus = Exclude<WatchStatus, 'none' | 'outline'>;
 
 export interface ContentRecordHistoryItem {
   /** 컨텐츠(영화/시리즈) 포스터 이미지 URL */
   posterUrl?: string | null;
   /** 컨텐츠명 */
   contentTitle: string;
-  /** 기록 종류 — 시청 상태 변경 / 좋아요 등록 */
+  /** 기록 종류 */
   type: ContentRecordHistoryType;
-  /** type이 'status'일 때 변경된 시청 상태 */
-  watchStatus?: Exclude<WatchStatus, 'none' | 'outline'>;
-  /** 백엔드로부터 받은 시행 날짜 (예: "2026-06-01") */
+  /** status-changed일 때 변경 전 상태 (없으면 '없음') */
+  oldStatus?: IconStatus;
+  /** status-* 일 때 시청 상태 (아이콘 + 라벨; 없으면 '없음') */
+  watchStatus?: IconStatus;
+  /** 백엔드로부터 받은 시행 일시 (예: "2026-06-01 19:17:51") */
   date: string;
 }
 
 interface ContentRecordHistoryProps {
   item: ContentRecordHistoryItem;
+  /** 포스터/텍스트 클릭 시 (상세 이동 등). 날짜·아이콘은 제외 */
+  onContentClick?: () => void;
+}
+
+/** 시청 상태 라벨 (없으면 '없음') */
+function statusLabel(s?: IconStatus): string {
+  return s ? WATCH_STATUS_LABEL[s] : '없음';
+}
+
+/** 시청 상태 라벨 — 상태 색상 적용 (없으면 = 기록 삭제 색상) */
+function StatusValue({ status }: { status?: IconStatus }) {
+  return (
+    <span className={status ? WATCH_STATUS_COLOR[status] : REMOVED_COLOR}>
+      {statusLabel(status)}
+    </span>
+  );
 }
 
 /** 시청 기록 히스토리 — 개별 항목 (포스터 + 내용 + 시청상태/좋아요 아이콘) */
-export default function ContentRecordHistory({ item }: ContentRecordHistoryProps) {
-  const { posterUrl, contentTitle, type, watchStatus = 'completed', date } = item;
+export default function ContentRecordHistory({ item, onContentClick }: ContentRecordHistoryProps) {
+  const { posterUrl, contentTitle, type, oldStatus, watchStatus, date } = item;
+  const isStatus = type === 'status-registered' || type === 'status-changed';
+  const clickableClass = onContentClick ? 'cursor-pointer' : '';
 
   return (
     <div className="flex items-center px-[16px]">
       <div className="flex flex-1 items-center gap-[10px] min-w-0">
-        {/* 포스터 (Figma TriplePoster small — 32.65×46.31, ratio 0.706 유지) */}
-        <div className="w-[33px] h-[47px] rounded-[4px] overflow-hidden shrink-0">
+        {/* 포스터 (Figma TriplePoster small — 32.65×46.31, ratio 0.706 유지) — 클릭 시 상세 이동 */}
+        <div
+          className={`w-[33px] h-[47px] rounded-[4px] overflow-hidden shrink-0 ${clickableClass}`}
+          onClick={onContentClick}
+        >
           {posterUrl ? (
             <Image
               src={posterUrl}
@@ -54,28 +93,46 @@ export default function ContentRecordHistory({ item }: ContentRecordHistoryProps
 
         {/* 내용 + 날짜 */}
         <div className="flex flex-1 flex-col gap-[7px] min-w-0">
-          <p className="text-[14px] leading-none text-white break-keep [overflow-wrap:anywhere]">
-            <span className="font-bold">{contentTitle}</span>
-            {type === 'like' ? (
-              <span>의 좋아요 등록</span>
+          {/* 메시지 영역 — 클릭 시 상세 이동 (날짜는 제외) */}
+          <div className={clickableClass} onClick={onContentClick}>
+            {type === 'status-changed' ? (
+              // 시청 상태 변경 — 2줄, line-height 18 (newValue만 상태 색상)
+              <div className="text-[14px] leading-[18px] text-white break-keep [overflow-wrap:anywhere]">
+                <p>
+                  <span className="font-semibold">{contentTitle}</span>의 시청 상태 변경
+                </p>
+                <p>
+                  {statusLabel(oldStatus)} → <StatusValue status={watchStatus} />
+                </p>
+              </div>
             ) : (
-              <>
-                <span>의 시청 상태를 </span>
-                <span className="font-bold">{WATCH_STATUS_LABEL[watchStatus]}</span>
-                <span>로 변경</span>
-              </>
+              // 시청 상태 등록 / 좋아요 등록 / 좋아요 취소 — 1줄
+              <p className="text-[14px] leading-none text-white break-keep [overflow-wrap:anywhere]">
+                <span className="font-medium">{contentTitle}</span>
+                {type === 'status-registered' ? (
+                  <>의 시청 상태 등록 : <StatusValue status={watchStatus} /></>
+                ) : (
+                  <>
+                    의{' '}
+                    <span className={type === 'like' ? 'text-wb-red' : REMOVED_COLOR}>
+                      좋아요
+                    </span>{' '}
+                    {type === 'like' ? '등록' : '취소'}
+                  </>
+                )}
+              </p>
             )}
-          </p>
+          </div>
           <p className="text-[11px] leading-none font-medium text-wb-grey-03 whitespace-nowrap">
             {date}
           </p>
         </div>
 
         {/* 우측 아이콘 (medium) */}
-        {type === 'status' ? (
-          <WatchStatusIcon status={watchStatus} size="medium" className="shrink-0" />
+        {isStatus ? (
+          <WatchStatusIcon status={watchStatus ?? 'none'} size="medium" className="shrink-0" />
         ) : (
-          <LikeIcon active size="medium" className="shrink-0" />
+          <LikeIcon active={type === 'like'} size="medium" className="shrink-0" />
         )}
       </div>
     </div>

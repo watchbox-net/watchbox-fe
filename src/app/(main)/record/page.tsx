@@ -15,7 +15,7 @@ import PlainContextMenu from '@/components/common/PlainContextMenu';
 import Toast from '@/components/common/Toast';
 import MainContent from '@/components/common/MainContent';
 import PreviewOverlay from '@/components/preview/PreviewOverlay';
-import { ChevronDownOutline } from '@/components/icons';
+import { ChevronDownOutline, HistoryIcon } from '@/components/icons';
 import {
   fetchMyRecordedContentPage,
   fetchMyRecordedContentCount,
@@ -272,7 +272,15 @@ export default function RecordPage() {
 
   return (
     <>
-      <Header variant="center" title="시청 기록" />
+      <Header
+        variant="icon1"
+        title="시청 기록"
+        rightIcon={<HistoryIcon className="size-6 text-wb-white-02" />}
+        onRightIconClick={() => {
+          if (isPreview) { showLoginModal(); return; }
+          router.push('/record/history');
+        }}
+      />
       <TabNav
         tabs={TABS.map((t) => t.label)}
         activeIndex={activeTabIndex}

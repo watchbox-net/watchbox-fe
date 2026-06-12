@@ -119,7 +119,7 @@ export default function Header({
 
           {(variant === 'icon1' || variant === 'icon1-back') && (
             rightIcon ? (
-              <div className="ml-auto" onClick={onRightIconClick}>
+              <div className="ml-auto cursor-pointer" onClick={onRightIconClick}>
                 {rightIcon}
               </div>
             ) : (

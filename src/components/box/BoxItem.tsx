@@ -20,6 +20,8 @@ interface BoxItemProps {
   update?: boolean;
   /** 우측 케밥 메뉴 표시 여부 (기본 true) */
   menu?: boolean;
+  /** MY 박스일 때 '내 박스' 라벨 표시 (기본 false) */
+  myLabel?: boolean;
   /** 박스 영역 클릭 */
   onClick?: () => void;
   /** 우측 케밥 아이콘 클릭 */
@@ -41,6 +43,7 @@ export default function BoxItem({
   memberNames,
   update = true,
   menu = true,
+  myLabel = false,
   onClick,
   onMenuClick,
   menuSlot,
@@ -56,7 +59,7 @@ export default function BoxItem({
         onClick={onClick}
       >
         <TriplePosterBox posters={posters} />
-        <div className={`flex flex-col items-start min-w-0 flex-1 ${isShared ? 'gap-[5px]' : 'gap-[3px]'}`}>
+        <div className={`flex flex-col items-start min-w-0 flex-1 ${isShared || myLabel ? 'gap-[5px]' : 'gap-[3px]'}`}>
           <p className="w-full text-[16px] font-medium text-white leading-[18px] tracking-[0.15px] line-clamp-2">
             {name}
           </p>
@@ -68,6 +71,11 @@ export default function BoxItem({
           {isShared && memberNames && memberNames.length > 0 && (
             <p className="w-full h-[17px] text-[13px] text-wb-primary leading-[17px] tracking-[0.25px] truncate">
               {memberNames.join(' · ')}
+            </p>
+          )}
+          {!isShared && myLabel && (
+            <p className="text-[13px] text-wb-grey-04 leading-[17px] tracking-[0.25px]">
+              내 박스
             </p>
           )}
         </div>

@@ -139,6 +139,7 @@ export default function BoxHistoryPage() {
             memberNames={box.memberList?.map((m) => m.boxMemberName)}
             update={false}
             menu={false}
+            myLabel
           />
         </div>
       )}

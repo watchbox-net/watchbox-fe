@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/common/Header';
 import MainContent from '@/components/common/MainContent';
+import { Loading } from '@/components/common/Loading';
 import Button from '@/components/common/Button';
 import Toast from '@/components/common/Toast';
 import { ProfileIcon, PencilOutline } from '@/components/icons';
@@ -82,7 +83,7 @@ export default function ProfileEditPage() {
 
       <MainContent>
         {loading && (
-          <p className="text-center text-wb-grey-03 py-8">불러오는 중...</p>
+          <Loading />
         )}
         {!loading && error && (
           <p className="text-center text-wb-grey-03 py-8">

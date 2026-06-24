@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/common/Header';
 import MainContent from '@/components/common/MainContent';
+import { Loading } from '@/components/common/Loading';
 import Modal from '@/components/common/Modal';
 import Toast from '@/components/common/Toast';
 import {
@@ -32,8 +33,6 @@ export default function MyPage() {
   const [preparingModalVisible, setPreparingModalVisible] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: '' });
   const isLeavingRef = useRef(false);
-
-  const showToast = (msg: string) => setToast({ visible: true, message: msg });
 
   const handleWithdraw = async () => {
     setWithdrawModalVisible(false);
@@ -72,7 +71,7 @@ export default function MyPage() {
 
       <MainContent>
         {(loading || isWithdrawing) && (
-          <p className="text-center text-wb-grey-03 py-8">불러오는 중...</p>
+          <Loading />
         )}
         {!loading && !isWithdrawing && !isAuthenticated && (
           <div className="flex flex-col items-center gap-[16px] py-[60px]">

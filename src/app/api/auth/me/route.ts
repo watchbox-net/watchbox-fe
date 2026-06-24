@@ -11,7 +11,10 @@ const BACKEND_API_URL = process.env.BACKEND_API_URL;
  * accessToken 만료 시 refreshToken으로 갱신 후 재시도
  */
 
-async function refreshAccessToken(refreshToken: string): Promise<string | null> {
+// 백엔드 회전(rotation)으로 새 refreshToken도 함께 내려오므로 둘 다 받아 반환한다.
+async function refreshTokens(
+  refreshToken: string,
+): Promise<{ accessToken: string; refreshToken: string } | null> {
   try {
     const res = await fetch(`${BACKEND_API_URL}/auth/refresh`, {
       method: 'POST',
@@ -20,7 +23,8 @@ async function refreshAccessToken(refreshToken: string): Promise<string | null> 
     });
     if (!res.ok) return null;
     const data = await res.json();
-    return data.accessToken ?? null;
+    if (!data.accessToken) return null;
+    return { accessToken: data.accessToken, refreshToken: data.refreshToken ?? refreshToken };
   } catch {
     return null;
   }
@@ -40,19 +44,21 @@ export async function GET(request: NextRequest) {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
 
-    // 401 → refreshToken으로 accessToken 갱신 후 재시도
+    // 401 → refreshToken으로 토큰 회전 후 재시도
     if (response.status === 401 && refreshToken) {
-      const newAccessToken = await refreshAccessToken(refreshToken);
-      if (newAccessToken) {
+      const refreshed = await refreshTokens(refreshToken);
+      if (refreshed) {
         response = await fetch(`${BACKEND_API_URL}/members/mypage`, {
-          headers: { Authorization: `Bearer ${newAccessToken}` },
+          headers: { Authorization: `Bearer ${refreshed.accessToken}` },
         });
 
         if (response.ok) {
           const result = await response.json();
           const profile = result.data?.profile ?? result.profile;
           const res = NextResponse.json({ authenticated: true, member: profile });
-          res.cookies.set('accessToken', newAccessToken, TOKEN_COOKIE_OPTIONS);
+          // 회전된 access/refresh 토큰을 모두 저장 (refresh 미갱신 시 다음 회전에 강제 로그아웃)
+          res.cookies.set('accessToken', refreshed.accessToken, TOKEN_COOKIE_OPTIONS);
+          res.cookies.set('refreshToken', refreshed.refreshToken, TOKEN_COOKIE_OPTIONS);
           return res;
         }
       }

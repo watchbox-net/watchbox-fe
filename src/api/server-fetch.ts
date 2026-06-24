@@ -2,32 +2,18 @@ import { cookies } from 'next/headers';
 import { context, propagation } from '@opentelemetry/api';
 import { logger } from '@/lib/logger';
 
-const BACKEND_API_URL = process.env.BACKEND_API_URL;
-
 /**
  * 서버 컴포넌트용 인증 fetch 유틸
  *
- * 1. accessToken 있으면 붙여서 요청
- * 2. 401 → refreshToken으로 accessToken 재발급 → 새 토큰으로 재요청
- * 3. 리프레시 실패 → 토큰 없이 재요청 (비로그인 fallback)
- * 4. 토큰 없으면 바로 비로그인 요청
+ * 1. accessToken 있으면 붙여서 요청 → 성공 시 인증 응답
+ * 2. accessToken 만료(401)거나 없으면 → 비로그인 fallback 요청
+ *
+ * 주의: 여기서는 refresh를 하지 않는다.
+ * 서버 컴포넌트 렌더 단계는 응답 쿠키를 set할 수 없어, 회전된 refreshToken을
+ * 영속화하지 못한다. SSR에서 회전을 일으키면 폐기된 토큰이 쿠키에 남아 강제 로그아웃으로 이어진다.
+ * 토큰 갱신은 쿠키 저장이 가능한 BFF 라우트(/api/auth/me, /api/[...path])가 담당한다.
+ * (클라이언트 하이드레이션 직후 AuthContext.checkAuth가 /api/auth/me로 갱신)
  */
-
-async function refreshAccessToken(refreshToken: string): Promise<string | null> {
-  try {
-    const res = await fetch(`${BACKEND_API_URL}/auth/refresh`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken }),
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.accessToken ?? null;
-  } catch (err) {
-    logger.error({ err }, 'server-fetch: token refresh request failed');
-    return null;
-  }
-}
 
 export interface ServerTokens {
   accessToken?: string;
@@ -50,12 +36,12 @@ function injectTraceHeaders(headers: Record<string, string> = {}): Record<string
   return carrier;
 }
 
-/** 서버 컴포넌트용 인증 fetch — 401 시 리프레시 후 재시도, 실패 시 비로그인 fallback */
+/** 서버 컴포넌트용 인증 fetch — accessToken 유효하면 인증 요청, 만료/없으면 비로그인 fallback */
 export async function serverFetch(
   url: string,
   tokens: ServerTokens,
 ): Promise<{ response: Response; authenticated: boolean }> {
-  const { accessToken, refreshToken } = tokens;
+  const { accessToken } = tokens;
 
   // 1. accessToken 있으면 붙여서 요청
   if (accessToken) {
@@ -63,24 +49,14 @@ export async function serverFetch(
       headers: injectTraceHeaders({ Authorization: `Bearer ${accessToken}` }),
     });
 
+    // 만료(401)가 아니면 인증 응답으로 반환
     if (response.status !== 401) {
       return { response, authenticated: true };
     }
-
-    // 2. 401 → refreshToken으로 재발급 시도
-    if (refreshToken) {
-      const newAccessToken = await refreshAccessToken(refreshToken);
-
-      if (newAccessToken) {
-        const retryResponse = await fetch(url, {
-          headers: injectTraceHeaders({ Authorization: `Bearer ${newAccessToken}` }),
-        });
-        return { response: retryResponse, authenticated: true };
-      }
-    }
+    // 401(만료) → SSR에서는 refresh하지 않고 비로그인 fallback (사유는 파일 상단 주석)
   }
 
-  // 3. 토큰 없거나 리프레시 실패 → 비로그인 요청
+  // 2. 토큰 없거나 만료 → 비로그인 요청
   logger.warn({ url }, 'server-fetch: falling back to unauthenticated request');
   const response = await fetch(url, {
     headers: injectTraceHeaders(),

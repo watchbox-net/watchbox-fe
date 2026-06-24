@@ -15,8 +15,11 @@ function injectTraceHeaders(headers: Record<string, string>): Record<string, str
   return headers;
 }
 
-// ─── 리프레시토큰으로 액세스토큰 재발급 ──────────────────────
-async function refreshAccessToken(refreshToken: string): Promise<string | null> {
+// ─── 리프레시토큰으로 액세스/리프레시 토큰 재발급(회전) ──────────────
+// 백엔드가 회전(rotation)으로 새 refreshToken도 함께 내려주므로 둘 다 받아 반환한다.
+async function refreshTokens(
+  refreshToken: string,
+): Promise<{ accessToken: string; refreshToken: string } | null> {
   try {
     const res = await fetch(`${BACKEND_API_URL}/auth/refresh`, {
       method: 'POST',
@@ -28,7 +31,9 @@ async function refreshAccessToken(refreshToken: string): Promise<string | null> 
     if (!res.ok) return null;
 
     const data = await res.json();
-    return data.accessToken ?? null;
+    if (!data.accessToken) return null;
+    // 구버전 백엔드(refreshToken 미반환) 대비: 없으면 기존 값 유지
+    return { accessToken: data.accessToken, refreshToken: data.refreshToken ?? refreshToken };
   } catch {
     return null;
   }
@@ -73,20 +78,21 @@ async function proxyRequest(
     const refreshToken = request.cookies.get('refreshToken')?.value;
 
     if (refreshToken) {
-      const newAccessToken = await refreshAccessToken(refreshToken);
+      const refreshed = await refreshTokens(refreshToken);
 
-      if (newAccessToken) {
+      if (refreshed) {
         logger.info(
           { method: request.method, path: pathStr },
           `${request.method} /${pathStr} access token refreshed`,
         );
 
         // 새 토큰으로 재요청
-        headers['Authorization'] = `Bearer ${newAccessToken}`;
+        headers['Authorization'] = `Bearer ${refreshed.accessToken}`;
         injectTraceHeaders(headers);  // 재요청 시점 span context로 재주입
         backendRes = await fetch(backendUrl, { method: request.method, headers, body });
 
-        // 재요청 성공 → 새 accessToken 쿠키 세팅 후 응답 반환
+        // 재요청 성공 → 회전된 access/refresh 토큰을 모두 쿠키에 세팅 후 응답 반환
+        // (refreshToken을 갱신하지 않으면 다음 회전 때 폐기된 토큰을 보내 강제 로그아웃됨)
         const retryData = await backendRes.text();
         const response = new NextResponse(retryData, {
           status: backendRes.status,
@@ -94,24 +100,34 @@ async function proxyRequest(
             'Content-Type': backendRes.headers.get('Content-Type') || 'application/json',
           },
         });
-        response.cookies.set('accessToken', newAccessToken, TOKEN_COOKIE_OPTIONS);
+        response.cookies.set('accessToken', refreshed.accessToken, TOKEN_COOKIE_OPTIONS);
+        response.cookies.set('refreshToken', refreshed.refreshToken, TOKEN_COOKIE_OPTIONS);
         return response;
       }
     }
 
-    // 리프레시 실패 (refreshToken 없거나 만료) → 쿠키 삭제 후 401 반환
-    // 클라이언트 인터셉터가 /login으로 리다이렉트
+    // 리프레시 실패(만료 등) → 쿠키 삭제 후, 토큰 없이 익명으로 재요청하여 그 결과를 그대로 반환
+    // - 공개 가능 엔드포인트(예: 콘텐츠 상세): 공개 콘텐츠 200 응답 → 계속 열람 가능(개인화만 빠짐)
+    // - 인증 필수 엔드포인트: 백엔드가 401 → 클라이언트 privateApi 인터셉터가 /login 처리
     logger.warn(
       { method: request.method, path: pathStr },
-      `${request.method} /${pathStr} session expired, token refresh failed`,
+      `${request.method} /${pathStr} session expired, falling back to anonymous request`,
     );
-    const unauthorizedRes = NextResponse.json(
-      { message: '인증이 만료되었습니다. 다시 로그인해주세요.' },
-      { status: 401 },
-    );
-    unauthorizedRes.cookies.delete('accessToken');
-    unauthorizedRes.cookies.delete('refreshToken');
-    return unauthorizedRes;
+    delete headers['Authorization'];
+    injectTraceHeaders(headers);
+    const anonRes = await fetch(backendUrl, { method: request.method, headers, body });
+
+    const anonData = await anonRes.text();
+    const response = new NextResponse(anonData, {
+      status: anonRes.status,
+      headers: {
+        'Content-Type': anonRes.headers.get('Content-Type') || 'application/json',
+      },
+    });
+    // 만료된 세션 정리(폐기된 토큰 잔류 방지)
+    response.cookies.delete('accessToken');
+    response.cookies.delete('refreshToken');
+    return response;
   }
 
   // ── 정상 응답 반환 ────────────────────────────────────────────

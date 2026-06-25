@@ -202,7 +202,7 @@ export default function RecordHistoryPage() {
             {/* 무한 스크롤 sentinel */}
             {hasNextPage && <div ref={sentinelRef} className="h-px" />}
             {isFetchingNextPage && (
-              <p className="text-center text-wb-grey-03 py-4">불러오는 중...</p>
+              <Loading size={24} className="py-4" />
             )}
           </>
         )}

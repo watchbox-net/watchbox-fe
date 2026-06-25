@@ -283,18 +283,17 @@ export default function DevPage() {
         setMemberInfo(null);
 
         try {
-            // 토큰은 HttpOnly Cookie에서 자동으로 전송됨
-            const response = await fetch('/api/dev/member', {
-                method: 'GET',
-            });
-
+            const response = await fetch('/api/members/mypage');
             const result = await response.json();
 
             if (!result.success) {
-                throw new Error(result.message || '회원 조회 실패');
+                throw new Error(result.error?.message || '회원 조회 실패');
             }
 
-            setMemberInfo(result.data);
+            const profile = result.data?.profile;
+            setMemberInfo(profile
+                ? `ID: ${profile.memberId}\nName: ${profile.nickname}\nEmail: ${profile.email}`
+                : '회원 정보 없음');
         } catch (err: any) {
             setAuthError(err.message ?? '회원 조회 실패');
             console.error('Get member error:', err);
@@ -623,7 +622,7 @@ export default function DevPage() {
  *   → 토큰은 HttpOnly Cookie에 저장, 클라이언트는 memberId만 반환받음
  *   → accessToken: 1시간, refreshToken: 7일 만료
  *
- * - handleGetMember: 로그인된 회원 정보 조회 (GET /api/dev/member → GET /dev/member)
+ * - handleGetMember: 로그인된 회원 정보 조회 (GET /api/members/mypage → BFF 프록시)
  *   → Cookie에서 accessToken 자동 전송, Authorization 헤더 불필요
  */
 

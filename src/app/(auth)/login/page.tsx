@@ -7,6 +7,7 @@ import MobileFrame from '@/components/common/MobileFrame';
 import Header from '@/components/common/Header';
 
 const SPRING_BOOT_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+const BLOCK_WEBVIEW_OAUTH = true; // true 활성 | false 비활성
 
 function isInAppBrowser(): boolean {
     if (typeof navigator === 'undefined') return false;
@@ -22,7 +23,7 @@ function LoginContent() {
     const [copied, setCopied] = useState(false);
 
     const handleGoogleLogin = () => {
-        if (isInAppBrowser()) {
+        if (BLOCK_WEBVIEW_OAUTH && isInAppBrowser()) {
             setShowWebViewModal(true);
             return;
         }

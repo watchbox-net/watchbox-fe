@@ -20,6 +20,11 @@ ARG NEXT_PUBLIC_ENV
 ENV NEXT_PUBLIC_SERVER_URL=$NEXT_PUBLIC_SERVER_URL
 ENV NEXT_PUBLIC_ENV=$NEXT_PUBLIC_ENV
 
+# Node 힙 상한 (JVM의 -Xmx 대응)
+# → 4GB 박스에 prod 스택 상주분(~2.5-3GB)을 제외하면 빌드 여유가 ~1-1.5GB뿐이라
+#   빌드가 메모리를 무한정 잡아 호스트를 압박하지 않도록 천장을 막음 (스왑이 비상 백스톱)
+ENV NODE_OPTIONS="--max-old-space-size=896"
+
 RUN npm run build
 
 # 3단계: 실행 (경량 이미지)

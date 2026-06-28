@@ -6,6 +6,12 @@ const nextConfig: NextConfig = {
     typescript: {
         ignoreBuildErrors: true,
     },
+    // 빌드 정적 생성 워커 수 제한
+    // → t4g.medium(2 vCPU/4GB)에 prod 스택 전체가 상주한 상태로 온박스 빌드되므로
+    //   워커를 1개로 묶어 빌드 중 CPU·메모리 경합으로 BE/MySQL이 OOM·헬스체크 실패하는 것을 방지
+    experimental: {
+        cpus: 1,
+    },
     // pino : native 바인딩
     // @opentelemetry/* + @vercel/otel : SDK가 module-level patching (global fetch, http) 수행
     //   → bundling 시 패치 대상과 분리돼 instrumentation 미작동

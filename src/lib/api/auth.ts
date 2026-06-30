@@ -4,8 +4,21 @@
 
 import { privateApi } from './client';
 
+const SPRING_BOOT_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+
 export const authApi = {
     logout: () => privateApi.post('/auth/logout'),
 
-    // 소셜 로그인은 브라우저에서 Spring Boot로 직접 이동 (login 페이지에서 처리)
+    // 네이티브 앱(WebView)에서 Google SDK로 얻은 serverAuthCode를 BE에 전달.
+    // BE가 소셜토큰 검증 후 HttpOnly 쿠키를 설정한다.
+    // BFF 프록시를 거치지 않고 BE에 직접 호출해야 Set-Cookie가 브라우저에 전달됨.
+    nativeGoogleLogin: async (serverAuthCode: string): Promise<void> => {
+        const res = await fetch(`${SPRING_BOOT_URL}/api/auth/login/google`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: serverAuthCode }),
+            credentials: 'include',
+        });
+        if (!res.ok) throw new Error(`native google login failed: ${res.status}`);
+    },
 };

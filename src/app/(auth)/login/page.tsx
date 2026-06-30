@@ -5,6 +5,13 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 import MobileFrame from '@/components/common/MobileFrame';
 import Header from '@/components/common/Header';
+import {
+    isReactNativeWebView,
+    postNativeGoogleLogin,
+    waitForNativeResult,
+    type NativeGoogleLoginResult,
+} from '@/lib/native-bridge';
+import { authApi } from '@/lib/api/auth';
 
 const SPRING_BOOT_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 const BLOCK_WEBVIEW_OAUTH = true; // true 활성 | false 비활성
@@ -21,12 +28,38 @@ function LoginContent() {
     const error = searchParams.get('error');
     const [showWebViewModal, setShowWebViewModal] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [nativeLoading, setNativeLoading] = useState(false);
+    const [nativeError, setNativeError] = useState<string | null>(null);
 
-    const handleGoogleLogin = () => {
+    const handleGoogleLogin = async () => {
+        // WebView 앱 — 네이티브 SDK 로그인
+        if (isReactNativeWebView()) {
+            setNativeLoading(true);
+            setNativeError(null);
+            try {
+                postNativeGoogleLogin();
+                const result = await waitForNativeResult<NativeGoogleLoginResult>('NATIVE_GOOGLE_LOGIN_RESULT');
+                if (result.status === 'success') {
+                    await authApi.nativeGoogleLogin(result.serverAuthCode);
+                    window.location.replace('/');
+                } else if (result.status === 'error') {
+                    setNativeError('Google 로그인에 실패했습니다. 다시 시도해주세요.');
+                }
+            } catch {
+                setNativeError('Google 로그인에 실패했습니다. 다시 시도해주세요.');
+            } finally {
+                setNativeLoading(false);
+            }
+            return;
+        }
+
+        // 일반 인앱 브라우저(카카오/인스타 등) — 외부 브라우저 유도
         if (BLOCK_WEBVIEW_OAUTH && isInAppBrowser()) {
             setShowWebViewModal(true);
             return;
         }
+
+        // 웹 브라우저 — 기존 OAuth 리다이렉트
         window.location.href = `${SPRING_BOOT_URL}/oauth2/authorization/google`;
     };
 
@@ -64,7 +97,8 @@ function LoginContent() {
                 {/* 구글 로그인 버튼 */}
                 <button
                     onClick={handleGoogleLogin}
-                    className="mt-[20px] cursor-pointer"
+                    disabled={nativeLoading}
+                    className="mt-[20px] cursor-pointer disabled:opacity-50"
                 >
                     <Image
                         src="/oauth/google/web_light_rd_SU@4x.png"
@@ -77,9 +111,9 @@ function LoginContent() {
                 </button>
 
                 {/* 에러 메시지 */}
-                {error && (
+                {(error || nativeError) && (
                     <p className="mt-6 text-sm text-red-500">
-                        로그인에 실패했습니다. 다시 시도해주세요.
+                        {nativeError ?? '로그인에 실패했습니다. 다시 시도해주세요.'}
                     </p>
                 )}
             </div>

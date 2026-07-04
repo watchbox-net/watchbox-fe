@@ -30,8 +30,8 @@ async function refreshTokens(
     // 201 Created 반환
     if (!res.ok) return null;
 
-    const data = await res.json();
-    if (!data.accessToken) return null;
+    const { data } = await res.json();
+    if (!data?.accessToken) return null;
     // 구버전 백엔드(refreshToken 미반환) 대비: 없으면 기존 값 유지
     return { accessToken: data.accessToken, refreshToken: data.refreshToken ?? refreshToken };
   } catch {

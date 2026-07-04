@@ -1,5 +1,7 @@
 const REFRESH_TOKEN_EXPIRY = Number(process.env.REFRESH_TOKEN_EXPIRY) || 604800; // 미설정 시 7일(세션쿠키 방지)
-const isProduction = process.env.NODE_ENV === 'production';
+// COOKIE_SECURE: 운영=true, 개발=false, 로컬=false
+// NODE_ENV 대신 명시적 env var 사용 — 배포된 dev 환경도 NODE_ENV=production이라 구분 불가
+const COOKIE_SECURE = process.env.COOKIE_SECURE === 'true';
 // 로컬: 미설정(host-only, localhost 포트 무관 공유) / 개발·운영: .watch-box.net (FE·BE가 apex만 공유)
 const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || undefined;
 
@@ -13,6 +15,6 @@ export const TOKEN_COOKIE_OPTIONS = {
   sameSite: 'lax' as const,
   path: '/',
   maxAge: REFRESH_TOKEN_EXPIRY,
-  secure: isProduction,
+  secure: COOKIE_SECURE,
   domain: COOKIE_DOMAIN,
 };

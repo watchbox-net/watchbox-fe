@@ -22,8 +22,8 @@ async function refreshTokens(
       body: JSON.stringify({ refreshToken }),
     });
     if (!res.ok) return null;
-    const data = await res.json();
-    if (!data.accessToken) return null;
+    const { data } = await res.json();
+    if (!data?.accessToken) return null;
     return { accessToken: data.accessToken, refreshToken: data.refreshToken ?? refreshToken };
   } catch {
     return null;

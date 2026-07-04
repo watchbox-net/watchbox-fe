@@ -37,9 +37,9 @@ export async function GET(request: NextRequest) {
     });
 
     if (res.ok) {
-      const { accessToken, refreshToken } = await res.json();
-      response.cookies.set('accessToken', accessToken, TOKEN_COOKIE_OPTIONS);
-      response.cookies.set('refreshToken', refreshToken, TOKEN_COOKIE_OPTIONS);
+      const { data } = await res.json();
+      response.cookies.set('accessToken', data.accessToken, TOKEN_COOKIE_OPTIONS);
+      response.cookies.set('refreshToken', data.refreshToken, TOKEN_COOKIE_OPTIONS);
     } else {
       logger.warn({ status: res.status }, 'oauth callback: oneTimeCode exchange failed');
     }

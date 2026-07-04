@@ -64,7 +64,7 @@ function LoginContent() {
             return;
         }
 
-        // 웹 브라우저 — 하이브리드 모드면 진입점, 아니면 기존 OAuth 리다이렉트
+        // (로컬 환경) 웹 브라우저 — 하이브리드 모드면 진입점, 아니면 기존 OAuth 리다이렉트
         if (HYBRID_LOGIN) {
             const target = `${window.location.origin}/api/auth/callback`;
             window.location.href = `${SPRING_BOOT_URL}/oauth2/local-entry?target=${encodeURIComponent(target)}`;

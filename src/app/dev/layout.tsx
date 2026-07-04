@@ -4,8 +4,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const env = process.env.NEXT_PUBLIC_ENV ?? 'local';
   const title =
     env === 'prod' ? 'WatchBox'
-    : env === 'dev' ? 'WatchBox-dev'
-    : 'WatchBox-local';
+    : env === 'dev' ? 'WatchBox-Dev'
+    : 'WatchBox-Local';
 
   return {
     title,

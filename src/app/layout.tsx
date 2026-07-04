@@ -11,9 +11,17 @@ export const viewport: Viewport = {
     themeColor: '#181818',
 }
 
-export const metadata: Metadata = {
-    title: 'WatchBox',
-    description: '...',
+export async function generateMetadata(): Promise<Metadata> {
+    const env = process.env.NEXT_PUBLIC_ENV ?? 'local';
+    const title =
+        env === 'prod' ? 'WatchBox'
+        : env === 'dev' ? 'WatchBox-DEV'
+        : 'WatchBox-Local';
+
+    return {
+        title,
+        description: '...',
+    };
 }
 
 export default function RootLayout({

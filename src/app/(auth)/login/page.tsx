@@ -69,7 +69,7 @@ function LoginContent() {
             const target = `${window.location.origin}/api/auth/callback`;
             window.location.href = `${SPRING_BOOT_URL}/oauth2/local-entry?target=${encodeURIComponent(target)}`;
         } else {
-            window.location.href = `${SPRING_BOOT_URL }/oauth2/authorization/google`;
+            window.location.href = `${SPRING_BOOT_URL}/oauth2/authorization/google`;
         }
     };
 

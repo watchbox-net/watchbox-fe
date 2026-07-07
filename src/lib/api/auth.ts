@@ -13,10 +13,10 @@ export const authApi = {
     // BE가 소셜토큰 검증 후 HttpOnly 쿠키를 설정한다.
     // BFF 프록시를 거치지 않고 BE에 직접 호출해야 Set-Cookie가 브라우저에 전달됨.
     nativeGoogleLogin: async (serverAuthCode: string): Promise<void> => {
-        const res = await fetch(`${SPRING_BOOT_URL}/api/auth/login/google`, {
+        const res = await fetch(`${SPRING_BOOT_URL}/api/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: serverAuthCode }),
+            body: JSON.stringify({ provider: 'GOOGLE', token: serverAuthCode }),
             credentials: 'include',
         });
         if (!res.ok) throw new Error(`native google login failed: ${res.status}`);

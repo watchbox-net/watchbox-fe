@@ -44,11 +44,18 @@ function LoginContent() {
     const [showAppleLogin, setShowAppleLogin] = useState(false);
 
     useEffect(() => {
-        setShowAppleLogin(APPLE_LOGIN_ENABLED && isIosWebView());
+        // iOS 앱(네이티브 Apple) 또는 일반 웹 브라우저(Apple 리다이렉트)에서 노출. Android WebView 는 제외.
+        setShowAppleLogin(APPLE_LOGIN_ENABLED && (isIosWebView() || !isReactNativeWebView()));
     }, []);
 
     const handleAppleLogin = async () => {
-        if (!isReactNativeWebView()) return;
+        // 웹 브라우저 — 애플 리다이렉트 로그인 (백엔드 커스텀 엔드포인트)
+        if (!isReactNativeWebView()) {
+            window.location.href = `${SPRING_BOOT_URL}/oauth2/apple/authorize`;
+            return;
+        }
+
+        // WebView 앱 — 네이티브 SDK 로그인
         setNativeLoading(true);
         setNativeError(null);
         try {

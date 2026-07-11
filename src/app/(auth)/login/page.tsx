@@ -2,19 +2,24 @@
 
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import MobileFrame from '@/components/common/MobileFrame';
 import Header from '@/components/common/Header';
 import {
     isReactNativeWebView,
+    isIosWebView,
     postNativeGoogleLogin,
+    postNativeAppleLogin,
     waitForNativeResult,
     type NativeGoogleLoginResult,
+    type NativeAppleLoginResult,
 } from '@/lib/native-bridge';
 import { authApi } from '@/lib/api/auth';
 
 const SPRING_BOOT_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 const BLOCK_WEBVIEW_OAUTH = true; // true 활성 | false 비활성
+// 애플 로그인 버튼 노출 여부 (환경변수로 on/off). 'true' 일 때만 노출.
+const APPLE_LOGIN_ENABLED = process.env.NEXT_PUBLIC_APPLE_LOGIN_ENABLED === 'true';
 
 // 로컬 웹 ↔ 개발 서버(dev-api) 하이브리드 로그인 여부.
 // localhost 는 dev-api 의 Set-Cookie 를 받을 수 없으므로, 켜져 있으면 일반 OAuth 경로 대신
@@ -35,6 +40,32 @@ function LoginContent() {
     const [copied, setCopied] = useState(false);
     const [nativeLoading, setNativeLoading] = useState(false);
     const [nativeError, setNativeError] = useState<string | null>(null);
+    // Apple 로그인 버튼은 iOS WebView 앱에서만 노출 (네이티브 Sign in with Apple 필요)
+    const [showAppleLogin, setShowAppleLogin] = useState(false);
+
+    useEffect(() => {
+        setShowAppleLogin(APPLE_LOGIN_ENABLED && isIosWebView());
+    }, []);
+
+    const handleAppleLogin = async () => {
+        if (!isReactNativeWebView()) return;
+        setNativeLoading(true);
+        setNativeError(null);
+        try {
+            postNativeAppleLogin();
+            const result = await waitForNativeResult<NativeAppleLoginResult>('NATIVE_APPLE_LOGIN_RESULT');
+            if (result.status === 'success') {
+                await authApi.nativeAppleLogin(result.identityToken);
+                window.location.replace('/');
+            } else if (result.status === 'error' || result.status === 'unavailable') {
+                setNativeError('Apple 로그인에 실패했습니다. 다시 시도해주세요.');
+            }
+        } catch {
+            setNativeError('Apple 로그인에 실패했습니다. 다시 시도해주세요.');
+        } finally {
+            setNativeLoading(false);
+        }
+    };
 
     const handleGoogleLogin = async () => {
         // WebView 앱 — 네이티브 SDK 로그인
@@ -69,7 +100,7 @@ function LoginContent() {
             const target = `${window.location.origin}/api/auth/callback`;
             window.location.href = `${SPRING_BOOT_URL}/oauth2/local-entry?target=${encodeURIComponent(target)}`;
         } else {
-            window.location.href = `${SPRING_BOOT_URL }/oauth2/authorization/google`;
+            window.location.href = `${SPRING_BOOT_URL}/oauth2/authorization/google`;
         }
     };
 
@@ -119,6 +150,24 @@ function LoginContent() {
                         priority
                     />
                 </button>
+
+                {/* 애플 로그인 버튼 (iOS WebView 앱에서만) */}
+                {showAppleLogin && (
+                    <button
+                        onClick={handleAppleLogin}
+                        disabled={nativeLoading}
+                        className="mt-[12px] cursor-pointer disabled:opacity-50"
+                    >
+                        <Image
+                            src="/oauth/apple/appleid_button@2x.png"
+                            alt="Apple로 계속하기"
+                            width={160}
+                            height={26}
+                            className="h-[26px] w-[160px]"
+                            priority
+                        />
+                    </button>
+                )}
 
                 {/* 에러 메시지 */}
                 {(error || nativeError) && (

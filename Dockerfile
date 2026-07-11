@@ -15,10 +15,13 @@ COPY . .
 
 # 빌드 시 환경변수 주입 (NEXT_PUBLIC_* 는 브라우저 번들에 빌드 타임 인라인)
 # - NEXT_PUBLIC_ENV : local/dev/prod 분기 (otel-browser, 기타 브라우저 코드에서 사용)
+# - NEXT_PUBLIC_APPLE_LOGIN_ENABLED : 애플 로그인 버튼 노출 on/off ('true' 일 때만)
 ARG NEXT_PUBLIC_SERVER_URL
 ARG NEXT_PUBLIC_ENV
+ARG NEXT_PUBLIC_APPLE_LOGIN_ENABLED
 ENV NEXT_PUBLIC_SERVER_URL=$NEXT_PUBLIC_SERVER_URL
 ENV NEXT_PUBLIC_ENV=$NEXT_PUBLIC_ENV
+ENV NEXT_PUBLIC_APPLE_LOGIN_ENABLED=$NEXT_PUBLIC_APPLE_LOGIN_ENABLED
 
 # Node 힙 상한 (JVM의 -Xmx 대응)
 # → 4GB 박스에 prod 스택 상주분(~2.5-3GB)을 제외하면 빌드 여유가 ~1-1.5GB뿐이라

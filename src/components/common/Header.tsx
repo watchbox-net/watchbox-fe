@@ -80,6 +80,11 @@ export default function Header({
         ? 'h-[50px] py-[7px]'
         : 'h-[50px] py-3';
 
+  // 브랜드 헤더(WatchBox)일 때, prod 가 아니면 환경명을 옆에 붙인다. (예: WatchBox dev / WatchBox local)
+  const appEnv = process.env.NEXT_PUBLIC_ENV ?? 'local';
+  const displayTitle =
+    title === 'WatchBox' && appEnv !== 'prod' ? `WatchBox ${appEnv}` : title;
+
   return (
     <header
       className={`relative flex items-center px-[10px] w-full ${heightPadding}${
@@ -97,7 +102,7 @@ export default function Header({
       {!isSearch && (
         <>
           <p className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 wb-header-title text-wb-white-02 whitespace-nowrap">
-            {title}
+            {displayTitle}
           </p>
 
           {(variant === 'icon2' || variant === 'icon2-back') && (

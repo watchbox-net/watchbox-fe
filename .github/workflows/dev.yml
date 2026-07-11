@@ -21,6 +21,7 @@ jobs:
           docker build \
             --build-arg NEXT_PUBLIC_SERVER_URL=https://dev-api.watch-box.net \
             --build-arg NEXT_PUBLIC_ENV=dev \
+            --build-arg NEXT_PUBLIC_APPLE_LOGIN_ENABLED=true \
             --cache-from ${{ env.DOCKER_IMAGE }} \
             --build-arg BUILDKIT_INLINE_CACHE=1 \
             -f Dockerfile \

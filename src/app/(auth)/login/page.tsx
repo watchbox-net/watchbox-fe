@@ -18,6 +18,8 @@ import { authApi } from '@/lib/api/auth';
 
 const SPRING_BOOT_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 const BLOCK_WEBVIEW_OAUTH = true; // true 활성 | false 비활성
+// 애플 로그인 버튼 노출 여부 (환경변수로 on/off). 'true' 일 때만 노출.
+const APPLE_LOGIN_ENABLED = process.env.NEXT_PUBLIC_APPLE_LOGIN_ENABLED === 'true';
 
 // 로컬 웹 ↔ 개발 서버(dev-api) 하이브리드 로그인 여부.
 // localhost 는 dev-api 의 Set-Cookie 를 받을 수 없으므로, 켜져 있으면 일반 OAuth 경로 대신
@@ -42,7 +44,7 @@ function LoginContent() {
     const [showAppleLogin, setShowAppleLogin] = useState(false);
 
     useEffect(() => {
-        setShowAppleLogin(isIosWebView());
+        setShowAppleLogin(APPLE_LOGIN_ENABLED && isIosWebView());
     }, []);
 
     const handleAppleLogin = async () => {
@@ -154,12 +156,16 @@ function LoginContent() {
                     <button
                         onClick={handleAppleLogin}
                         disabled={nativeLoading}
-                        className="mt-[12px] flex h-[36px] w-[160px] cursor-pointer items-center justify-center gap-[6px] rounded-[4px] bg-black text-[14px] font-medium text-white disabled:opacity-50"
+                        className="mt-[12px] cursor-pointer disabled:opacity-50"
                     >
-                        <svg width="14" height="16" viewBox="0 0 14 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                            <path d="M11.5 8.5c0-1.9 1.5-2.8 1.6-2.9-0.9-1.3-2.2-1.5-2.7-1.5-1.1-0.1-2.2 0.7-2.8 0.7-0.6 0-1.5-0.7-2.4-0.6-1.2 0-2.4 0.7-3 1.8-1.3 2.2-0.3 5.5 0.9 7.3 0.6 0.9 1.3 1.8 2.2 1.8 0.9 0 1.2-0.6 2.3-0.6 1.1 0 1.3 0.6 2.3 0.5 0.9 0 1.5-0.9 2.1-1.7 0.7-1 0.9-1.9 0.9-2-0-0-1.8-0.7-1.8-2.8zM9.7 2.9c0.5-0.6 0.8-1.4 0.7-2.3-0.7 0-1.5 0.5-2 1.1-0.4 0.5-0.8 1.4-0.7 2.2 0.8 0.1 1.5-0.4 2-1z"/>
-                        </svg>
-                        Apple로 계속하기
+                        <Image
+                            src="/oauth/apple/appleid_button@2x.png"
+                            alt="Apple로 계속하기"
+                            width={160}
+                            height={26}
+                            className="h-[26px] w-[160px]"
+                            priority
+                        />
                     </button>
                 )}
 

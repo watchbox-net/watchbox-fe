@@ -18,6 +18,8 @@ import { authApi } from '@/lib/api/auth';
 
 const SPRING_BOOT_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 const BLOCK_WEBVIEW_OAUTH = true; // true 활성 | false 비활성
+// 애플 로그인 버튼 노출 여부 (환경변수로 on/off). 'true' 일 때만 노출.
+const APPLE_LOGIN_ENABLED = process.env.NEXT_PUBLIC_APPLE_LOGIN_ENABLED === 'true';
 
 // 로컬 웹 ↔ 개발 서버(dev-api) 하이브리드 로그인 여부.
 // localhost 는 dev-api 의 Set-Cookie 를 받을 수 없으므로, 켜져 있으면 일반 OAuth 경로 대신
@@ -42,7 +44,7 @@ function LoginContent() {
     const [showAppleLogin, setShowAppleLogin] = useState(false);
 
     useEffect(() => {
-        setShowAppleLogin(isIosWebView());
+        setShowAppleLogin(APPLE_LOGIN_ENABLED && isIosWebView());
     }, []);
 
     const handleAppleLogin = async () => {

@@ -4,10 +4,16 @@ export type NativeGoogleLoginResult =
   | { status: 'error'; message: string };
 
 export type NativeAppleLoginResult =
-  | { status: 'success'; authorizationCode: string }
+  | { status: 'success'; identityToken: string }
   | { status: 'cancelled' }
   | { status: 'unavailable' }
   | { status: 'error'; message: string };
+
+// WebView 앱이 iOS 인지 판별 (Apple 네이티브 로그인은 iOS 에서만 가능)
+export function isIosWebView(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  return isReactNativeWebView() && /iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
 
 export function isReactNativeWebView(): boolean {
   return typeof window !== 'undefined' && !!window.ReactNativeWebView;

@@ -2,14 +2,17 @@
 
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import MobileFrame from '@/components/common/MobileFrame';
 import Header from '@/components/common/Header';
 import {
     isReactNativeWebView,
+    isIosWebView,
     postNativeGoogleLogin,
+    postNativeAppleLogin,
     waitForNativeResult,
     type NativeGoogleLoginResult,
+    type NativeAppleLoginResult,
 } from '@/lib/native-bridge';
 import { authApi } from '@/lib/api/auth';
 
@@ -35,6 +38,32 @@ function LoginContent() {
     const [copied, setCopied] = useState(false);
     const [nativeLoading, setNativeLoading] = useState(false);
     const [nativeError, setNativeError] = useState<string | null>(null);
+    // Apple 로그인 버튼은 iOS WebView 앱에서만 노출 (네이티브 Sign in with Apple 필요)
+    const [showAppleLogin, setShowAppleLogin] = useState(false);
+
+    useEffect(() => {
+        setShowAppleLogin(isIosWebView());
+    }, []);
+
+    const handleAppleLogin = async () => {
+        if (!isReactNativeWebView()) return;
+        setNativeLoading(true);
+        setNativeError(null);
+        try {
+            postNativeAppleLogin();
+            const result = await waitForNativeResult<NativeAppleLoginResult>('NATIVE_APPLE_LOGIN_RESULT');
+            if (result.status === 'success') {
+                await authApi.nativeAppleLogin(result.identityToken);
+                window.location.replace('/');
+            } else if (result.status === 'error' || result.status === 'unavailable') {
+                setNativeError('Apple 로그인에 실패했습니다. 다시 시도해주세요.');
+            }
+        } catch {
+            setNativeError('Apple 로그인에 실패했습니다. 다시 시도해주세요.');
+        } finally {
+            setNativeLoading(false);
+        }
+    };
 
     const handleGoogleLogin = async () => {
         // WebView 앱 — 네이티브 SDK 로그인
@@ -119,6 +148,20 @@ function LoginContent() {
                         priority
                     />
                 </button>
+
+                {/* 애플 로그인 버튼 (iOS WebView 앱에서만) */}
+                {showAppleLogin && (
+                    <button
+                        onClick={handleAppleLogin}
+                        disabled={nativeLoading}
+                        className="mt-[12px] flex h-[36px] w-[160px] cursor-pointer items-center justify-center gap-[6px] rounded-[4px] bg-black text-[14px] font-medium text-white disabled:opacity-50"
+                    >
+                        <svg width="14" height="16" viewBox="0 0 14 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                            <path d="M11.5 8.5c0-1.9 1.5-2.8 1.6-2.9-0.9-1.3-2.2-1.5-2.7-1.5-1.1-0.1-2.2 0.7-2.8 0.7-0.6 0-1.5-0.7-2.4-0.6-1.2 0-2.4 0.7-3 1.8-1.3 2.2-0.3 5.5 0.9 7.3 0.6 0.9 1.3 1.8 2.2 1.8 0.9 0 1.2-0.6 2.3-0.6 1.1 0 1.3 0.6 2.3 0.5 0.9 0 1.5-0.9 2.1-1.7 0.7-1 0.9-1.9 0.9-2-0-0-1.8-0.7-1.8-2.8zM9.7 2.9c0.5-0.6 0.8-1.4 0.7-2.3-0.7 0-1.5 0.5-2 1.1-0.4 0.5-0.8 1.4-0.7 2.2 0.8 0.1 1.5-0.4 2-1z"/>
+                        </svg>
+                        Apple로 계속하기
+                    </button>
+                )}
 
                 {/* 에러 메시지 */}
                 {(error || nativeError) && (

@@ -13,11 +13,11 @@ import { logger } from '@/lib/logger';
  * 2) 하이브리드(로컬 웹 ↔ 개발 서버): localhost는 dev-api의 Set-Cookie를 받을 수 없으므로,
  *    백엔드가 토큰 대신 1회용 oneTimeCode(?oneTimeCode=)만 넘긴다. Google 자체 authorization
  *    code와 구분하기 위해 "code"가 아닌 "oneTimeCode"로 명명. 이 Route가 oneTimeCode를
- *    /auth/exchange로 교환해 토큰을 받아, localhost 도메인 쿠키를 직접 심는다.
+ *    /oauth2/local/exchange로 교환해 토큰을 받아, localhost 도메인 쿠키를 직접 심는다.
  */
 
 const FRONTEND_URL = process.env.FRONTEND_URL;
-const BACKEND_API_URL = process.env.BACKEND_API_URL;
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export async function GET(request: NextRequest) {
   const oneTimeCode = request.nextUrl.searchParams.get('oneTimeCode');
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
 
   // 하이브리드 경로: oneTimeCode → 토큰 교환 후 localhost 쿠키 심기
   try {
-    const res = await fetch(`${BACKEND_API_URL}/auth/exchange`, {
+    const res = await fetch(`${BACKEND_URL}/oauth2/local/exchange`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ oneTimeCode }),

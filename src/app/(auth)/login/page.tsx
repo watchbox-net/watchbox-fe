@@ -23,7 +23,7 @@ const APPLE_LOGIN_ENABLED = process.env.NEXT_PUBLIC_APPLE_LOGIN_ENABLED === 'tru
 
 // 로컬 웹 ↔ 개발 서버(dev-api) 하이브리드 로그인 여부.
 // localhost 는 dev-api 의 Set-Cookie 를 받을 수 없으므로, 켜져 있으면 일반 OAuth 경로 대신
-// 진입점(/oauth2/local-entry)을 태워 oneTimeCode 릴레이 방식으로 로그인한다.
+// 진입점(/oauth2/local/entry)을 태워 oneTimeCode 릴레이 방식으로 로그인한다.
 const HYBRID_LOGIN = process.env.NEXT_PUBLIC_HYBRID_LOGIN === 'true';
 
 function isInAppBrowser(): boolean {
@@ -44,11 +44,18 @@ function LoginContent() {
     const [showAppleLogin, setShowAppleLogin] = useState(false);
 
     useEffect(() => {
-        setShowAppleLogin(APPLE_LOGIN_ENABLED && isIosWebView());
+        // iOS 앱(네이티브 Apple) 또는 일반 웹 브라우저(Apple 리다이렉트)에서 노출. Android WebView 는 제외.
+        setShowAppleLogin(APPLE_LOGIN_ENABLED && (isIosWebView() || !isReactNativeWebView()));
     }, []);
 
     const handleAppleLogin = async () => {
-        if (!isReactNativeWebView()) return;
+        // 웹 브라우저 — 애플 리다이렉트 로그인 (백엔드 커스텀 엔드포인트)
+        if (!isReactNativeWebView()) {
+            window.location.href = `${SPRING_BOOT_URL}/oauth2/apple/authorize`;
+            return;
+        }
+
+        // WebView 앱 — 네이티브 SDK 로그인
         setNativeLoading(true);
         setNativeError(null);
         try {
@@ -95,12 +102,12 @@ function LoginContent() {
             return;
         }
 
-        // (로컬 환경) 웹 브라우저 — 하이브리드 모드면 진입점, 아니면 기존 OAuth 리다이렉트
+        // (로컬 환경) 웹 브라우저 — 하이브리드 모드면 진입점, 아니면 구글 웹 진입(커스텀 엔드포인트)
         if (HYBRID_LOGIN) {
             const target = `${window.location.origin}/api/auth/callback`;
-            window.location.href = `${SPRING_BOOT_URL}/oauth2/local-entry?target=${encodeURIComponent(target)}`;
+            window.location.href = `${SPRING_BOOT_URL}/oauth2/local/entry?target=${encodeURIComponent(target)}`;
         } else {
-            window.location.href = `${SPRING_BOOT_URL}/oauth2/authorization/google`;
+            window.location.href = `${SPRING_BOOT_URL}/oauth2/google/authorize`;
         }
     };
 

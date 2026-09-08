@@ -15,6 +15,7 @@ import PlainContextMenu from '@/components/common/PlainContextMenu';
 import Toast from '@/components/common/Toast';
 import MainContent from '@/components/common/MainContent';
 import PreviewOverlay from '@/components/preview/PreviewOverlay';
+import PreviewNoticeModal from '@/components/preview/PreviewNoticeModal';
 import { ChevronDownOutline, HistoryIcon } from '@/components/icons';
 import {
   fetchMyRecordedContentPage,
@@ -82,6 +83,8 @@ export default function RecordPage() {
   const [filterMenuOpen, setFilterMenuOpen] = useState(false);
 
   const [toast, setToast] = useState({ visible: false, message: '' });
+  // Preview 안내 모달 상태 (페이지 방문마다 1회 노출)
+  const [previewNoticeOpen, setPreviewNoticeOpen] = useState(true);
   const menuRef = useRef<HTMLDivElement>(null);
   const sortMenuRef = useRef<HTMLDivElement>(null);
   const filterMenuRef = useRef<HTMLDivElement>(null);
@@ -374,6 +377,15 @@ export default function RecordPage() {
         {/* Preview 오버레이 */}
         {isPreview && !loading && items.length > 0 && <PreviewOverlay />}
       </MainContent>
+
+      {/* Preview 진입 안내 모달 (오버레이와 동일 조건, 페이지 방문마다 1회) */}
+      {isPreview && !loading && items.length > 0 && (
+        <PreviewNoticeModal
+          screen="record"
+          visible={previewNoticeOpen}
+          onClose={() => setPreviewNoticeOpen(false)}
+        />
+      )}
 
       <Toast
         message={toast.message}

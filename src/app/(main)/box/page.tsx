@@ -12,6 +12,7 @@ import ContextMenu from '@/components/common/ContextMenu';
 import BoxItem from '@/components/box/BoxItem';
 import BoxList from '@/components/box/BoxList';
 import PreviewOverlay from '@/components/preview/PreviewOverlay';
+import PreviewNoticeModal from '@/components/preview/PreviewNoticeModal';
 import { PlusOutline } from '@/components/icons';
 import { fetchBoxList, deleteBox } from '@/lib/api/box';
 import { hasReceivedInvitation } from '@/lib/api/member';
@@ -29,6 +30,9 @@ export default function BoxPage() {
   const { showLoginModal } = useLoginModal();
 
   const isPreview = !authLoading && !isAuthenticated;
+
+  // Preview 안내 모달 상태 (페이지 방문마다 1회 노출)
+  const [previewNoticeOpen, setPreviewNoticeOpen] = useState(true);
 
   // 삭제 모달 상태
   const [deleteTarget, setDeleteTarget] = useState<{ boxId: number; name: string } | null>(null);
@@ -191,6 +195,15 @@ export default function BoxPage() {
         {/* Preview 오버레이 */}
         {isPreview && !previewLoading && boxes.length > 0 && <PreviewOverlay />}
       </MainContent>
+
+      {/* Preview 진입 안내 모달 (오버레이와 동일 조건, 페이지 방문마다 1회) */}
+      {isPreview && !previewLoading && boxes.length > 0 && (
+        <PreviewNoticeModal
+          screen="box"
+          visible={previewNoticeOpen}
+          onClose={() => setPreviewNoticeOpen(false)}
+        />
+      )}
 
       {/* 삭제 확인 모달 */}
       <Modal

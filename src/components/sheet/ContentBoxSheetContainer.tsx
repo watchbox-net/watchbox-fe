@@ -13,11 +13,11 @@ interface ContentBoxSheetContainerProps {
   visible: boolean;
   /** 시트 닫기 (취소/오버레이/완료 모두 호출) */
   onClose: () => void;
-  /** 시트 상단에 표시할 컨텐츠 정보 */
+  /** 시트 상단에 표시할 콘텐츠 정보 */
   content: SheetContent;
-  /** 대상 컨텐츠 media type */
+  /** 대상 콘텐츠 media type */
   mediaType: ContentMediaType;
-  /** 대상 컨텐츠 tmdbId */
+  /** 대상 콘텐츠 tmdbId */
   tmdbId: number;
   /** 완료 후 변경 성공 시 호출 (토스트 등) */
   onCompleted?: (summary: { added: number; removed: number }) => void;

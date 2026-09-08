@@ -148,7 +148,7 @@ export default function DevComponentsPage() {
 
         {/* 라이브 프리뷰 (모바일 프레임) */}
         <div className="mx-auto w-[393px] bg-neutral-100 rounded-2xl overflow-hidden shadow-lg border border-neutral-200">
-          {/* 가상 컨텐츠 영역 */}
+          {/* 가상 콘텐츠 영역 */}
           <div className="h-60 flex items-center justify-center bg-wb-dark-02">
             <p className="text-wb-grey-03 text-sm">
               현재 경로: <span className="text-wb-white font-semibold">{activePath}</span>

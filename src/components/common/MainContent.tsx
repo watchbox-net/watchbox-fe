@@ -9,7 +9,7 @@ interface MainContentProps {
 }
 
 /**
- * 메인 컨텐츠 영역 레이아웃 컴포넌트
+ * 메인 콘텐츠 영역 레이아웃 컴포넌트
  * MobileFrame 내부에서 Header 아래, BottomNav 위 영역으로 사용
  * 좌우 패딩은 각 컴포넌트 내부에서 관리
  * 스크롤 위치를 sessionStorage에 저장/복원

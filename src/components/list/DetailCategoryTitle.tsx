@@ -16,7 +16,7 @@ interface DetailCategoryTitleProps {
  * 상세 페이지의 카테고리 헤더
  * 피그마: Detail Category Title (more on/off, line on/off)
  *
- * 라인 사양: 양옆 16px 패딩(컨텐츠 가로폭과 동일), 색 wb-grey-01
+ * 라인 사양: 양옆 16px 패딩(콘텐츠 가로폭과 동일), 색 wb-grey-01
  */
 export default function DetailCategoryTitle({
   title,

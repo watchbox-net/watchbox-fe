@@ -13,7 +13,7 @@ interface SheetBoxItemProps {
   memberNames?: string[];
   /** 포스터 경로 배열 (최대 3개) */
   posters?: (string | null)[];
-  /** 이 컨텐츠가 박스에 이미 포함되어 있으면 true */
+  /** 이 콘텐츠가 박스에 이미 포함되어 있으면 true */
   included: boolean;
   /** 행 클릭 */
   onClick?: () => void;

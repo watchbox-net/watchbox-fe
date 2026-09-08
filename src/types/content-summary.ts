@@ -77,7 +77,7 @@ export interface ContentPageResponse<T extends ContentSummary = ContentSummary> 
 
 /**
  * 콘텐츠 페이지 응답 (cursor 기반)
- * - 시청 기록, 박스 컨텐츠 등에서 사용
+ * - 시청 기록, 박스 콘텐츠 등에서 사용
  * - 총 개수가 필요하면 별도 count 엔드포인트 호출
  */
 export interface ContentCursorPageResponse<T extends ContentSummary = ContentSummary> {

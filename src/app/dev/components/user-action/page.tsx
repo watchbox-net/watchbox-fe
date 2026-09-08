@@ -248,9 +248,9 @@ export default function UserActionComponentsPage() {
           </div>
         </div>
 
-        {/* Content Media Type Line — 박스 컨텐츠 페이지에서 사용되는 row 조합 */}
+        {/* Content Media Type Line — 박스 콘텐츠 페이지에서 사용되는 row 조합 */}
         <div>
-          <p className="text-xs font-semibold text-neutral-500 mb-2">Content Media Type Line — 박스 컨텐츠 페이지 row</p>
+          <p className="text-xs font-semibold text-neutral-500 mb-2">Content Media Type Line — 박스 콘텐츠 페이지 row</p>
           <div className="bg-wb-dark-02 rounded-lg py-3">
             {/* watch-media 모드 */}
             <div className="flex items-center justify-between pl-[16px] pr-[5px] mb-3">

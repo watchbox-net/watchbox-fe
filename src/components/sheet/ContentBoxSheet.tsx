@@ -6,7 +6,7 @@ import SheetContentItem from '@/components/sheet/SheetContentItem';
 import SheetBoxItem from '@/components/sheet/SheetBoxItem';
 import type { BoxType } from '@/types/box';
 
-/** 시트에 표시할 컨텐츠 정보 */
+/** 시트에 표시할 콘텐츠 정보 */
 export interface SheetContent {
   posterSrc?: string | null;
   title: string;
@@ -21,7 +21,7 @@ export interface SheetBox {
   name: string;
   memberNames?: string[];
   posters?: (string | null)[];
-  /** 현재 컨텐츠가 이 박스에 이미 포함되어 있는지 */
+  /** 현재 콘텐츠가 이 박스에 이미 포함되어 있는지 */
   included: boolean;
 }
 
@@ -32,7 +32,7 @@ interface ContentBoxSheetProps {
   onCancel: () => void;
   /** 완료 (API 요청 등 실제 저장 — ContentBoxSheetContainer에서 연결) */
   onDone?: () => void;
-  /** 상단에 표시되는 추가 대상 컨텐츠 */
+  /** 상단에 표시되는 추가 대상 콘텐츠 */
   content: SheetContent;
   /** 박스 리스트 */
   boxes: SheetBox[];
@@ -82,7 +82,7 @@ export default function ContentBoxSheet({
         <ContentBoxSheetHead onCancel={onCancel} onDone={onDone ?? onCancel} />
 
         <div className="bg-wb-dark-02 flex flex-col gap-[12px] pb-[10px]">
-          {/* 추가 대상 컨텐츠 정보 */}
+          {/* 추가 대상 콘텐츠 정보 */}
           <SheetContentItem
             posterSrc={content.posterSrc}
             title={content.title}

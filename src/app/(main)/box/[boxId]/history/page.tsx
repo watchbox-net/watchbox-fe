@@ -29,7 +29,7 @@ const SORT_LABEL: Record<BoxHistorySortOrder, string> = {
   OLDEST: '오래된순',
 };
 
-/** 굵게 강조 (사용자명/컨텐츠명) */
+/** 굵게 강조 (사용자명/콘텐츠명) */
 function Bold({ children }: { children: ReactNode }) {
   return <span className="font-semibold">{children}</span>;
 }
@@ -43,7 +43,7 @@ function objectParticle(word: string): '을' | '를' {
 
 const REMOVED_MEMBER = '탈퇴한 사용자';
 
-/** 박스 히스토리 엔트리 → 표시 내용 (사용자명/컨텐츠명 semibold) */
+/** 박스 히스토리 엔트리 → 표시 내용 (사용자명/콘텐츠명 semibold) */
 function buildContent(entry: BoxHistoryEntry): ReactNode {
   const actor = entry.actor?.nickname ?? REMOVED_MEMBER;
   const contentName = entry.content ? getDisplayTitle(entry.content) : '';

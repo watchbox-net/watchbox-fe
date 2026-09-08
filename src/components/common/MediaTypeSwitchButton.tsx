@@ -14,7 +14,7 @@ interface MediaTypeSwitchButtonProps {
 
 // ─── Component ──────────────────────────────────────────────
 /**
- * 박스 컨텐츠에서 인물 ↔ 영화/시리즈 모드 전환용 pill 버튼.
+ * 박스 콘텐츠에서 인물 ↔ 영화/시리즈 모드 전환용 pill 버튼.
  * 보더만 있는 다크 스타일 (rounded-20, h-28).
  * 너비: person 65px / watch-media 101px (디자인 토큰).
  */

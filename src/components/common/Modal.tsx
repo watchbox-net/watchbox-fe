@@ -4,7 +4,7 @@ import Button from './Button';
 import { ExclamationCircleSolid } from '@/components/icons';
 
 // ─── Types ──────────────────────────────────────────────────
-export type ModalVariant = 'confirm' | 'invite' | 'login' | 'body-only' | 'delete' | 'error' | 'preparing';
+export type ModalVariant = 'confirm' | 'invite' | 'login' | 'body-only' | 'delete' | 'error' | 'preparing' | 'preview';
 
 interface ModalProps {
   visible: boolean;
@@ -27,7 +27,11 @@ const CONFIRM_DEFAULTS: Record<ModalVariant, { label: string; variant: 'accept' 
   delete:      { label: '삭제', variant: 'alert' },
   error:       { label: '확인', variant: 'accept' },
   preparing:   { label: '확인', variant: 'accept' },
+  preview:     { label: '둘러보기', variant: 'accept' },
 };
+
+// ─── 확인 버튼만 있는 variant (취소 버튼 숨김) ──────────────
+const SINGLE_BUTTON_VARIANTS: ReadonlySet<ModalVariant> = new Set(['preparing', 'preview']);
 
 // ─── variant별 기본 텍스트 ──────────────────────────────────
 const TEXT_DEFAULTS: Partial<Record<ModalVariant, { title: string; body?: string }>> = {
@@ -37,6 +41,9 @@ const TEXT_DEFAULTS: Partial<Record<ModalVariant, { title: string; body?: string
   },
   preparing: {
     title: '아직 준비중이에요',
+  },
+  preview: {
+    title: '미리보기 화면이에요',
   },
 };
 
@@ -92,7 +99,7 @@ export default function Modal({
 
           {/* Buttons */}
           <div className="flex items-center justify-end gap-[10px]">
-            {variant !== 'preparing' && (
+            {!SINGLE_BUTTON_VARIANTS.has(variant) && (
               <Button size="modal" variant="cancel" onClick={onCancel}>
                 {cancelLabel}
               </Button>

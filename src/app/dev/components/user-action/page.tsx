@@ -23,6 +23,7 @@ const MODAL_DEMOS: { variant: ModalVariant; title: string; body: string; confirm
   { variant: 'delete',    title: '박스 삭제',           body: '이 박스를 삭제하시겠습니까?' },
   { variant: 'error',     title: '오류가 발생했어요',    body: '잠시 후에 다시 시도해주세요', confirmLabel: '확인' },
   { variant: 'preparing', title: '아직 준비중이에요',    body: '' },
+  { variant: 'preview',   title: '미리보기 화면이에요',   body: '지금 보이는 박스 화면은 예시예요.\n로그인하면 나만의 박스를 만들고\n친구와 함께 채워갈 수 있어요.' },
 ];
 
 export default function UserActionComponentsPage() {

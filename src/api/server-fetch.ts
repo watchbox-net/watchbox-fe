@@ -1,5 +1,4 @@
 import { cookies } from 'next/headers';
-import { context, propagation } from '@opentelemetry/api';
 import { logger } from '@/lib/logger';
 
 /**
@@ -29,13 +28,6 @@ export async function getServerTokens(): Promise<ServerTokens> {
   };
 }
 
-/** 현재 OTel context에서 traceparent 등 전파 헤더를 추출하여 headers에 merge */
-function injectTraceHeaders(headers: Record<string, string> = {}): Record<string, string> {
-  const carrier: Record<string, string> = { ...headers };
-  propagation.inject(context.active(), carrier);
-  return carrier;
-}
-
 /** 서버 컴포넌트용 인증 fetch — accessToken 유효하면 인증 요청, 만료/없으면 비로그인 fallback */
 export async function serverFetch(
   url: string,
@@ -44,9 +36,11 @@ export async function serverFetch(
   const { accessToken } = tokens;
 
   // 1. accessToken 있으면 붙여서 요청
+  //    traceparent는 @vercel/otel의 fetch 계측이 주입한다 (instrumentation.ts의 propagateContextUrls).
+  //    직접 inject하면 fetch CLIENT span이 아직 없어 부모가 어긋난다.
   if (accessToken) {
     const response = await fetch(url, {
-      headers: injectTraceHeaders({ Authorization: `Bearer ${accessToken}` }),
+      headers: { Authorization: `Bearer ${accessToken}` },
     });
 
     // 만료(401)가 아니면 인증 응답으로 반환
@@ -58,8 +52,6 @@ export async function serverFetch(
 
   // 2. 토큰 없거나 만료 → 비로그인 요청
   logger.warn({ url }, 'server-fetch: falling back to unauthenticated request');
-  const response = await fetch(url, {
-    headers: injectTraceHeaders(),
-  });
+  const response = await fetch(url);
   return { response, authenticated: false };
 }

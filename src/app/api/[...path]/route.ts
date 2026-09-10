@@ -1,19 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { propagation, context } from '@opentelemetry/api';
 import { TOKEN_COOKIE_OPTIONS } from '@/lib/utils/cookie';
 import { logger } from '@/lib/logger';
 
 const BACKEND_API_URL = process.env.BACKEND_API_URL;
-
-/**
- * 현재 active span의 W3C trace context를 헤더로 직렬화.
- * Next.js fetch wrapper가 @vercel/otel의 자동 inject를 가로채는 케이스가 있어
- * BFF→backend 호출에는 명시적으로 박아준다 (traceparent, tracestate).
- */
-function injectTraceHeaders(headers: Record<string, string>): Record<string, string> {
-  propagation.inject(context.active(), headers);
-  return headers;
-}
 
 // ─── 리프레시토큰으로 액세스/리프레시 토큰 재발급(회전) ──────────────
 // 백엔드가 회전(rotation)으로 새 refreshToken도 함께 내려주므로 둘 다 받아 반환한다.
@@ -69,7 +58,10 @@ async function proxyRequest(
   const accessToken = request.cookies.get('accessToken')?.value;
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
-  injectTraceHeaders(headers);  // ← W3C traceparent 주입 (백엔드 trace 연결)
+
+  // traceparent는 @vercel/otel의 fetch 계측이 주입한다 (instrumentation.ts의 propagateContextUrls).
+  // 여기서 propagation.inject를 직접 하면 아직 fetch CLIENT span이 없어 라우트 핸들러 span이
+  // 부모로 박히고, 그러면 Tempo가 next→spring 서비스 그래프 엣지를 만들지 못한다.
 
   let backendRes = await fetch(backendUrl, { method: request.method, headers, body });
 
@@ -88,7 +80,6 @@ async function proxyRequest(
 
         // 새 토큰으로 재요청
         headers['Authorization'] = `Bearer ${refreshed.accessToken}`;
-        injectTraceHeaders(headers);  // 재요청 시점 span context로 재주입
         backendRes = await fetch(backendUrl, { method: request.method, headers, body });
 
         // 재요청 성공 → 회전된 access/refresh 토큰을 모두 쿠키에 세팅 후 응답 반환
@@ -114,7 +105,6 @@ async function proxyRequest(
       `${request.method} /${pathStr} session expired, falling back to anonymous request`,
     );
     delete headers['Authorization'];
-    injectTraceHeaders(headers);
     const anonRes = await fetch(backendUrl, { method: request.method, headers, body });
 
     const anonData = await anonRes.text();

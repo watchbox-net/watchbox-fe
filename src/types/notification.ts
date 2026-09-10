@@ -6,7 +6,7 @@
 export type NotificationType =
   | 'BOX_INVITATION_RECEIVED'   // 공유 박스 초대 받음 (초대받은 사람에게)
   | 'BOX_INVITATION_RESPONDED'  // 초대 수락/거절 결과 (초대 보낸 사람에게)
-  | 'BOX_CONTENT_ADDED';        // 박스 컨텐츠 추가 (아직 미구현)
+  | 'BOX_CONTENT_ADDED';        // 박스 콘텐츠 추가 (아직 미구현)
 
 /** 초대 응답 상태 */
 export type RequestStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED';
@@ -42,7 +42,7 @@ export interface BoxInvitationRespondedPayload {
   requestStatus: RequestStatus;
 }
 
-/** 박스 컨텐츠 추가 payload */
+/** 박스 콘텐츠 추가 payload */
 export interface BoxContentAddedPayload {
   type: 'BOX_CONTENT_ADDED';
   boxId: number;

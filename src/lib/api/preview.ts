@@ -15,7 +15,7 @@ export async function fetchPreviewBoxList(): Promise<BoxPageResponse> {
   return data.data;
 }
 
-/** Preview 박스 컨텐츠 조회 (커서 기반) */
+/** Preview 박스 콘텐츠 조회 (커서 기반) */
 export async function fetchPreviewBoxContents(
   boxId: number,
   params: {
@@ -35,7 +35,7 @@ export async function fetchPreviewBoxContents(
   return data.data;
 }
 
-/** Preview 박스 컨텐츠 총 개수 (필터 적용) */
+/** Preview 박스 콘텐츠 총 개수 (필터 적용) */
 export async function fetchPreviewBoxContentCount(
   boxId: number,
   params: {

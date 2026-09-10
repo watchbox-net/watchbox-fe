@@ -30,9 +30,9 @@ export type ContentRecordHistoryType =
 type IconStatus = Exclude<WatchStatus, 'none' | 'outline'>;
 
 export interface ContentRecordHistoryItem {
-  /** 컨텐츠(영화/시리즈) 포스터 이미지 URL */
+  /** 콘텐츠(영화/시리즈) 포스터 이미지 URL */
   posterUrl?: string | null;
-  /** 컨텐츠명 */
+  /** 콘텐츠명 */
   contentTitle: string;
   /** 기록 종류 */
   type: ContentRecordHistoryType;

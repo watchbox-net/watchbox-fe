@@ -15,7 +15,7 @@ interface MemberInfoProps {
 // ─── Component ──────────────────────────────────────────────
 /**
  * 콘텐츠 리스트 아이템 하단 멤버 정보
- * - like: "좋아요 누른 컨텐츠" (마이 박스)
+ * - like: "좋아요 누른 콘텐츠" (마이 박스)
  * - publisher: "공유 멤버: 사용자A, 사용자B" (공유 박스)
  * - none: 표시 안 함
  *
@@ -28,7 +28,7 @@ export default function MemberInfo({ variant, publishers, className }: MemberInf
     return (
       <div className={`flex items-center gap-[5px] ${className ?? ''}`}>
         <HandThumbUpIcon className="size-[12px] text-wb-red" />
-        <span className="text-[10px] text-wb-red whitespace-nowrap">좋아요 누른 컨텐츠</span>
+        <span className="text-[10px] text-wb-red whitespace-nowrap">좋아요 누른 콘텐츠</span>
       </div>
     );
   }

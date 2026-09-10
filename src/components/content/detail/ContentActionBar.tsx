@@ -27,7 +27,7 @@ interface ContentActionBarProps {
   liked: boolean;
   /** 현재 시청 상태 */
   watchStatus: WatchStatus | null;
-  /** 박스 시트 표시용 — 컨텐츠 헤더 정보 */
+  /** 박스 시트 표시용 — 콘텐츠 헤더 정보 */
   sheetContent: {
     posterSrc: string | null;
     title: string;
@@ -49,7 +49,7 @@ interface ContentActionBarProps {
 }
 
 /**
- * 컨텐츠 상세 페이지 액션 바 — 좋아요 + 박스에 추가 + 시청 상태 (3개 아이콘)
+ * 콘텐츠 상세 페이지 액션 바 — 좋아요 + 박스에 추가 + 시청 상태 (3개 아이콘)
  *
  * 페이지에서 상태(liked/watchStatus/recordId)는 controlled로 관리하고,
  * 변경 시 콜백으로 알린다.

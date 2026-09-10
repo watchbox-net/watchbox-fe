@@ -39,7 +39,7 @@ export default function SpinnerDemoPage() {
           <Loading text="불러오는 중" />
         </div>
         <div className="rounded-lg border border-wb-grey-01">
-          <Loading size={48} text="컨텐츠를 불러오고 있습니다" />
+          <Loading size={48} text="콘텐츠를 불러오고 있습니다" />
         </div>
       </section>
 

@@ -133,7 +133,7 @@ export default function BoxContentsPage() {
     ...(viewMode === 'media' ? { watchStatusFilter } : {}),
   };
 
-  // ── 박스 컨텐츠 무한 스크롤 (cursor 기반) ──
+  // ── 박스 콘텐츠 무한 스크롤 (cursor 기반) ──
   const {
     items,
     sentinelRef,
@@ -158,7 +158,7 @@ export default function BoxContentsPage() {
     staleTime: isPreview ? 1000 * 60 * 5 : 0,
   });
 
-  // ── 박스 컨텐츠 총 개수 (필터 적용 — 필터 변경 시 재호출) ──
+  // ── 박스 콘텐츠 총 개수 (필터 적용 — 필터 변경 시 재호출) ──
   const { data: totalCount = 0 } = useQuery({
     queryKey: ['boxContentCount', boxId, contentMediaTypeFilter, sort, effectiveWatchStatusFilter, isPreview ? 'preview' : 'auth'],
     queryFn: () =>
@@ -304,7 +304,7 @@ export default function BoxContentsPage() {
               type="button"
               onClick={() => {
                 if (isPreview) { showLoginModal(); return; }
-                setPreparingModalVisible(true); // 컨텐츠 추가 — 아직 미구현
+                setPreparingModalVisible(true); // 콘텐츠 추가 — 아직 미구현
               }}
             >
               <PlusOutline className="size-6 text-wb-white-02" />
@@ -399,12 +399,12 @@ export default function BoxContentsPage() {
         {loading && <Loading />}
         {!loading && error && (
           <p className="text-center text-neutral-500 py-8">
-            컨텐츠를 불러올 수 없습니다.
+            콘텐츠를 불러올 수 없습니다.
           </p>
         )}
         {!loading && !error && items.length === 0 && (
           <p className="text-center text-neutral-500 py-8">
-            박스에 담긴 컨텐츠가 없습니다.
+            박스에 담긴 콘텐츠가 없습니다.
           </p>
         )}
         {!loading && !error && items.length > 0 && (
@@ -432,7 +432,7 @@ export default function BoxContentsPage() {
         onClose={() => setToast((t) => ({ ...t, visible: false }))}
       />
 
-      {/* 컨텐츠 추가 — 아직 준비중 안내 */}
+      {/* 콘텐츠 추가 — 아직 준비중 안내 */}
       <Modal
         visible={preparingModalVisible}
         variant="preparing"

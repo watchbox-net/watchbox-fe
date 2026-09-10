@@ -10,7 +10,7 @@ export interface ContentBoxItem {
   previewPosterList: string[];
   /** 공유 박스에만 존재 (my 박스는 null) */
   memberNameList: string[] | null;
-  /** 해당 컨텐츠가 이 박스에 포함되어 있는지 */
+  /** 해당 콘텐츠가 이 박스에 포함되어 있는지 */
   hasContent: boolean;
 }
 

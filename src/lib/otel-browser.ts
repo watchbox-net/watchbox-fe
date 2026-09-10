@@ -23,6 +23,13 @@
 // - ❌ documentLoad / resourceFetch (CSS/font/JS chunk 로드 timing) — 제거
 // - ❌ Next.js RSC 페이로드 fetch (route 경로, /api/ 아님) — 필터로 제외
 // - ❌ TMDB 이미지 등 외부 호출 — 필터로 제외
+//
+// span 이름 정규화:
+// - 경로의 숫자 세그먼트(tmdbId, boxId 등)를 :id 로 치환한다
+// - Tempo metrics-generator가 span_name을 라벨로 쓰기 때문에, 원본 경로를 그대로 두면
+//   사용자가 새 콘텐츠를 볼 때마다 시계열이 하나씩 늘어 카디널리티가 무한히 커진다
+//   (백엔드는 http.route 덕에 /api/contents/{mediaType}/{tmdbId} 로 이미 템플릿화됨)
+// - method 는 XHR 인스턴스에서 직접 읽는다 (아래 patchXhrOpen 주석 참고)
 
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
@@ -35,6 +42,53 @@ import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xm
 
 const appEnv = process.env.NEXT_PUBLIC_ENV ?? 'local';
 
+/**
+ * 스팬 이름용 경로 정규화 — 숫자 세그먼트를 `:id` 로 치환.
+ *
+ * 이 앱의 경로 파라미터(tmdbId, boxId, memberId, requestId)는 모두 숫자라
+ * 숫자 세그먼트만 걸러도 충분하다. mediaType(MOVIE/TV/PERSON)처럼 값이 유한한
+ * 세그먼트는 그대로 둔다 — 라벨로 남아 있어야 구분이 되고 개수도 늘지 않는다.
+ *
+ * 예) /api/contents/MOVIE/1030571 → /api/contents/MOVIE/:id
+ */
+function normalizePathForSpanName(path: string): string {
+  return path
+    .split('/')
+    .map((segment) => (/^\d+$/.test(segment) ? ':id' : segment))
+    .join('/');
+}
+
+/** `GET /api/contents/MOVIE/:id` 형태의 스팬 이름을 만든다. */
+function buildSpanName(method: string, rawUrl: string): string {
+  const path = new URL(rawUrl, window.location.origin).pathname;
+  return `${method} ${normalizePathForSpanName(path)}`;
+}
+
+/**
+ * `open()` 을 감싸 method / url 을 XHR 인스턴스에 기록한다.
+ *
+ * OTel XHR 계측은 이 둘을 내부 WeakMap(`_xhrMem`)에만 들고 있고 xhr 객체에는 남기지 않는다.
+ * 그래서 applyCustomAttributesOnSpan 콜백에서 꺼낼 방법이 없고, 심어주는 쪽이 없으면
+ * `_method` 가 항상 undefined 라 'GET' 폴백이 걸린다. 실제로 axios(=XHR)로 나가는 모든
+ * mutation 이 `GET /api/...` 로 기록되고 있었다 — 이름만 틀리고 http.method 속성은 POST 로
+ * 정상이라 눈에 잘 안 띄었다.
+ *
+ * 계측 등록 순서와는 무관하다. 콜백은 span 종료 시점에 호출되므로 그때는 이미 세팅돼 있다.
+ */
+function patchXhrOpen() {
+  const originalOpen = XMLHttpRequest.prototype.open;
+
+  // 원본 open 은 오버로드가 있어 그대로는 대입이 안 된다 — 캐스팅으로 시그니처를 맞춘다
+  XMLHttpRequest.prototype.open = function (
+    this: XMLHttpRequest,
+    ...args: Parameters<typeof originalOpen>
+  ) {
+    const [method, url] = args;
+    Object.assign(this, { _method: method, _url: String(url) });
+    return originalOpen.apply(this, args);
+  } as typeof originalOpen;
+}
+
 // SSR 단계에서는 import만 되고 실행 X (window 가드)
 // 중복 초기화 방지 (HMR / 모듈 다중 로드 대응)
 declare global {
@@ -44,6 +98,8 @@ declare global {
 
 if (typeof window !== 'undefined' && appEnv !== 'local' && !globalThis.__WATCHBOX_OTEL_INITIALIZED__) {
   globalThis.__WATCHBOX_OTEL_INITIALIZED__ = true;
+
+  patchXhrOpen();
 
   // URL 필터링 정규식
   // - /api/* 외 모든 URL은 ignore (negative lookahead로 정확히 /api/ 포함 안 된 경로 매칭)
@@ -87,10 +143,9 @@ if (typeof window !== 'undefined' && appEnv !== 'local' && !globalThis.__WATCHBO
           try {
             const xhrAny = xhr as XMLHttpRequest & { _url?: string; _method?: string };
             const rawUrl = xhrAny.responseURL || xhrAny._url || '';
-            const method = xhrAny._method || 'GET';
+            const method = (xhrAny._method || 'GET').toUpperCase();
             if (rawUrl) {
-              const path = new URL(rawUrl, window.location.origin).pathname;
-              span.updateName(`${method} ${path}`);
+              span.updateName(buildSpanName(method, rawUrl));
             }
           } catch {
             // 무시
@@ -120,8 +175,7 @@ if (typeof window !== 'undefined' && appEnv !== 'local' && !globalThis.__WATCHBO
             }
 
             if (url) {
-              const path = new URL(url, window.location.origin).pathname;
-              span.updateName(`${method} ${path}`);
+              span.updateName(buildSpanName(method, url));
             }
           } catch {
             // 이름 변경 실패해도 trace 자체는 영향 X

@@ -5,7 +5,7 @@ import ProfileIcon from '@/components/icons/ProfileIcon';
 export interface BoxHistoryItem {
   /** 멤버 프로필 이미지 URL (없으면 기본 아이콘) */
   profileImageUrl?: string | null;
-  /** 내용 (사용자명/컨텐츠명 강조 위해 ReactNode 가능) */
+  /** 내용 (사용자명/콘텐츠명 강조 위해 ReactNode 가능) */
   content: ReactNode;
   /** 백엔드로부터 받은 시행 일시 (예: "2026-06-01 19:17:51") */
   date: string;

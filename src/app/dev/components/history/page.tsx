@@ -15,24 +15,24 @@ const B = ({ children }: { children: ReactNode }) => (
 
 const SAMPLE_ITEM: BoxHistoryItem = {
   profileImageUrl: null,
-  content: <><B>{'{사용자명}'}</B>님이 <B>{'{컨텐츠명}'}</B>을 박스에 <B>추가</B></>,
+  content: <><B>{'{사용자명}'}</B>님이 <B>{'{콘텐츠명}'}</B>을 박스에 <B>추가</B></>,
   date: '2026-06-01 19:17:51',
 };
 
 const SAMPLE_LIST: BoxHistoryItem[] = [
-  { profileImageUrl: null, content: <><B>{'{사용자명}'}</B>님이 <B>{'{컨텐츠명}'}</B>을 박스에 <B>추가</B></>, date: '2026-06-01 19:17:51' },
-  { profileImageUrl: null, content: <><B>{'{사용자명}'}</B>님이 <B>{'{컨텐츠명}'}</B>을 박스에서 <B>삭제</B></>, date: '2026-06-01 19:17:51' },
+  { profileImageUrl: null, content: <><B>{'{사용자명}'}</B>님이 <B>{'{콘텐츠명}'}</B>을 박스에 <B>추가</B></>, date: '2026-06-01 19:17:51' },
+  { profileImageUrl: null, content: <><B>{'{사용자명}'}</B>님이 <B>{'{콘텐츠명}'}</B>을 박스에서 <B>삭제</B></>, date: '2026-06-01 19:17:51' },
   { profileImageUrl: null, content: <><B>{'{사용자명}'}</B>님이 박스 멤버로 <B>합류</B></>, date: '2026-06-01 19:17:51' },
 ];
 
 // 시청 기록 히스토리 샘플 (시청 상태 변경 / 좋아요 등록 혼합)
 const RECORD_LIST: ContentRecordHistoryItem[] = [
-  { posterUrl: null, contentTitle: '{컨텐츠명}', type: 'status-registered', watchStatus: 'planned', date: '2026-06-01 19:17:51' },
-  { posterUrl: null, contentTitle: '{컨텐츠명}', type: 'status-changed', oldStatus: 'planned', watchStatus: 'watching', date: '2026-06-01 19:17:51' },
-  { posterUrl: null, contentTitle: '{컨텐츠명}', type: 'like', date: '2026-06-01 19:17:51' },
-  { posterUrl: null, contentTitle: '{컨텐츠명}', type: 'status-changed', oldStatus: 'watching', watchStatus: 'completed', date: '2026-06-01 19:17:51' },
-  { posterUrl: null, contentTitle: '{컨텐츠명}', type: 'like-removed', date: '2026-06-01 19:17:51' },
-  { posterUrl: null, contentTitle: '{컨텐츠명}', type: 'status-registered', watchStatus: 'completed', date: '2026-06-01 19:17:51' },
+  { posterUrl: null, contentTitle: '{콘텐츠명}', type: 'status-registered', watchStatus: 'planned', date: '2026-06-01 19:17:51' },
+  { posterUrl: null, contentTitle: '{콘텐츠명}', type: 'status-changed', oldStatus: 'planned', watchStatus: 'watching', date: '2026-06-01 19:17:51' },
+  { posterUrl: null, contentTitle: '{콘텐츠명}', type: 'like', date: '2026-06-01 19:17:51' },
+  { posterUrl: null, contentTitle: '{콘텐츠명}', type: 'status-changed', oldStatus: 'watching', watchStatus: 'completed', date: '2026-06-01 19:17:51' },
+  { posterUrl: null, contentTitle: '{콘텐츠명}', type: 'like-removed', date: '2026-06-01 19:17:51' },
+  { posterUrl: null, contentTitle: '{콘텐츠명}', type: 'status-registered', watchStatus: 'completed', date: '2026-06-01 19:17:51' },
 ];
 
 export default function BoxHistoryComponentsPage() {
@@ -79,13 +79,13 @@ export default function BoxHistoryComponentsPage() {
 
         <div className="bg-wb-dark-02 rounded-lg py-4 space-y-4">
           <ContentRecordHistory
-            item={{ posterUrl: null, contentTitle: '{컨텐츠명}', type: 'status-registered', watchStatus: 'completed', date: '2026-06-01 19:17:51' }}
+            item={{ posterUrl: null, contentTitle: '{콘텐츠명}', type: 'status-registered', watchStatus: 'completed', date: '2026-06-01 19:17:51' }}
           />
           <ContentRecordHistory
-            item={{ posterUrl: null, contentTitle: '{컨텐츠명}', type: 'status-changed', oldStatus: 'watching', watchStatus: 'completed', date: '2026-06-01 19:17:51' }}
+            item={{ posterUrl: null, contentTitle: '{콘텐츠명}', type: 'status-changed', oldStatus: 'watching', watchStatus: 'completed', date: '2026-06-01 19:17:51' }}
           />
           <ContentRecordHistory
-            item={{ posterUrl: null, contentTitle: '{컨텐츠명}', type: 'like', date: '2026-06-01 19:17:51' }}
+            item={{ posterUrl: null, contentTitle: '{콘텐츠명}', type: 'like', date: '2026-06-01 19:17:51' }}
           />
         </div>
 
@@ -116,10 +116,10 @@ export default function BoxHistoryComponentsPage() {
         <h2 className="text-xl font-bold text-black mb-4">모바일 사이즈 미리보기</h2>
 
         <div className="flex flex-wrap justify-center gap-6">
-          {/* 박스 컨텐츠 히스토리 */}
+          {/* 박스 콘텐츠 히스토리 */}
           <div className="relative w-full max-w-[430px] bg-wb-dark-02 rounded-[20px] overflow-hidden shadow-[rgba(100,100,111,0.2)_0px_7px_29px_0px]">
             <div className="h-[56px] flex items-center justify-center border-b border-wb-dark-04">
-              <span className="text-white text-[16px] font-semibold">박스 컨텐츠 히스토리</span>
+              <span className="text-white text-[16px] font-semibold">박스 콘텐츠 히스토리</span>
             </div>
             <div className="overflow-y-auto max-h-[600px]">
               <BoxHistoryList items={SAMPLE_LIST} />

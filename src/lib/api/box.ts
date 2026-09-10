@@ -49,7 +49,7 @@ export async function deleteBox(boxId: number): Promise<void> {
   await privateApi.delete(`/boxes/${boxId}`);
 }
 
-// ─── 박스 컨텐츠 페이지 조회 파라미터 ─────────────────────────
+// ─── 박스 콘텐츠 페이지 조회 파라미터 ─────────────────────────
 export type ContentMediaTypeFilter = 'MOVIE_TV' | 'MOVIE' | 'TV' | 'PERSON';
 export type BoxContentSortOrder = 'RECENT_SAVED' | 'OLDEST_SAVED' | 'RECENT_YEAR' | 'OLDEST_YEAR';
 export type BoxWatchStatusFilter = 'ALL' | 'COMPLETED' | 'WATCHING' | 'PLANNED' | 'PAUSED' | 'NONE';
@@ -61,7 +61,7 @@ export interface BoxContentRecordQueryParams {
 }
 
 /**
- * 박스 컨텐츠 리스트 조회 - 커서 기반 무한스크롤
+ * 박스 콘텐츠 리스트 조회 - 커서 기반 무한스크롤
  * 첫 페이지 요청은 cursor 생략 또는 null. 이후 응답의 nextCursor 그대로 전달.
  */
 export async function fetchBoxContents(
@@ -79,7 +79,7 @@ export async function fetchBoxContents(
   return data.data;
 }
 
-/** 박스 컨텐츠 총 개수 (필터 적용) */
+/** 박스 콘텐츠 총 개수 (필터 적용) */
 export async function fetchBoxContentCount(
   boxId: number,
   params: BoxContentRecordQueryParams = {},

@@ -5,7 +5,7 @@ import Poster, { type PosterVariant } from '@/components/content/Poster';
 interface SheetContentItemProps {
   /** 포스터 이미지 URL */
   posterSrc?: string | null;
-  /** 컨텐츠 제목 */
+  /** 콘텐츠 제목 */
   title: string;
   /** 연도 */
   year?: number | null;
@@ -17,7 +17,7 @@ interface SheetContentItemProps {
 }
 
 /**
- * 박스 시트 상단의 "어떤 컨텐츠를 박스에 추가하는지" 표시하는 행
+ * 박스 시트 상단의 "어떤 콘텐츠를 박스에 추가하는지" 표시하는 행
  * 피그마 Sheet Content Item 대응
  * - Poster(xsmall 50x71) + 제목 + (연도·장르)
  * - 하단 1.5px stroke (wb-dark-03)

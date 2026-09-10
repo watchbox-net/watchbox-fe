@@ -64,7 +64,7 @@ export default async function DiscoverCategoryPage({ params }: PageProps) {
               isAuthenticated={isAuthenticated}
             />
           ) : (
-            <p className="text-center text-neutral-500 py-8">컨텐츠가 없습니다.</p>
+            <p className="text-center text-neutral-500 py-8">콘텐츠가 없습니다.</p>
           )}
         </MainContent>
       </>

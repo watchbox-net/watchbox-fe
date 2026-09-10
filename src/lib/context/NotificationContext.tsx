@@ -50,7 +50,7 @@ function markShown(id: number): void {
 // 초대 알림 보러가기 → 초대 화면
 const INVITATIONS_PATH = '/box/invitations';
 // 자동 소멸 시간
-const CONTENT_TOAST_MS = 8000;    // 컨텐츠 추가 알림
+const CONTENT_TOAST_MS = 8000;    // 콘텐츠 추가 알림
 const INVITATION_TOAST_MS = 20000; // 초대 받음 / 수락·거절 알림
 
 // ── 스낵바 큐 항목 ────────────────────────────────────────────
@@ -78,7 +78,7 @@ function objectParticle(word: string): '을' | '를' {
   return (code - 0xac00) % 28 > 0 ? '을' : '를';
 }
 
-/** 박스 컨텐츠 페이지 경로 (박스 목록의 이동 규칙과 동일) */
+/** 박스 콘텐츠 페이지 경로 (박스 목록의 이동 규칙과 동일) */
 function boxContentsPath(boxId: number, boxType: string, boxName: string): string {
   return `/box/${boxId}/contents?type=${boxType}&name=${encodeURIComponent(boxName)}`;
 }

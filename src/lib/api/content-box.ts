@@ -9,7 +9,7 @@ import type {
 type ContentMediaType = 'MOVIE' | 'TV' | 'PERSON';
 
 /**
- * 컨텐츠가 사용자의 박스들에 포함되어 있는지 조회
+ * 콘텐츠가 사용자의 박스들에 포함되어 있는지 조회
  * GET /api/contents/{mediaType}/{tmdbId}/boxes
  */
 export async function fetchContentBoxSheet(
@@ -23,7 +23,7 @@ export async function fetchContentBoxSheet(
 }
 
 /**
- * 컨텐츠를 사용자 박스들에 일괄 추가/삭제
+ * 콘텐츠를 사용자 박스들에 일괄 추가/삭제
  * POST /api/contents/{mediaType}/{tmdbId}/boxes
  */
 export async function updateContentBoxes(

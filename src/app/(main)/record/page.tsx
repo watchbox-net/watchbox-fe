@@ -132,8 +132,17 @@ export default function RecordPage() {
   });
 
   // ── 시청 기록 총 개수 (필터 적용 — 필터 변경 시 재호출) ──
+  // 정렬은 키에 넣지 않는다. 순서만 바뀌고 개수는 그대로라, 넣으면 정렬을 바꿀 때마다
+  // 같은 값을 다시 받아온다. 아래 setQueryData 도 이 키를 써야 하므로 상수로 뽑았다.
+  const countQueryKey = [
+    'recordedContentCount',
+    watchMediaTypeFilter,
+    watchRecordFilter,
+    isPreview ? 'preview' : 'auth',
+  ] as const;
+
   const { data: totalCount = 0 } = useQuery({
-    queryKey: ['recordedContentCount', watchMediaTypeFilter, sort, watchRecordFilter, isPreview ? 'preview' : 'auth'],
+    queryKey: countQueryKey,
     queryFn: () =>
       isPreview
         ? fetchPreviewRecordedContentCount(queryParams)
@@ -225,7 +234,7 @@ export default function RecordPage() {
       removeItemFromCache(item.memberRecord.recordId);
       // 총 개수도 감소 (별도 캐시이므로 직접 갱신)
       queryClient.setQueryData<number>(
-        ['recordedContentCount', isPreview ? 'preview' : 'auth'],
+        countQueryKey,
         (prev) => (typeof prev === 'number' ? Math.max(0, prev - 1) : prev),
       );
     }

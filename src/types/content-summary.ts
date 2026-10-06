@@ -56,6 +56,8 @@ export interface ContentItem<T extends ContentSummary = ContentSummary> {
   memberRecord: MemberRecord | null;
   publisherSummaryList: PublisherSummary[] | null;
   boxContentId: number | null;
+  /** 박스 포함 여부 (로그인 사용자가 담은 것 기준). 홈·상세·시트에서 사용 */
+  hasAddedInbox?: boolean;
 }
 
 // ============================================================

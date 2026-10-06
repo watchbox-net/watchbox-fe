@@ -11,6 +11,7 @@ import ContentItem from '@/components/list/ContentItem';
 import ContentList from '@/components/list/ContentList';
 import WatchStatusMenu from '@/components/common/WatchStatusMenu';
 import PlainContextMenu from '@/components/common/PlainContextMenu';
+import ContentRecordSheetContainer from '@/components/sheet/ContentRecordSheetContainer';
 import MediaTypeButton from '@/components/common/MediaTypeButton';
 import MediaTypeSwitchButton from '@/components/common/MediaTypeSwitchButton';
 import Toast from '@/components/common/Toast';
@@ -103,6 +104,8 @@ export default function BoxContentsPage() {
   // 헤더 + 버튼의 콘텐츠 추가 메뉴
   const [addMenuOpen, setAddMenuOpen] = useState(false);
   const addMenuRef = useRef<HTMLDivElement>(null);
+  // 시청 기록에서 박스에 추가하기 시트
+  const [recordSheetOpen, setRecordSheetOpen] = useState(false);
   const [filterMenuOpen, setFilterMenuOpen] = useState(false);
 
   const menuRef = useRef<HTMLDivElement>(null);
@@ -322,9 +325,9 @@ export default function BoxContentsPage() {
                     items={[
                       {
                         label: '내 기록에서 추가',
-                        onClick: () => { // TODO: 시청 기록 시트로 이동
+                        onClick: () => {
                           setAddMenuOpen(false);
-                          setPreparingModalVisible(true);
+                          setRecordSheetOpen(true);
                         },
                       },
                       {
@@ -460,6 +463,19 @@ export default function BoxContentsPage() {
         message={toast.message}
         visible={toast.visible}
         onClose={() => setToast((t) => ({ ...t, visible: false }))}
+      />
+
+      {/* 시청 기록에서 박스에 추가하기 */}
+      <ContentRecordSheetContainer
+        visible={recordSheetOpen}
+        onClose={() => setRecordSheetOpen(false)}
+        boxId={Number(boxId)}
+        onCompleted={({ added, removed }) => {
+          const parts: string[] = [];
+          if (added) parts.push(`${added}개 추가`);
+          if (removed) parts.push(`${removed}개 삭제`);
+          showToast(parts.join(' · '));
+        }}
       />
 
       {/* 콘텐츠 추가 — 아직 준비중 안내 */}

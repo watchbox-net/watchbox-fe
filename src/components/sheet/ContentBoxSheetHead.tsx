@@ -5,6 +5,8 @@ interface ContentBoxSheetHeadProps {
   onCancel?: () => void;
   /** 완료 버튼 클릭 (시트 닫기) */
   onDone?: () => void;
+  /** 가운데 타이틀. 시트 종류마다 다르다 */
+  title?: string;
   className?: string;
 }
 
@@ -17,6 +19,7 @@ interface ContentBoxSheetHeadProps {
 export default function ContentBoxSheetHead({
   onCancel,
   onDone,
+  title = '박스에 추가하기',
   className,
 }: ContentBoxSheetHeadProps) {
   return (
@@ -31,7 +34,7 @@ export default function ContentBoxSheetHead({
         취소
       </button>
       <p className="absolute left-1/2 top-[16px] -translate-x-1/2 text-[16px] font-semibold text-white leading-none whitespace-nowrap">
-        박스에 추가하기
+        {title}
       </p>
       <button
         type="button"

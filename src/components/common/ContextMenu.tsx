@@ -76,12 +76,18 @@ export default function ContextMenu({ items, size = 'small', className }: Contex
         const label = item.label ?? preset.defaultLabel;
         const isHovered = hoveredIndex === index;
 
-        const hoverRounded =
-          index === 0
-            ? 'rounded-t-[10px]'
-            : index === items.length - 1
-              ? 'rounded-b-[10px]'
-              : '';
+        // 라운딩은 hover 상태가 아니라 '위치'에 달린 값이다.
+        // hover 와 함께 붙였다 뗐다 하면, transition-colors 로 배경이 사라지는 동안
+        // 라운딩만 먼저 없어져 모서리가 잠깐 직각으로 보인다.
+        // 배경이 투명할 때 라운딩은 보이지 않으므로 항상 적용해도 된다.
+        const positionRounded =
+          items.length === 1
+            ? 'rounded-[10px]'
+            : index === 0
+              ? 'rounded-t-[10px]'
+              : index === items.length - 1
+                ? 'rounded-b-[10px]'
+                : '';
 
         return (
           <button
@@ -89,7 +95,7 @@ export default function ContextMenu({ items, size = 'small', className }: Contex
             className={`
               relative flex items-center h-[45px] w-full px-[16px] gap-[24px]
               cursor-pointer transition-colors
-              ${isHovered ? `bg-wb-grey-01 ${hoverRounded}` : ''}
+              ${positionRounded} ${isHovered ? 'bg-wb-grey-01' : ''}
             `}
             onMouseEnter={() => setHoveredIndex(index)}
             onMouseLeave={() => setHoveredIndex(null)}
@@ -117,12 +123,18 @@ export function PlainContextMenu({ items, activeIndex, width = 120, className }:
       {items.map((item, index) => {
         const isActive = hoveredIndex === index || activeIndex === index;
 
-        const hoverRounded =
-          index === 0
-            ? 'rounded-t-[10px]'
-            : index === items.length - 1
-              ? 'rounded-b-[10px]'
-              : '';
+        // 라운딩은 hover 상태가 아니라 '위치'에 달린 값이다.
+        // hover 와 함께 붙였다 뗐다 하면, transition-colors 로 배경이 사라지는 동안
+        // 라운딩만 먼저 없어져 모서리가 잠깐 직각으로 보인다.
+        // 배경이 투명할 때 라운딩은 보이지 않으므로 항상 적용해도 된다.
+        const positionRounded =
+          items.length === 1
+            ? 'rounded-[10px]'
+            : index === 0
+              ? 'rounded-t-[10px]'
+              : index === items.length - 1
+                ? 'rounded-b-[10px]'
+                : '';
 
         return (
           <button
@@ -130,7 +142,7 @@ export function PlainContextMenu({ items, activeIndex, width = 120, className }:
             className={`
               relative flex items-center h-[45px] w-full px-[16px]
               cursor-pointer transition-colors
-              ${isActive ? `bg-wb-grey-01 ${hoverRounded}` : ''}
+              ${positionRounded} ${isActive ? 'bg-wb-grey-01' : ''}
             `}
             onMouseEnter={() => setHoveredIndex(index)}
             onMouseLeave={() => setHoveredIndex(null)}

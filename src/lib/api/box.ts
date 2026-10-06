@@ -9,6 +9,7 @@ import type {
 } from '@/types/box';
 import type { ContentCursorPageResponse, ContentSummary, CountResponse } from '@/types/content-summary';
 import type { ApiResponse } from '@/types/api';
+import type { WatchMediaTypeFilter, WatchRecordFilter } from './watch-record';
 
 /** 박스 리스트 조회 (마이 + 공유 통합) */
 export async function fetchBoxList(): Promise<BoxPageResponse> {
@@ -152,6 +153,65 @@ export async function fetchBoxHistory(
   const { data } = await privateApi.get<ApiResponse<BoxHistoryPageResponse>>(
     `/boxes/${boxId}/history`,
     { params },
+  );
+  return data.data;
+}
+
+// ─── 시청 기록 시트 (박스에 일괄 추가/삭제) ──────────────────
+
+export interface BoxRecordSheetParams {
+  /** 전체 / 영화 / 시리즈 탭 */
+  watchMediaTypeFilter?: WatchMediaTypeFilter;
+  /** 시청 상태 필터 */
+  watchRecordFilter?: WatchRecordFilter;
+}
+
+/**
+ * 내 시청 기록 + 이 박스 포함 여부 (커서 무한스크롤)
+ *
+ * 정렬 파라미터가 없다 — 서버에서 최근 기록순으로 고정돼 있다.
+ * 탭·필터가 바뀌면 커서를 버리고 처음부터 다시 호출해야 한다.
+ */
+export async function fetchBoxRecordSheet(
+  boxId: number,
+  params: BoxRecordSheetParams = {},
+  cursor: string | null = null,
+): Promise<ContentCursorPageResponse> {
+  const queryParams: Record<string, unknown> = { ...params };
+  if (cursor) queryParams.cursor = cursor;
+
+  const { data } = await privateApi.get<ApiResponse<ContentCursorPageResponse>>(
+    `/boxes/${boxId}/records`,
+    { params: queryParams },
+  );
+  return data.data;
+}
+
+export interface BoxRecordDiffRequest {
+  addContentIds: number[];
+  removeContentIds: number[];
+}
+
+export interface BoxRecordUpdateResponse {
+  boxId: number;
+  memberId: number;
+  addedContentIds: number[];
+  removedContentIds: number[];
+}
+
+/**
+ * 체크 변경분을 박스에 일괄 반영
+ *
+ * 이미 담긴 것을 또 추가하거나 내가 담지 않은 것을 삭제 요청하면 서버가 조용히 건너뛴다.
+ * 그래서 <b>요청 목록과 응답 목록이 다를 수 있다</b> — 응답 기준으로 상태를 맞춰야 한다.
+ */
+export async function updateBoxRecords(
+  boxId: number,
+  req: BoxRecordDiffRequest,
+): Promise<BoxRecordUpdateResponse> {
+  const { data } = await privateApi.post<ApiResponse<BoxRecordUpdateResponse>>(
+    `/boxes/${boxId}/records`,
+    req,
   );
   return data.data;
 }

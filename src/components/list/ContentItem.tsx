@@ -38,6 +38,8 @@ interface ContentItemProps {
   statusMenuSlot?: ReactNode;
   /** 시청 상태 아이콘을 숨길지 여부 */
   hideStatusIcon?: boolean;
+  /** 시청 상태 아이콘 오른쪽에 덧붙는 영역 (시트의 체크 표시 등) */
+  trailingSlot?: ReactNode;
   className?: string;
 }
 
@@ -64,6 +66,7 @@ export default function ContentItem({
   onStatusClick,
   statusMenuSlot,
   hideStatusIcon,
+  trailingSlot,
   className,
 }: ContentItemProps) {
   const isPerson = summary.mediaType === 'PERSON';
@@ -108,18 +111,21 @@ export default function ContentItem({
         </div>
       </div>
 
-      {/* 오른쪽: 시청 상태 아이콘 (PERSON은 노출 X) */}
-      {!isPerson && !hideStatusIcon && (
-        <div className="relative shrink-0 ml-[10px]">
-          <div
-            className={onStatusClick ? 'cursor-pointer' : ''}
-            onClick={onStatusClick}
-          >
-            <WatchStatusIcon status={toIconStatus(watchStatus)} size="medium" />
+      {/* 오른쪽: 시청 상태 아이콘 (PERSON은 노출 X) + 덧붙는 영역 */}
+      <div className="flex items-center gap-[20px] shrink-0 ml-[10px]">
+        {!isPerson && !hideStatusIcon && (
+          <div className="relative">
+            <div
+              className={onStatusClick ? 'cursor-pointer' : ''}
+              onClick={onStatusClick}
+            >
+              <WatchStatusIcon status={toIconStatus(watchStatus)} size="medium" />
+            </div>
+            {statusMenuSlot}
           </div>
-          {statusMenuSlot}
-        </div>
-      )}
+        )}
+        {trailingSlot}
+      </div>
     </div>
   );
 }

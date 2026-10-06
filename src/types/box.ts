@@ -20,6 +20,8 @@ export interface BoxItem {
   lastContentAddedAt: string | null;
   previewPosterList: string[];
   memberList: BoxMemberResponse[] | null;
+  /** 이 박스에서 로그인 사용자의 권한. 마이 박스는 항상 OWNER, 수락 전 초대 박스는 null */
+  myRole: BoxMemberRole | null;
 }
 
 /** 공개 타입 */

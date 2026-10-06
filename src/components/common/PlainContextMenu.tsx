@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 // ─── Types ──────────────────────────────────────────────────
-export type PlainContextMenuSize = 'w120' | 'w135';
+export type PlainContextMenuSize = 'w120' | 'w135' | 'w140';
 
 export interface PlainContextMenuItem {
   label: string;
@@ -20,6 +20,7 @@ interface PlainContextMenuProps {
 const SIZE_CLASS: Record<PlainContextMenuSize, string> = {
   w120: 'w-[120px]',
   w135: 'w-[135px]',
+  w140: 'w-[140px]',
 };
 
 // ─── Component ──────────────────────────────────────────────
@@ -36,12 +37,18 @@ export default function PlainContextMenu({
     >
       {items.map((item, index) => {
         const isHovered = hoveredIndex === index;
-        const hoverRounded =
-          index === 0
-            ? 'rounded-t-[10px]'
-            : index === items.length - 1
-              ? 'rounded-b-[10px]'
-              : '';
+        // 라운딩은 hover 상태가 아니라 '위치'에 달린 값이다.
+        // hover 와 함께 붙였다 뗐다 하면, transition-colors 로 배경이 사라지는 동안
+        // 라운딩만 먼저 없어져 모서리가 잠깐 직각으로 보인다.
+        // 배경이 투명할 때 라운딩은 보이지 않으므로 항상 적용해도 된다.
+        const positionRounded =
+          items.length === 1
+            ? 'rounded-[10px]'
+            : index === 0
+              ? 'rounded-t-[10px]'
+              : index === items.length - 1
+                ? 'rounded-b-[10px]'
+                : '';
 
         return (
           <button
@@ -50,7 +57,7 @@ export default function PlainContextMenu({
             className={`
               relative flex items-center h-[45px] w-full px-[16px]
               cursor-pointer transition-colors text-left
-              ${isHovered ? `bg-wb-grey-01 ${hoverRounded}` : ''}
+              ${positionRounded} ${isHovered ? 'bg-wb-grey-01' : ''}
             `}
             onMouseEnter={() => setHoveredIndex(index)}
             onMouseLeave={() => setHoveredIndex(null)}

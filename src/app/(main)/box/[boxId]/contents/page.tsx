@@ -100,6 +100,9 @@ export default function BoxContentsPage() {
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [menuDir, setMenuDir] = useState<'down' | 'up'>('down');
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
+  // 헤더 + 버튼의 콘텐츠 추가 메뉴
+  const [addMenuOpen, setAddMenuOpen] = useState(false);
+  const addMenuRef = useRef<HTMLDivElement>(null);
   const [filterMenuOpen, setFilterMenuOpen] = useState(false);
 
   const menuRef = useRef<HTMLDivElement>(null);
@@ -176,6 +179,7 @@ export default function BoxContentsPage() {
       if (menuRef.current && !menuRef.current.contains(target)) setOpenMenuId(null);
       if (sortMenuRef.current && !sortMenuRef.current.contains(target)) setSortMenuOpen(false);
       if (filterMenuRef.current && !filterMenuRef.current.contains(target)) setFilterMenuOpen(false);
+      if (addMenuRef.current && !addMenuRef.current.contains(target)) setAddMenuOpen(false);
     };
     document.addEventListener('mousedown', handleMouseDown);
     return () => document.removeEventListener('mousedown', handleMouseDown);
@@ -300,15 +304,41 @@ export default function BoxContentsPage() {
             >
               <HistoryIcon className="size-6 text-wb-white-02" />
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                if (isPreview) { showLoginModal(); return; }
-                setPreparingModalVisible(true); // 콘텐츠 추가 — 아직 미구현
-              }}
-            >
-              <PlusOutline className="size-6 text-wb-white-02" />
-            </button>
+            {/* flex: div 가 블록이면 안쪽 button 이 inline 기준선에 놓여 아이콘이 아래로 밀린다 */}
+            <div ref={addMenuRef} className="relative flex items-center">
+              <button
+                type="button"
+                onClick={() => {
+                  if (isPreview) { showLoginModal(); return; }
+                  setAddMenuOpen((v) => !v);
+                }}
+              >
+                <PlusOutline className="size-6 text-wb-white-02" />
+              </button>
+              {addMenuOpen && (
+                <div className="absolute right-0 top-full mt-[6px] z-40">
+                  <PlainContextMenu
+                    size="w140"
+                    items={[
+                      {
+                        label: '내 기록에서 추가',
+                        onClick: () => { // TODO: 시청 기록 시트로 이동
+                          setAddMenuOpen(false);
+                          setPreparingModalVisible(true);
+                        },
+                      },
+                      {
+                        label: '다른 박스에서 추가',
+                        onClick: () => { // TODO: 박스 선택 시트로 이동
+                          setAddMenuOpen(false);
+                          setPreparingModalVisible(true);
+                        },
+                      },
+                    ]}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         }
       />

@@ -11,6 +11,7 @@
 // ─── Outline (24x24 stroke) ─────────────────────────────────
 export {
   ArchiveBoxIcon as ArchiveBoxOutline,
+  ArchiveBoxXMarkIcon as ArchiveBoxXMarkOutline,
   AdjustmentsHorizontalIcon as AdjustmentsHorizontalOutline,
   ArrowDownIcon as ArrowDownOutline,
   ArrowDownCircleIcon as ArrowDownCircleOutline,

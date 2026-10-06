@@ -2,6 +2,7 @@
 
 import { useState, type ComponentType, type SVGProps } from 'react';
 import {
+  ArchiveBoxXMarkOutline,
   UserPlusOutline,
   PencilOutline,
   TrashOutline,
@@ -13,7 +14,7 @@ import {
 } from '@/components/icons';
 
 // ─── Types ──────────────────────────────────────────────────
-export type ContextMenuItemType = 'invite' | 'edit' | 'delete' | 'add' | 'help' | 'info' | 'notification' | 'feedback';
+export type ContextMenuItemType = 'invite' | 'edit' | 'delete' | 'leave' | 'add' | 'help' | 'info' | 'notification' | 'feedback';
 export type ContextMenuSize = 'small' | 'medium';
 
 export interface ContextMenuItemConfig {
@@ -48,6 +49,7 @@ const PRESETS: Record<ContextMenuItemType, {
   invite: { icon: UserPlusOutline, defaultLabel: '초대' },
   edit:   { icon: PencilOutline,   defaultLabel: '수정' },
   delete: { icon: TrashOutline,    defaultLabel: '삭제' },
+  leave:  { icon: ArchiveBoxXMarkOutline, defaultLabel: '나가기' },
   add:    { icon: PlusOutline,     defaultLabel: '추가' },
   help:         { icon: QuestionMarkCircleOutline, defaultLabel: '도움말' },
   info:         { icon: ExclamationCircleOutline, defaultLabel: '정보' },

@@ -49,6 +49,16 @@ export async function deleteBox(boxId: number): Promise<void> {
   await privateApi.delete(`/boxes/${boxId}`);
 }
 
+/**
+ * 공유 박스 나가기 (소유자가 아닌 멤버)
+ *
+ * 내가 담았던 콘텐츠도 함께 삭제된다.
+ * 소유자 · 마이 박스는 409 로 거절된다.
+ */
+export async function leaveBox(boxId: number): Promise<void> {
+  await privateApi.delete(`/boxes/${boxId}/members/me`);
+}
+
 // ─── 박스 콘텐츠 페이지 조회 파라미터 ─────────────────────────
 export type ContentMediaTypeFilter = 'MOVIE_TV' | 'MOVIE' | 'TV' | 'PERSON';
 export type BoxContentSortOrder = 'RECENT_SAVED' | 'OLDEST_SAVED' | 'RECENT_YEAR' | 'OLDEST_YEAR';

@@ -14,12 +14,12 @@ import BoxList from '@/components/box/BoxList';
 import PreviewOverlay from '@/components/preview/PreviewOverlay';
 import PreviewNoticeModal from '@/components/preview/PreviewNoticeModal';
 import { PlusOutline } from '@/components/icons';
-import { fetchBoxList, deleteBox } from '@/lib/api/box';
+import { fetchBoxList, deleteBox, leaveBox } from '@/lib/api/box';
 import { hasReceivedInvitation } from '@/lib/api/member';
 import { fetchPreviewBoxList } from '@/lib/api/preview';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useLoginModal } from '@/lib/context/LoginModalContext';
-import type { BoxType } from '@/types/box';
+import type { BoxType, BoxMemberRole } from '@/types/box';
 
 type MenuTarget = { boxId: number; boxType: BoxType };
 
@@ -36,6 +36,9 @@ export default function BoxPage() {
 
   // 삭제 모달 상태
   const [deleteTarget, setDeleteTarget] = useState<{ boxId: number; name: string } | null>(null);
+  // 나가기 모달 상태 (소유자가 아닌 공유 박스 멤버)
+  const [leaveTarget, setLeaveTarget] = useState<{ boxId: number; name: string } | null>(null);
+  const [errorTitle, setErrorTitle] = useState('오류');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // ── 인증된 사용자: 일반 API ──
@@ -96,6 +99,22 @@ export default function BoxPage() {
       setDeleteTarget(null);
       const axiosError = err as AxiosError<{ error?: { message?: string } }>;
       const msg = axiosError.response?.data?.error?.message ?? '박스 삭제 중 오류가 발생했습니다.';
+      setErrorTitle('삭제 실패');
+      setErrorMessage(msg);
+    }
+  };
+
+  const handleLeaveConfirm = async () => {
+    if (!leaveTarget) return;
+    try {
+      await leaveBox(leaveTarget.boxId);
+      setLeaveTarget(null);
+      queryClient.invalidateQueries({ queryKey: ['boxList'] });
+    } catch (err) {
+      setLeaveTarget(null);
+      const axiosError = err as AxiosError<{ error?: { message?: string } }>;
+      const msg = axiosError.response?.data?.error?.message ?? '박스를 나가는 중 오류가 발생했습니다.';
+      setErrorTitle('나가기 실패');
       setErrorMessage(msg);
     }
   };
@@ -108,7 +127,13 @@ export default function BoxPage() {
     }
   };
 
-  const buildMenuItems = (boxId: number, boxType: BoxType) => [
+  /**
+   * 세 번째 항목이 권한에 따라 갈린다.
+   * - OWNER: 삭제 (박스 자체가 사라진다)
+   * - EDITOR · VIEWER: 나가기 (내 멤버십만 빠진다)
+   * myRole 이 없으면(구버전 응답 등) 삭제로 두지 않고 나가기로 둬서 사고를 막는다.
+   */
+  const buildMenuItems = (boxId: number, boxType: BoxType, myRole: BoxMemberRole | null) => [
     ...(boxType === 'SHARED'
       ? [{
           type: 'invite' as const,
@@ -125,14 +150,23 @@ export default function BoxPage() {
         router.push(`/box/edit/${boxId}?type=${boxType}`);
       },
     },
-    {
-      type: 'delete' as const,
-      onClick: () => {
-        const box = boxes.find((b) => b.boxId === boxId);
-        setOpenMenu(null);
-        setDeleteTarget({ boxId, name: box?.name ?? '박스' });
-      },
-    },
+    myRole === 'OWNER'
+      ? {
+          type: 'delete' as const,
+          onClick: () => {
+            const box = boxes.find((b) => b.boxId === boxId);
+            setOpenMenu(null);
+            setDeleteTarget({ boxId, name: box?.name ?? '박스' });
+          },
+        }
+      : {
+          type: 'leave' as const,
+          onClick: () => {
+            const box = boxes.find((b) => b.boxId === boxId);
+            setOpenMenu(null);
+            setLeaveTarget({ boxId, name: box?.name ?? '박스' });
+          },
+        },
   ];
 
   return (
@@ -182,7 +216,7 @@ export default function BoxPage() {
                     }}
                     menuSlot={isMenuOpen ? (
                       <div ref={menuRef} className="absolute right-[5px] top-full z-50 mt-1">
-                        <ContextMenu items={buildMenuItems(box.boxId, box.boxType)} />
+                        <ContextMenu items={buildMenuItems(box.boxId, box.boxType, box.myRole)} />
                       </div>
                     ) : null}
                   />
@@ -215,11 +249,22 @@ export default function BoxPage() {
         onConfirm={handleDeleteConfirm}
       />
 
+      {/* 나가기 확인 모달 */}
+      <Modal
+        visible={!!leaveTarget}
+        variant="delete"
+        title={`'${leaveTarget?.name}' 박스에서 나가시겠습니까?`}
+        body={'내가 추가한 콘텐츠도 함께 삭제됩니다.'}
+        confirmLabel="나가기"
+        onCancel={() => setLeaveTarget(null)}
+        onConfirm={handleLeaveConfirm}
+      />
+
       {/* 에러 모달 (백엔드 에러 메시지 표시) */}
       <Modal
         visible={!!errorMessage}
         variant="error"
-        title="삭제 실패"
+        title={errorTitle}
         body={errorMessage ?? ''}
         onCancel={() => setErrorMessage(null)}
         onConfirm={() => setErrorMessage(null)}

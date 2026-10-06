@@ -71,6 +71,14 @@ function buildContent(entry: BoxHistoryEntry): ReactNode {
         </Fragment>
       );
     }
+    case 'MEMBER_LEFT': {
+      const target = entry.targetMember?.nickname ?? actor;
+      return (
+        <Fragment>
+          <Bold>{target}</Bold>님이 박스에서 <Bold>나감</Bold>
+        </Fragment>
+      );
+    }
     default:
       // 미구현 이벤트 — 안전하게 빈 내용
       return null;
